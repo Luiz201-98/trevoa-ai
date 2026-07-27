@@ -202,11 +202,18 @@
 
     .field.full { width: 100%; }
 
+    .form-izzy {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .form-izzy .field input,
     .field.full input {
       font: inherit;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
       color: var(--ink);
       background: #eef4f8;
       border: 1.5px solid var(--line);
@@ -216,11 +223,24 @@
       margin-top: 0.25rem;
     }
 
+    .form-izzy .field input:focus,
     .field.full input:focus {
       outline: 2px solid var(--accent);
       outline-offset: 1px;
       border-color: var(--accent);
       background: #fff;
+    }
+
+    .avancado {
+      border-top: 1px dashed var(--line);
+      padding-top: 0.65rem;
+    }
+
+    .avancado summary {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
     }
 
     .manual-row input {
@@ -533,37 +553,64 @@
     </div>
 
     <div class="scan-box">
-      <h2>Bipar etiqueta → peso sai sozinho</h2>
+      <h2>Lançar etiqueta</h2>
       <p class="hint" style="margin-top:0;margin-bottom:0.65rem">
-        O kg já vem no código. Ex: <code>2 111700 079000</code> = <strong>1117</strong> · <strong>7,900 kg</strong> (Entrada no IzzyWay).
-        Não precisa digitar peso.
+        Igual o IzzyWay: digita o código (<strong>1117</strong>) e o peso da etiqueta (<strong>7,900</strong>).
+        Se bipar a etiqueta <em>completa</em> com o leitor, o kg preenche sozinho.
       </p>
 
-      <div class="scan-actions" style="margin-top:0;margin-bottom:0.55rem">
-        <button type="button" class="primary" id="btnCam">Abrir câmera</button>
-        <button type="button" id="btnStopCam" disabled>Parar</button>
+      <div class="form-izzy">
+        <label class="field">
+          Produto
+          <input
+            type="text"
+            id="produtoCod"
+            inputmode="numeric"
+            placeholder="Ex: 1117"
+            autocomplete="off"
+            autofocus
+          />
+        </label>
+        <label class="field">
+          Entrada (kg)
+          <input
+            type="text"
+            id="pesoManual"
+            inputmode="decimal"
+            placeholder="Ex: 7,900"
+            autocomplete="off"
+          />
+        </label>
       </div>
-      <div id="reader">
-        <video id="video" playsinline muted></video>
-        <div id="html5Reader"></div>
-      </div>
-      <p class="hint" id="camHint" style="display:none;margin-top:0.35rem">Aponte só pra barra preta, bem perto, com luz boa.</p>
+      <div id="nomeProduto" class="preview-scan" aria-live="polite"></div>
 
-      <label class="field full" style="margin-top:0.55rem">
-        Leitor / código (foco aqui pra bipar)
-        <input
-          type="text"
-          id="codigoManual"
-          inputmode="numeric"
-          placeholder="Bipa aqui ou cole o código"
-          autocomplete="off"
-          autofocus
-        />
-      </label>
-      <div id="previewScan" class="preview-scan" aria-live="polite"></div>
-      <button type="button" class="btn-add" id="btnAdd" style="width:100%;margin-top:0.45rem;padding:0.85rem">
-        Adicionar etiqueta
+      <button type="button" class="btn-add" id="btnAdd" style="width:100%;margin-top:0.55rem;padding:0.85rem">
+        Adicionar
       </button>
+
+      <details class="avancado" style="margin-top:0.85rem">
+        <summary>Bipar etiqueta completa (câmera / leitor)</summary>
+        <div class="scan-actions" style="margin-top:0.55rem">
+          <button type="button" class="primary" id="btnCam">Abrir câmera</button>
+          <button type="button" id="btnStopCam" disabled>Parar</button>
+        </div>
+        <div id="reader">
+          <video id="video" playsinline muted></video>
+          <div id="html5Reader"></div>
+        </div>
+        <p class="hint" id="camHint" style="display:none;margin-top:0.35rem">Aponte pra barra preta.</p>
+        <label class="field full" style="margin-top:0.55rem">
+          Ou cole/bipa o código longo aqui
+          <input
+            type="text"
+            id="codigoManual"
+            inputmode="numeric"
+            placeholder="Ex: 2111700079000"
+            autocomplete="off"
+          />
+        </label>
+        <div id="previewScan" class="preview-scan" aria-live="polite"></div>
+      </details>
     </div>
 
     <div class="totais">
@@ -796,9 +843,122 @@
         }
         return null;
       }
-      el.textContent = `${parsed.produto} · ${formatKg(parsed.peso)} kg`;
+      el.textContent = `${parsed.codigo} · ${parsed.produto} · ${formatKg(parsed.peso)} kg`;
       el.className = "preview-scan";
       return parsed;
+    }
+
+    function resolverProdutoCurto(raw) {
+      const digits = String(raw).replace(/\D/g, "");
+      if (!digits) return null;
+
+      // Código longo da balança → usa parse completo
+      if (digits.length >= 12 && digits.startsWith("2")) {
+        const parsed = parseBarcode(digits);
+        return parsed.ok ? parsed : null;
+      }
+
+      let codigo = digits.replace(/^0+/, "") || digits;
+      codigo = codigoIzzy(codigo);
+
+      // tenta match parcial (11 → ainda não; 1117 → ok)
+      if (!PRODUTOS[codigo] && !PLU_PARA_IZZY[codigo]) {
+        // se digitou 11170 etc
+        const trimmed = codigo.replace(/0+$/, "");
+        if (PRODUTOS[trimmed] || PLU_PARA_IZZY[trimmed]) {
+          codigo = codigoIzzy(trimmed);
+        } else {
+          return { ok: false, codigo, produto: null };
+        }
+      }
+
+      return {
+        ok: true,
+        codigo,
+        produto: nomeProduto(codigo),
+        peso: null,
+        barcode: `manual-${codigo}`,
+      };
+    }
+
+    function atualizarNomeProduto() {
+      const el = $("#nomeProduto");
+      const raw = $("#produtoCod").value.trim();
+      if (!raw) {
+        el.textContent = "";
+        el.className = "preview-scan";
+        return null;
+      }
+
+      const digits = raw.replace(/\D/g, "");
+      // Se colar código longo no campo produto, preenche peso também
+      if (digits.length >= 12 && digits.startsWith("2")) {
+        const parsed = parseBarcode(digits);
+        if (parsed.ok) {
+          $("#produtoCod").value = parsed.codigo;
+          $("#pesoManual").value = formatKgEntrada(parsed.peso);
+          el.textContent = parsed.produto;
+          el.className = "preview-scan";
+          return parsed;
+        }
+      }
+
+      const r = resolverProdutoCurto(raw);
+      if (r && r.ok && r.produto) {
+        el.textContent = r.produto;
+        el.className = "preview-scan";
+        return r;
+      }
+      if (digits.length >= 2) {
+        el.textContent = "Código não cadastrado";
+        el.className = "preview-scan err";
+      } else {
+        el.textContent = "";
+        el.className = "preview-scan";
+      }
+      return null;
+    }
+
+    function parsePesoDigitado(raw) {
+      const t = String(raw).trim().replace(/\s/g, "").replace(",", ".");
+      const n = parseFloat(t);
+      if (Number.isNaN(n) || n <= 0) return null;
+      return Math.round(n * 1000) / 1000;
+    }
+
+    function processarFormularioSimples() {
+      const rawCod = $("#produtoCod").value.trim();
+      const rawPeso = $("#pesoManual").value.trim();
+
+      // Campo produto com código longo completo
+      const digits = rawCod.replace(/\D/g, "");
+      if (digits.length >= 12 && digits.startsWith("2")) {
+        return processarCodigo(digits);
+      }
+
+      const prod = resolverProdutoCurto(rawCod);
+      if (!prod || !prod.ok || !prod.produto) {
+        toast("Digite o código do produto (ex: 1117)", true);
+        $("#produtoCod").focus();
+        return false;
+      }
+
+      const peso = parsePesoDigitado(rawPeso);
+      if (!peso) {
+        toast("Digite o peso da etiqueta (ex: 7,900)", true);
+        $("#pesoManual").focus();
+        return false;
+      }
+
+      adicionarLeitura({
+        barcode: `manual-${prod.codigo}-${peso}-${Date.now()}`,
+        codigo: prod.codigo,
+        produto: prod.produto,
+        peso,
+      });
+      $("#pesoManual").value = "";
+      $("#pesoManual").focus();
+      return true;
     }
 
     function resolverCodigo(plu6) {
@@ -1106,8 +1266,8 @@
         $("#btnCam").disabled = false;
         $("#btnStopCam").disabled = true;
         $("#camHint").style.display = "none";
-        toast("Câmera falhou — use o leitor no campo abaixo", true);
-        $("#codigoManual").focus();
+        toast("Câmera falhou — use código + peso", true);
+        $("#produtoCod").focus();
       }
     }
 
@@ -1142,7 +1302,7 @@
     $("#quem").value = salvo?.quem || "";
     itens = Array.isArray(salvo?.itens) ? salvo.itens : [];
     render();
-    $("#codigoManual").focus();
+    $("#produtoCod").focus();
 
     $("#tipoTabs").addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-tipo]");
@@ -1153,23 +1313,42 @@
     });
 
     $("#btnAdd").addEventListener("click", () => {
-      const raw = $("#codigoManual").value.trim();
-      if (!raw) {
-        toast("Bipa ou cole o código de barras", true);
-        return;
+      processarFormularioSimples();
+    });
+
+    $("#produtoCod").addEventListener("input", () => {
+      atualizarNomeProduto();
+    });
+
+    $("#produtoCod").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const digits = $("#produtoCod").value.replace(/\D/g, "");
+        if (digits.length >= 12 && digits.startsWith("2")) {
+          if (processarFormularioSimples()) {
+            $("#produtoCod").value = "";
+            $("#pesoManual").value = "";
+            atualizarNomeProduto();
+            $("#produtoCod").focus();
+          }
+          return;
+        }
+        $("#pesoManual").focus();
+        $("#pesoManual").select();
       }
-      if (processarCodigo(raw)) {
-        $("#codigoManual").value = "";
-        atualizarPreviewCodigo();
+    });
+
+    $("#pesoManual").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        processarFormularioSimples();
       }
-      $("#codigoManual").focus();
     });
 
     $("#codigoManual").addEventListener("input", () => {
       const parsed = atualizarPreviewCodigo();
       clearTimeout(autoAddTimer);
       const digits = $("#codigoManual").value.replace(/\D/g, "");
-      // Leitor USB/Bluetooth costuma despejar 13 dígitos rápido
       if (parsed && digits.length >= 12) {
         autoAddTimer = setTimeout(() => {
           if (processarCodigo($("#codigoManual").value)) {
@@ -1184,14 +1363,17 @@
       if (e.key === "Enter") {
         e.preventDefault();
         clearTimeout(autoAddTimer);
-        $("#btnAdd").click();
+        const raw = $("#codigoManual").value.trim();
+        if (raw && processarCodigo(raw)) {
+          $("#codigoManual").value = "";
+          atualizarPreviewCodigo();
+        }
       }
     });
 
-    // Mantém foco no campo pra leitor de mão
     document.addEventListener("click", (e) => {
-      if (e.target.closest("input, select, button, a")) return;
-      $("#codigoManual").focus();
+      if (e.target.closest("input, select, button, a, summary, details")) return;
+      $("#produtoCod").focus();
     });
 
     $("#lista").addEventListener("click", (e) => {
