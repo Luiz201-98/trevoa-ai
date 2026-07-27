@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b3d2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Contagem · Trevo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e8f2ec;
+      --bg-deep: #d4e8dc;
+      --ink: #0f2a22;
+      --ink-soft: #3d5c52;
+      --leaf: #1a6b4a;
+      --leaf-deep: #0b3d2e;
+      --cream: #f7fbf8;
+      --line: #b8d4c6;
+      --ok: #1a6b4a;
+      --warn: #9a5b1a;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 120% 80% at 10% -20%, #c5e4d4 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 100% 0%, #dceee4 0%, transparent 45%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      padding: calc(1.25rem + var(--safe-top)) 1rem calc(6.5rem + var(--safe-bottom));
+    }
+
+    .wrap {
+      max-width: 28rem;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+      animation: rise 0.45s ease-out both;
+    }
+
+    .brand {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--leaf-deep);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin-top: 0.35rem;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+
+    .meta label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      flex: 1;
+      min-width: 8rem;
+    }
+
+    .meta input[type="date"],
+    .meta input[type="text"] {
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      width: 100%;
+      -webkit-appearance: none;
+    }
+
+    .meta input:focus {
+      outline: 2px solid var(--leaf);
+      outline-offset: 1px;
+      border-color: var(--leaf);
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 5.5rem;
+      gap: 0.75rem;
+      align-items: center;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 0.9rem;
+      animation: rise 0.45s ease-out both;
+    }
+
+    .row:nth-child(1) { animation-delay: 0.04s; }
+    .row:nth-child(2) { animation-delay: 0.07s; }
+    .row:nth-child(3) { animation-delay: 0.1s; }
+    .row:nth-child(4) { animation-delay: 0.13s; }
+    .row:nth-child(5) { animation-delay: 0.16s; }
+    .row:nth-child(6) { animation-delay: 0.19s; }
+    .row:nth-child(7) { animation-delay: 0.22s; }
+    .row:nth-child(8) { animation-delay: 0.25s; }
+
+    .row label {
+      font-size: 0.98rem;
+      font-weight: 600;
+      line-height: 1.25;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .row .kg {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .row .kg strong {
+      color: var(--leaf);
+      font-weight: 700;
+    }
+
+    .row input[type="number"] {
+      width: 100%;
+      font: inherit;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--leaf-deep);
+      background: #eef7f2;
+      border: 1.5px solid var(--line);
+      border-radius: 0.6rem;
+      padding: 0.55rem 0.35rem;
+      -moz-appearance: textfield;
+    }
+
+    .row input[type="number"]::-webkit-outer-spin-button,
+    .row input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .row input[type="number"]:focus {
+      outline: 2px solid var(--leaf);
+      outline-offset: 1px;
+      border-color: var(--leaf);
+      background: #fff;
+    }
+
+    .section-label {
+      margin: 1.25rem 0 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--leaf);
+      animation: rise 0.45s ease-out both;
+    }
+
+    .preview {
+      margin-top: 1.5rem;
+      padding: 1rem 1.05rem;
+      background: rgba(11, 61, 46, 0.06);
+      border-radius: 0.85rem;
+      border: 1px dashed var(--line);
+      animation: rise 0.45s 0.28s ease-out both;
+    }
+
+    .preview h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--leaf);
+      margin-bottom: 0.65rem;
+    }
+
+    .preview pre {
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      color: var(--ink);
+      word-break: break-word;
+    }
+
+    .actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.75rem 1rem calc(0.85rem + var(--safe-bottom));
+      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.92) 28%, var(--bg-deep) 100%);
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .actions-inner {
+      width: 100%;
+      max-width: 28rem;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 0.55rem;
+    }
+
+    button {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 0.85rem;
+      padding: 0.95rem 0.75rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-clear {
+      background: var(--cream);
+      color: var(--ink-soft);
+      border: 1.5px solid var(--line);
+    }
+
+    .btn-copy {
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      box-shadow: 0 4px 16px rgba(11, 61, 46, 0.28);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(5.2rem + var(--safe-bottom));
+      transform: translateX(-50%) translateY(0.5rem);
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.7rem 1.15rem;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 20;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.warn { background: var(--warn); }
+
+    .hint {
+      margin-top: 0.85rem;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="brand">Trevo</p>
+      <p class="subtitle">Contagem de insumos · toda segunda até 19h</p>
+      <div class="meta">
+        <label>
+          Data
+          <input type="date" id="data" />
+        </label>
+        <label>
+          Quem contou
+          <input type="text" id="quem" placeholder="Seu nome" autocomplete="name" />
+        </label>
+      </div>
+    </header>
+
+    <p class="section-label">Compostos (máquina soft)</p>
+    <div class="list" id="compostos"></div>
+
+    <p class="section-label">Bags e baldes <span style="font-weight:500;text-transform:none;letter-spacing:0;opacity:.85">(bags = 2 kg cada)</span></p>
+    <div class="list" id="bags"></div>
+
+    <div class="preview">
+      <h2>Prévia do texto</h2>
+      <pre id="preview"></pre>
+      <p class="hint">Salva sozinho neste celular. Toque em “Copiar” e cole no grupo do WhatsApp.</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <button type="button" class="btn-clear" id="btnClear">Limpar</button>
+      <button type="button" class="btn-copy" id="btnCopy">Copiar pro WhatsApp</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const KG_POR_BAG = 2;
+
+    const ITENS = [
+      { id: "ninho", label: "Composto Ninho", group: "compostos" },
+      { id: "daninho", label: "Composto Daninho", group: "compostos" },
+      { id: "trevella", label: "Composto Trevella", group: "compostos" },
+      { id: "bags0", label: "Bags Açaí 0", group: "bags", kgPorUnidade: KG_POR_BAG },
+      { id: "bagsSoft", label: "Bags Açaí Soft", group: "bags", kgPorUnidade: KG_POR_BAG },
+      { id: "bagsPremium", label: "Bags Açaí Premium", group: "bags", kgPorUnidade: KG_POR_BAG },
+      { id: "tapioca", label: "Baldes de Tapioca", group: "bags" },
+      { id: "cupuacu", label: "Baldes de Cupuaçu", group: "bags" },
+    ];
+
+    const STORAGE_KEY = "trevo-contagem-v1";
+    const $ = (sel) => document.querySelector(sel);
+
+    function kgDeBags(qtd, kgPorUnidade) {
+      if (qtd === "" || qtd == null) return null;
+      const n = parseInt(qtd, 10);
+      if (Number.isNaN(n)) return null;
+      return n * kgPorUnidade;
+    }
+
+    function hojeISO() {
+      const d = new Date();
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function formatarDataBR(iso) {
+      if (!iso) return "";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function montarLista() {
+      const compostos = $("#compostos");
+      const bags = $("#bags");
+      compostos.innerHTML = "";
+      bags.innerHTML = "";
+
+      ITENS.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        const kgHtml = item.kgPorUnidade
+          ? `<span class="kg" data-kg-for="${item.id}">— kg</span>`
+          : "";
+        row.innerHTML = `
+          <label for="${item.id}">
+            ${item.label}
+            ${kgHtml}
+          </label>
+          <input
+            type="number"
+            id="${item.id}"
+            inputmode="numeric"
+            min="0"
+            step="1"
+            placeholder="0"
+          />
+        `;
+        (item.group === "compostos" ? compostos : bags).appendChild(row);
+      });
+    }
+
+    function atualizarKgs() {
+      const { valores } = lerEstado();
+      ITENS.forEach((item) => {
+        if (!item.kgPorUnidade) return;
+        const el = document.querySelector(`[data-kg-for="${item.id}"]`);
+        if (!el) return;
+        const kg = kgDeBags(valores[item.id], item.kgPorUnidade);
+        el.innerHTML = kg == null
+          ? "— kg"
+          : `= <strong>${kg} kg</strong>`;
+      });
+    }
+
+    function lerEstado() {
+      const valores = {};
+      ITENS.forEach((item) => {
+        const el = document.getElementById(item.id);
+        const v = el.value.trim();
+        valores[item.id] = v === "" ? "" : String(Math.max(0, parseInt(v, 10) || 0));
+      });
+      return {
+        data: $("#data").value || hojeISO(),
+        quem: $("#quem").value.trim(),
+        valores,
+      };
+    }
+
+    function aplicarEstado(estado) {
+      if (!estado) return;
+      if (estado.data) $("#data").value = estado.data;
+      if (estado.quem != null) $("#quem").value = estado.quem;
+      ITENS.forEach((item) => {
+        const el = document.getElementById(item.id);
+        const v = estado.valores?.[item.id];
+        el.value = v === undefined || v === null ? "" : v;
+      });
+    }
+
+    function salvar() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lerEstado()));
+    }
+
+    function textoWhatsApp() {
+      const { data, quem, valores } = lerEstado();
+      const linhas = [
+        `*Contagem de insumos — ${formatarDataBR(data)}*`,
+      ];
+      if (quem) linhas.push(`Quem contou: ${quem}`);
+      linhas.push("");
+      ITENS.forEach((item) => {
+        const raw = valores[item.id];
+        if (raw === "") {
+          linhas.push(`- ${item.label}: —`);
+          return;
+        }
+        if (item.kgPorUnidade) {
+          const kg = kgDeBags(raw, item.kgPorUnidade);
+          linhas.push(`- ${item.label}: ${raw} (${kg} kg)`);
+        } else {
+          linhas.push(`- ${item.label}: ${raw}`);
+        }
+      });
+      return linhas.join("\n");
+    }
+
+    function atualizarPreview() {
+      atualizarKgs();
+      $("#preview").textContent = textoWhatsApp();
+    }
+
+    function toast(msg, warn) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.toggle("warn", !!warn);
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    async function copiar() {
+      const texto = textoWhatsApp();
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = texto;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast("Copiado! Cole no WhatsApp");
+      } catch {
+        toast("Não deu pra copiar — selecione a prévia", true);
+      }
+    }
+
+    function limpar() {
+      if (!confirm("Zerar todos os números desta contagem?")) return;
+      ITENS.forEach((item) => {
+        document.getElementById(item.id).value = "";
+      });
+      $("#data").value = hojeISO();
+      salvar();
+      atualizarPreview();
+      toast("Limpo");
+    }
+
+    montarLista();
+
+    const salvo = (() => {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      } catch {
+        return null;
+      }
+    })();
+
+    aplicarEstado(salvo || { data: hojeISO(), quem: "", valores: {} });
+    if (!$("#data").value) $("#data").value = hojeISO();
+    atualizarPreview();
+
+    document.body.addEventListener("input", () => {
+      salvar();
+      atualizarPreview();
+    });
+
+    $("#btnCopy").addEventListener("click", copiar);
+    $("#btnClear").addEventListener("click", limpar);
+  </script>
+</body>
+</html>
