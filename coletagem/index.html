@@ -163,15 +163,64 @@
       border-radius: 0.65rem;
       overflow: hidden;
       display: none;
-      margin-bottom: 0.65rem;
+      margin-bottom: 0.35rem;
+      background: #0b1520;
+      position: relative;
     }
 
-    #reader.active { display: block; }
+    #reader.active {
+      display: block;
+      min-height: 260px;
+    }
 
-    .manual-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.45rem;
+    #reader video {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      display: block;
+      border-radius: 0.65rem;
+    }
+
+    .preview-scan {
+      min-height: 1.4rem;
+      margin-top: 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ok);
+    }
+
+    .preview-scan.err { color: var(--warn); }
+    .preview-scan:empty { display: none; }
+
+    .scan-box code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.85em;
+      background: #e8eef3;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.3rem;
+    }
+
+    .field.full { width: 100%; }
+
+    .field.full input {
+      font: inherit;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      background: #eef4f8;
+      border: 1.5px solid var(--line);
+      border-radius: 0.65rem;
+      padding: 0.85rem 0.75rem;
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+
+    .field.full input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      border-color: var(--accent);
+      background: #fff;
     }
 
     .manual-row input {
@@ -484,23 +533,37 @@
     </div>
 
     <div class="scan-box">
-      <h2>Ler etiqueta</h2>
-      <div id="reader"></div>
-      <div class="manual-row">
+      <h2>Bipar etiqueta → peso sai sozinho</h2>
+      <p class="hint" style="margin-top:0;margin-bottom:0.65rem">
+        O kg já vem no código de barras. Ex: <code>2 111700 079000</code> = Açaí Premium <strong>7,900 kg</strong>.
+        Não precisa digitar peso.
+      </p>
+
+      <div class="scan-actions" style="margin-top:0;margin-bottom:0.55rem">
+        <button type="button" class="primary" id="btnCam">Abrir câmera</button>
+        <button type="button" id="btnStopCam" disabled>Parar</button>
+      </div>
+      <div id="reader">
+        <video id="video" playsinline muted></video>
+        <div id="html5Reader"></div>
+      </div>
+      <p class="hint" id="camHint" style="display:none;margin-top:0.35rem">Aponte só pra barra preta, bem perto, com luz boa.</p>
+
+      <label class="field full" style="margin-top:0.55rem">
+        Leitor / código (foco aqui pra bipar)
         <input
           type="text"
           id="codigoManual"
           inputmode="numeric"
-          placeholder="Código de barras ou digite"
+          placeholder="Bipa aqui ou cole o código"
           autocomplete="off"
+          autofocus
         />
-        <button type="button" class="btn-add" id="btnAdd">Add</button>
-      </div>
-      <div class="scan-actions">
-        <button type="button" class="primary" id="btnCam">Abrir câmera</button>
-        <button type="button" id="btnStopCam" disabled>Parar câmera</button>
-      </div>
-      <p class="hint">Escolhe Entrada / Adicional / Volta e bipa. Cada etiqueta entra separada na lista.</p>
+      </label>
+      <div id="previewScan" class="preview-scan" aria-live="polite"></div>
+      <button type="button" class="btn-add" id="btnAdd" style="width:100%;margin-top:0.45rem;padding:0.85rem">
+        Adicionar etiqueta
+      </button>
     </div>
 
     <div class="totais">
@@ -518,7 +581,7 @@
     <div class="lista" id="lista"></div>
 
     <div class="preview">
-      <h2>Prévia pra copiar</h2>
+      <h2>Prévia IzzyWay</h2>
       <pre id="preview"></pre>
     </div>
   </div>
@@ -526,7 +589,7 @@
   <div class="actions">
     <div class="actions-inner">
       <button type="button" class="btn-clear" id="btnClear">Limpar dia</button>
-      <button type="button" class="btn-copy" id="btnCopy">Copiar lista</button>
+      <button type="button" class="btn-copy" id="btnCopy">Copiar p/ IzzyWay</button>
     </div>
   </div>
 
@@ -539,14 +602,13 @@
     const PRODUTOS = {
       "1117": "Açaí Premium",
       "982": "Açaí Zero",
+      soft: "Açaí Soft",
       "101": "Cupuaçu",
       "903": "Tapioca",
     };
 
-    /** Se a balança tiver PLU próprio pro Soft, ajuste aqui */
-    const PRODUTOS_EXTRA = {
-      // "XXXX": "Açaí Soft",
-    };
+    /** Se a balança tiver PLU próprio pro Soft, coloque o código aqui */
+    const PRODUTOS_EXTRA = {};
 
     const TIPO_LABEL = {
       entrada: "Entrada",
@@ -557,8 +619,11 @@
     const $ = (s) => document.querySelector(s);
     let tipoAtual = "entrada";
     let itens = [];
+    let mediaStream = null;
+    let detectLoop = 0;
     let html5QrCode = null;
     let lastScanAt = 0;
+    let autoAddTimer = null;
 
     function hojeISO() {
       const d = new Date();
@@ -579,6 +644,65 @@
       });
     }
 
+    /** Só o número com vírgula, pra colar/digitar no campo Entrada do IzzyWay */
+    function formatKgEntrada(n) {
+      return Number(n).toLocaleString("pt-BR", {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
+    }
+
+    function textoLista() {
+      const { data, quem, itens: lista } = lerEstado();
+      if (!lista.length) {
+        return "Nenhuma etiqueta ainda.";
+      }
+
+      const linhas = [
+        `Coletagem Frios — ${formatarDataBR(data)} · TREVO RUSSAS`,
+      ];
+      if (quem) linhas.push(`Quem: ${quem}`);
+      linhas.push(`Etiquetas: ${lista.length}`);
+      linhas.push("");
+      linhas.push("=== PARA O IZZYWAY (Movimentação → Coletagem) ===");
+      linhas.push("Produto Final = código abaixo");
+      linhas.push("Campo Entrada = digitar cada peso (um por vez)");
+      linhas.push("");
+
+      const ordemProdutos = ["1117", "982", "soft", "101", "903"];
+      const codigos = [
+        ...ordemProdutos.filter((c) => lista.some((i) => String(i.codigo) === c)),
+        ...[...new Set(lista.map((i) => String(i.codigo)))].filter(
+          (c) => !ordemProdutos.includes(c)
+        ),
+      ];
+
+      codigos.forEach((codigo) => {
+        const doProduto = lista.filter((i) => String(i.codigo) === codigo);
+        if (!doProduto.length) return;
+        const nome = doProduto[0].produto;
+        const total = doProduto.reduce((s, i) => s + i.peso, 0);
+
+        linhas.push("----------------------------------------");
+        linhas.push(`Produto Final: ${codigo}`);
+        linhas.push(`${nome}`);
+        linhas.push(`Qtd etiquetas: ${doProduto.length} · Total: ${formatKg(total)} kg`);
+        linhas.push("");
+
+        ["entrada", "adicional", "volta"].forEach((tipo) => {
+          const grupo = doProduto.filter((i) => i.tipo === tipo);
+          if (!grupo.length) return;
+          linhas.push(`${TIPO_LABEL[tipo]} — digitar no campo Entrada:`);
+          grupo.forEach((i) => {
+            linhas.push(formatKgEntrada(i.peso));
+          });
+          linhas.push("");
+        });
+      });
+
+      return linhas.join("\n").trim();
+    }
+
     function nomeProduto(codigo) {
       const c = String(codigo);
       return PRODUTOS[c] || PRODUTOS_EXTRA[c] || `Produto ${c}`;
@@ -592,31 +716,61 @@
     function parseBarcode(raw) {
       const digits = String(raw).replace(/\D/g, "");
       if (digits.length < 12) {
-        return { ok: false, erro: "Código incompleto" };
+        return { ok: false, erro: "Código incompleto (precisa dos números embaixo da barra)" };
       }
 
-      const code13 = digits.length >= 13 ? digits.slice(0, 13) : digits.padStart(13, "0");
+      // Aceita 12 ou 13 dígitos (com/sem dígito verificador)
+      let code13 = digits;
+      if (digits.length === 12) code13 = digits; // sem DV
+      else code13 = digits.slice(0, 13);
+
       if (!code13.startsWith("2")) {
         return { ok: false, erro: "Não parece etiqueta de peso (não começa com 2)" };
       }
 
+      // 2 + PLU(6) + peso*1000(5) [+ DV]
       const pluRaw = code13.slice(1, 7);
       const pesoRaw = code13.slice(7, 12);
       const peso = parseInt(pesoRaw, 10) / 1000;
       const codigo = resolverCodigo(pluRaw);
 
-      if (!codigo || Number.isNaN(peso)) {
+      if (!codigo || Number.isNaN(peso) || peso <= 0) {
         return { ok: false, erro: "Não consegui ler produto/peso" };
       }
 
       return {
         ok: true,
-        barcode: code13,
+        barcode: code13.length >= 13 ? code13.slice(0, 13) : code13,
         codigo,
         produto: nomeProduto(codigo),
         peso,
         pluRaw,
       };
+    }
+
+    function atualizarPreviewCodigo() {
+      const el = $("#previewScan");
+      const raw = $("#codigoManual").value.trim();
+      if (!raw) {
+        el.textContent = "";
+        el.className = "preview-scan";
+        return null;
+      }
+      const parsed = parseBarcode(raw);
+      if (!parsed.ok) {
+        const digits = raw.replace(/\D/g, "");
+        if (digits.length >= 8) {
+          el.textContent = parsed.erro;
+          el.className = "preview-scan err";
+        } else {
+          el.textContent = "";
+          el.className = "preview-scan";
+        }
+        return null;
+      }
+      el.textContent = `${parsed.produto} · ${formatKg(parsed.peso)} kg`;
+      el.className = "preview-scan";
+      return parsed;
     }
 
     function resolverCodigo(plu6) {
@@ -694,46 +848,6 @@
       itens = itens.filter((i) => i.id !== id);
       salvar();
       render();
-    }
-
-    function textoLista() {
-      const { data, quem, itens: lista } = lerEstado();
-      const linhas = [
-        `*Coletagem Frios — ${formatarDataBR(data)}*`,
-      ];
-      if (quem) linhas.push(`Quem: ${quem}`);
-      linhas.push(`Etiquetas: ${lista.length}`);
-      linhas.push("");
-
-      ["entrada", "adicional", "volta"].forEach((tipo) => {
-        const grupo = lista.filter((i) => i.tipo === tipo);
-        if (!grupo.length) return;
-        const soma = grupo.reduce((s, i) => s + i.peso, 0);
-        linhas.push(`*${TIPO_LABEL[tipo]}* (${grupo.length} · ${formatKg(soma)} kg)`);
-        grupo.forEach((i, idx) => {
-          linhas.push(
-            `${idx + 1}. ${i.produto} (${i.codigo}) — ${formatKg(i.peso)} kg · ${i.hora}`
-          );
-        });
-        linhas.push("");
-      });
-
-      const porProduto = {};
-      lista.forEach((i) => {
-        const k = `${i.codigo}|${i.produto}`;
-        if (!porProduto[k]) porProduto[k] = 0;
-        porProduto[k] += i.peso;
-      });
-      const keys = Object.keys(porProduto);
-      if (keys.length) {
-        linhas.push("*Totais por produto*");
-        keys.forEach((k) => {
-          const [, nome] = k.split("|");
-          linhas.push(`- ${nome}: ${formatKg(porProduto[k])} kg`);
-        });
-      }
-
-      return linhas.join("\n").trim();
     }
 
     function render() {
@@ -816,7 +930,7 @@
           document.execCommand("copy");
           document.body.removeChild(ta);
         }
-        toast("Lista copiada");
+        toast("Copiado — use no IzzyWay");
       } catch {
         toast("Não deu pra copiar — selecione a prévia", true);
       }
@@ -835,48 +949,158 @@
       toast("Dia limpo");
     }
 
-    async function abrirCamera() {
-      if (!window.Html5Qrcode) {
-        toast("Scanner não carregou — use digitação", true);
-        return;
+    function formatsScanner() {
+      if (!window.Html5QrcodeSupportedFormats) return undefined;
+      const F = Html5QrcodeSupportedFormats;
+      return [F.EAN_13, F.EAN_8, F.CODE_128, F.UPC_A, F.UPC_E, F.CODE_39];
+    }
+
+    function onCodigoLido(decoded) {
+      const now = Date.now();
+      if (now - lastScanAt < 1400) return;
+      if (!processarCodigo(decoded)) return;
+      lastScanAt = now;
+      $("#codigoManual").value = "";
+      atualizarPreviewCodigo();
+      try {
+        if (navigator.vibrate) navigator.vibrate(50);
+      } catch (_) {}
+    }
+
+    async function abrirCameraNativa() {
+      if (!("BarcodeDetector" in window)) return false;
+
+      let detector;
+      try {
+        detector = new BarcodeDetector({
+          formats: ["ean_13", "ean_8", "code_128", "upc_a", "upc_e", "code_39"],
+        });
+      } catch {
+        return false;
       }
-      if (html5QrCode) return;
+
+      const video = $("#video");
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
+      });
+      video.srcObject = mediaStream;
+      await video.play();
+      $("#reader").classList.add("active");
+      $("#camHint").style.display = "block";
+
+      const tick = async () => {
+        if (!mediaStream) return;
+        try {
+          if (video.readyState >= 2) {
+            const codes = await detector.detect(video);
+            if (codes && codes.length) {
+              const raw = codes[0].rawValue || "";
+              if (raw) onCodigoLido(raw);
+            }
+          }
+        } catch (_) {}
+        detectLoop = requestAnimationFrame(tick);
+      };
+      detectLoop = requestAnimationFrame(tick);
+      return true;
+    }
+
+    async function abrirCameraHtml5() {
+      if (!window.Html5Qrcode) return false;
 
       const reader = $("#reader");
       reader.classList.add("active");
-      html5QrCode = new Html5Qrcode("reader");
+      $("#camHint").style.display = "block";
+      $("#video").style.display = "none";
+
+      html5QrCode = new Html5Qrcode("html5Reader", {
+        verbose: false,
+        formatsToSupport: formatsScanner(),
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      });
+
+      const scanConfig = {
+        fps: 20,
+        qrbox: (viewW, viewH) => ({
+          width: Math.floor(viewW * 0.98),
+          height: Math.floor(Math.min(140, viewH * 0.4)),
+        }),
+        aspectRatio: 1.777,
+      };
 
       try {
         await html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 8, qrbox: { width: 260, height: 140 }, aspectRatio: 1.4 },
-          (decoded) => {
-            const now = Date.now();
-            if (now - lastScanAt < 1600) return;
-            lastScanAt = now;
-            if (processarCodigo(decoded)) {
-              $("#codigoManual").value = "";
-            }
-          },
+          scanConfig,
+          (decoded) => onCodigoLido(decoded),
           () => {}
         );
-        $("#btnCam").disabled = true;
-        $("#btnStopCam").disabled = false;
-      } catch (err) {
-        reader.classList.remove("active");
+        return true;
+      } catch {
+        try {
+          await html5QrCode.clear();
+        } catch (_) {}
         html5QrCode = null;
-        toast("Sem acesso à câmera — digite o código", true);
+        reader.classList.remove("active");
+        $("#video").style.display = "";
+        return false;
+      }
+    }
+
+    async function abrirCamera() {
+      if (mediaStream || html5QrCode) return;
+      $("#btnCam").disabled = true;
+
+      try {
+        const okNativo = await abrirCameraNativa();
+        if (okNativo) {
+          $("#btnStopCam").disabled = false;
+          toast("Câmera ok — kg sai do código ao bipar");
+          return;
+        }
+        const okHtml5 = await abrirCameraHtml5();
+        if (okHtml5) {
+          $("#btnStopCam").disabled = false;
+          toast("Câmera ok — kg sai do código ao bipar");
+          return;
+        }
+        throw new Error("sem camera");
+      } catch (err) {
+        console.warn(err);
+        $("#btnCam").disabled = false;
+        $("#btnStopCam").disabled = true;
+        $("#camHint").style.display = "none";
+        toast("Câmera falhou — use o leitor no campo abaixo", true);
+        $("#codigoManual").focus();
       }
     }
 
     async function pararCamera() {
-      if (!html5QrCode) return;
-      try {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      } catch (_) {}
-      html5QrCode = null;
+      if (detectLoop) {
+        cancelAnimationFrame(detectLoop);
+        detectLoop = 0;
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((t) => t.stop());
+        mediaStream = null;
+        const video = $("#video");
+        video.srcObject = null;
+        video.style.display = "";
+      }
+      if (html5QrCode) {
+        try {
+          await html5QrCode.stop();
+          await html5QrCode.clear();
+        } catch (_) {}
+        html5QrCode = null;
+      }
       $("#reader").classList.remove("active");
+      $("#camHint").style.display = "none";
       $("#btnCam").disabled = false;
       $("#btnStopCam").disabled = true;
     }
@@ -887,6 +1111,7 @@
     $("#quem").value = salvo?.quem || "";
     itens = Array.isArray(salvo?.itens) ? salvo.itens : [];
     render();
+    $("#codigoManual").focus();
 
     $("#tipoTabs").addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-tipo]");
@@ -899,18 +1124,43 @@
     $("#btnAdd").addEventListener("click", () => {
       const raw = $("#codigoManual").value.trim();
       if (!raw) {
-        toast("Digite ou cole o código", true);
+        toast("Bipa ou cole o código de barras", true);
         return;
       }
-      if (processarCodigo(raw)) $("#codigoManual").value = "";
+      if (processarCodigo(raw)) {
+        $("#codigoManual").value = "";
+        atualizarPreviewCodigo();
+      }
       $("#codigoManual").focus();
+    });
+
+    $("#codigoManual").addEventListener("input", () => {
+      const parsed = atualizarPreviewCodigo();
+      clearTimeout(autoAddTimer);
+      const digits = $("#codigoManual").value.replace(/\D/g, "");
+      // Leitor USB/Bluetooth costuma despejar 13 dígitos rápido
+      if (parsed && digits.length >= 12) {
+        autoAddTimer = setTimeout(() => {
+          if (processarCodigo($("#codigoManual").value)) {
+            $("#codigoManual").value = "";
+            atualizarPreviewCodigo();
+          }
+        }, 120);
+      }
     });
 
     $("#codigoManual").addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
+        clearTimeout(autoAddTimer);
         $("#btnAdd").click();
       }
+    });
+
+    // Mantém foco no campo pra leitor de mão
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("input, select, button, a")) return;
+      $("#codigoManual").focus();
     });
 
     $("#lista").addEventListener("click", (e) => {
