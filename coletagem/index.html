@@ -535,7 +535,7 @@
     <div class="scan-box">
       <h2>Bipar etiqueta → peso sai sozinho</h2>
       <p class="hint" style="margin-top:0;margin-bottom:0.65rem">
-        O kg já vem no código de barras. Ex: <code>2 111700 079000</code> = Açaí Premium <strong>7,900 kg</strong>.
+        O kg já vem no código. Ex: <code>2 111700 079000</code> = <strong>1117</strong> · <strong>7,900 kg</strong> (Entrada no IzzyWay).
         Não precisa digitar peso.
       </p>
 
@@ -598,16 +598,27 @@
   <script>
     const STORAGE_KEY = "trevo-coletagem-frios-v1";
 
-    /** Códigos PLU da folha / balança */
+    /** Códigos iguais ao IzzyWay (Produtos para coletagem) */
     const PRODUTOS = {
-      "1117": "Açaí Premium",
-      "982": "Açaí Zero",
+      "1117": "TREVO ACAI ESPECIAL CX 20KG",
+      "982": "ACAI 0% ACUCAR CX 20KG",
       soft: "Açaí Soft",
-      "101": "Cupuaçu",
-      "903": "Tapioca",
+      "101": "CREME CUPUACU CX 5KG",
+      "390": "CREME TAPIOCA CX 5KG",
+      "341": "GELATINA DOCILE BEIJO (KG)",
     };
 
-    /** Se a balança tiver PLU próprio pro Soft, coloque o código aqui */
+    /** PLU da balança → código do IzzyWay (ex.: folha antiga usava 903) */
+    const PLU_PARA_IZZY = {
+      "903": "390",
+      "390": "390",
+    };
+
+    const PRODUTO_FINAL_IZZY = {
+      codigo: "51",
+      nome: "TREVO ACAI ESPECIAL",
+    };
+
     const PRODUTOS_EXTRA = {};
 
     const TIPO_LABEL = {
@@ -664,12 +675,14 @@
       if (quem) linhas.push(`Quem: ${quem}`);
       linhas.push(`Etiquetas: ${lista.length}`);
       linhas.push("");
-      linhas.push("=== PARA O IZZYWAY (Movimentação → Coletagem) ===");
-      linhas.push("Produto Final = código abaixo");
-      linhas.push("Campo Entrada = digitar cada peso (um por vez)");
+      linhas.push("=== IZZYWAY → Movimentação → Coletagem ===");
+      linhas.push(
+        `Produto Final: ${PRODUTO_FINAL_IZZY.codigo} — ${PRODUTO_FINAL_IZZY.nome}`
+      );
+      linhas.push("Cada linha abaixo = 1 produto na lista + kg no campo Entrada");
       linhas.push("");
 
-      const ordemProdutos = ["1117", "982", "soft", "101", "903"];
+      const ordemProdutos = ["1117", "982", "soft", "101", "390", "341"];
       const codigos = [
         ...ordemProdutos.filter((c) => lista.some((i) => String(i.codigo) === c)),
         ...[...new Set(lista.map((i) => String(i.codigo)))].filter(
@@ -684,21 +697,29 @@
         const total = doProduto.reduce((s, i) => s + i.peso, 0);
 
         linhas.push("----------------------------------------");
-        linhas.push(`Produto Final: ${codigo}`);
-        linhas.push(`${nome}`);
-        linhas.push(`Qtd etiquetas: ${doProduto.length} · Total: ${formatKg(total)} kg`);
+        linhas.push(`Produto: ${codigo} — ${nome}`);
+        linhas.push(`Total: ${formatKg(total)} kg (${doProduto.length} etiquetas)`);
         linhas.push("");
 
         ["entrada", "adicional", "volta"].forEach((tipo) => {
           const grupo = doProduto.filter((i) => i.tipo === tipo);
           if (!grupo.length) return;
-          linhas.push(`${TIPO_LABEL[tipo]} — digitar no campo Entrada:`);
+          linhas.push(`${TIPO_LABEL[tipo]} — campo Entrada (um por linha):`);
           grupo.forEach((i) => {
-            linhas.push(formatKgEntrada(i.peso));
+            linhas.push(`${codigo}  |  Entrada: ${formatKgEntrada(i.peso)}`);
           });
           linhas.push("");
         });
       });
+
+      linhas.push("----------------------------------------");
+      linhas.push("Só os pesos (na ordem), se preferir:");
+      lista
+        .slice()
+        .reverse()
+        .forEach((i) => {
+          linhas.push(formatKgEntrada(i.peso));
+        });
 
       return linhas.join("\n").trim();
     }
@@ -706,6 +727,13 @@
     function nomeProduto(codigo) {
       const c = String(codigo);
       return PRODUTOS[c] || PRODUTOS_EXTRA[c] || `Produto ${c}`;
+    }
+
+    function codigoIzzy(pluResolvido) {
+      const c = String(pluResolvido);
+      if (PLU_PARA_IZZY[c]) return PLU_PARA_IZZY[c];
+      if (PRODUTOS[c]) return c;
+      return c;
     }
 
     /**
@@ -732,7 +760,7 @@
       const pluRaw = code13.slice(1, 7);
       const pesoRaw = code13.slice(7, 12);
       const peso = parseInt(pesoRaw, 10) / 1000;
-      const codigo = resolverCodigo(pluRaw);
+      const codigo = codigoIzzy(resolverCodigo(pluRaw));
 
       if (!codigo || Number.isNaN(peso) || peso <= 0) {
         return { ok: false, erro: "Não consegui ler produto/peso" };
@@ -775,14 +803,17 @@
 
     function resolverCodigo(plu6) {
       const n = String(parseInt(plu6, 10));
-      const mapa = { ...PRODUTOS, ...PRODUTOS_EXTRA };
-      if (mapa[n]) return n;
+      const mapa = { ...PRODUTOS, ...PRODUTOS_EXTRA, "903": "Tapioca (balança)" };
+      if (mapa[n] || PLU_PARA_IZZY[n]) return n;
       const trimmed = n.replace(/0+$/, "");
-      if (trimmed && mapa[trimmed]) return trimmed;
+      if (trimmed && (mapa[trimmed] || PLU_PARA_IZZY[trimmed])) return trimmed;
       for (const cod of Object.keys(mapa)) {
         if (n === cod.padStart(6, "0") || n.startsWith(cod) || cod.startsWith(n)) {
           return cod;
         }
+      }
+      for (const cod of Object.keys(PLU_PARA_IZZY)) {
+        if (n === cod.padStart(6, "0") || n.startsWith(cod)) return cod;
       }
       return trimmed || n;
     }
