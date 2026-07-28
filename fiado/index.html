@@ -2680,14 +2680,31 @@
     function abrirPainel(tipo) {
       state.tipoMov = tipo;
       const isDebito = tipo === "debito";
+      const c = clienteAtivo();
+      const saldoAtual = c ? Math.round(saldoCliente(c) * 100) / 100 : 0;
       const painel = $("#painelMov");
       painel.hidden = false;
       painel.className = "sheet " + (isDebito ? "debito" : "pagamento");
+      const blocoSaldo = isDebito
+        ? ""
+        : `<p class="hint-field" id="movSaldoAtual" style="margin:0 0 0.75rem;font-size:0.88rem;font-weight:600;color:var(--ink)">
+            Deve agora: <strong>${formatBRL(Math.max(0, saldoAtual))}</strong>
+          </p>
+          <p class="hint-field" id="movPreviaSaldo" style="margin:-0.35rem 0 0.85rem;font-size:0.85rem;color:var(--ink-soft)">
+            Digite quanto recebeu — a conta só zera se o valor for o total.
+          </p>`;
+      const btnTudo =
+        !isDebito && saldoAtual > 0.009
+          ? `<button type="button" class="btn full" id="btnReceberTudo" style="margin-top:0.45rem">
+              Receber tudo (${formatBRL(saldoAtual)})
+            </button>`
+          : "";
       painel.innerHTML = `
         <h2>${isDebito ? "Lançar fiado" : "Registrar pagamento"}</h2>
+        ${blocoSaldo}
         <label class="field">
           Valor (R$)
-          <input class="money" id="movValor" type="text" inputmode="decimal" placeholder="0,00" />
+          <input class="money" id="movValor" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" />
         </label>
         <label class="field">
           Data
@@ -2700,24 +2717,93 @@
         <button type="button" class="btn ${isDebito ? "accent" : "primary"} full" id="btnConfirmarMov">
           ${isDebito ? "Confirmar fiado" : "Confirmar recebimento"}
         </button>
+        ${btnTudo}
       `;
-      $("#btnConfirmarMov").addEventListener("click", confirmarMov);
-      setTimeout(() => $("#movValor").focus(), 50);
+      $("#btnConfirmarMov").addEventListener("click", () => confirmarMov(false));
+      const btnTudoEl = $("#btnReceberTudo");
+      if (btnTudoEl) {
+        btnTudoEl.addEventListener("click", () => {
+          $("#movValor").value = String(saldoAtual).replace(".", ",");
+          atualizarPreviaPagamento(saldoAtual);
+          confirmarMov(true);
+        });
+      }
+      const inputValor = $("#movValor");
+      if (!isDebito && inputValor) {
+        inputValor.addEventListener("input", () => atualizarPreviaPagamento(saldoAtual));
+      }
+      setTimeout(() => inputValor && inputValor.focus(), 50);
     }
 
-    function confirmarMov() {
-      if (!exigirAcesso()) return;
-      const c = clienteAtivo();
-      if (!c) return;
-      const valor = parseMoney($("#movValor").value);
+    function atualizarPreviaPagamento(saldoAtual) {
+      const el = $("#movPreviaSaldo");
+      if (!el) return;
+      const valor = parseMoney($("#movValor")?.value);
       if (!Number.isFinite(valor) || valor <= 0) {
-        toast("Valor inválido", true);
+        el.textContent = "Digite quanto recebeu — a conta só zera se o valor for o total.";
+        el.style.color = "var(--ink-soft)";
         return;
       }
       const valorOk = Math.round(valor * 100) / 100;
-      if (state.tipoMov === "debito") {
+      const depois = Math.round((saldoAtual - valorOk) * 100) / 100;
+      if (depois <= 0.009) {
+        el.textContent =
+          valorOk > saldoAtual + 0.009
+            ? `Atenção: ${formatBRL(valorOk)} é mais do que deve (${formatBRL(saldoAtual)}). A conta vai zerar.`
+            : `Com ${formatBRL(valorOk)} a conta ZERA.`;
+        el.style.color = "var(--ok)";
+      } else {
+        el.textContent = `Recebendo ${formatBRL(valorOk)} → ainda vai dever ${formatBRL(depois)}.`;
+        el.style.color = "var(--warn)";
+      }
+    }
+
+    function confirmarMov(receberTudo) {
+      if (!exigirAcesso()) return;
+      const c = clienteAtivo();
+      if (!c) return;
+      const tipo = state.tipoMov;
+      if (tipo !== "debito" && tipo !== "pagamento") {
+        toast("Escolha Fiado ou Receber de novo", true);
+        return;
+      }
+
+      const saldoAntes = Math.round(saldoCliente(c) * 100) / 100;
+      let valorOk;
+
+      if (tipo === "pagamento" && receberTudo) {
+        if (saldoAntes <= 0.009) {
+          toast("Esse cliente não deve nada", true);
+          return;
+        }
+        valorOk = saldoAntes;
+      } else {
+        const valor = parseMoney($("#movValor")?.value);
+        if (!Number.isFinite(valor) || valor <= 0) {
+          toast("Valor inválido", true);
+          return;
+        }
+        valorOk = Math.round(valor * 100) / 100;
+      }
+
+      // Travas: pagamento NUNCA usa o saldo “por acidente” — só o que foi digitado (ou Receber tudo).
+      if (tipo === "pagamento") {
+        const depois = Math.round((saldoAntes - valorOk) * 100) / 100;
+        let msg;
+        if (depois <= 0.009) {
+          msg =
+            valorOk > saldoAntes + 0.009
+              ? `Receber ${formatBRL(valorOk)}?\nEle só deve ${formatBRL(saldoAntes)} — a conta vai ZERAR.`
+              : `Receber ${formatBRL(valorOk)}?\nIsso ZERA a conta (hoje deve ${formatBRL(saldoAntes)}).`;
+        } else {
+          msg = `Receber ${formatBRL(valorOk)}?\nHoje deve ${formatBRL(saldoAntes)} → fica devendo ${formatBRL(depois)}.`;
+        }
+        if (!confirm(msg)) return;
+      }
+
+      if (tipo === "debito") {
         const lim = limiteCliente(c);
-        const novoSaldo = saldoCliente(c) + valorOk;
+        const novoSaldo = saldoAntes + valorOk;
         if (lim != null && novoSaldo > lim + 0.009) {
           const ok = confirm(
             `Isso passa do limite de ${formatBRL(lim)}.\nSaldo ficaria em ${formatBRL(novoSaldo)}.\n\nLançar mesmo assim?`
@@ -2725,18 +2811,44 @@
           if (!ok) return;
         }
       }
-      const nota = $("#movNota").value.trim();
-      const dataRef = $("#movData").value || hojeISO();
-      c.movs.push({
+
+      const nota = ($("#movNota")?.value || "").trim();
+      const dataRef = $("#movData")?.value || hojeISO();
+      const mov = {
         id: uid(),
-        tipo: state.tipoMov,
+        tipo,
         valor: valorOk,
         nota,
         dataRef,
         ts: Date.now(),
-      });
+      };
+      c.movs.push(mov);
       salvar();
-      toast(state.tipoMov === "debito" ? "Fiado lançado" : "Pagamento registrado");
+
+      // Guarda: se o saldo não bater com a conta, desfaz o lançamento.
+      const saldoDepois = Math.round(saldoCliente(c) * 100) / 100;
+      const esperado =
+        tipo === "debito"
+          ? Math.round((saldoAntes + valorOk) * 100) / 100
+          : Math.round((saldoAntes - valorOk) * 100) / 100;
+      if (Math.abs(saldoDepois - esperado) > 0.009) {
+        c.movs = c.movs.filter((m) => m.id !== mov.id);
+        salvar();
+        toast("Erro ao lançar — nada foi alterado. Tente de novo.", true);
+        abrirDetalhe(c.id);
+        return;
+      }
+
+      if (tipo === "pagamento") {
+        const resto = Math.max(0, saldoDepois);
+        toast(
+          resto <= 0.009
+            ? `Recebido ${formatBRL(valorOk)} — conta zerada`
+            : `Recebido ${formatBRL(valorOk)} — ainda deve ${formatBRL(resto)}`
+        );
+      } else {
+        toast("Fiado lançado");
+      }
       abrirDetalhe(c.id);
     }
 
