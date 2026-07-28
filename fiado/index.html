@@ -768,6 +768,119 @@
       margin-bottom: 0.75rem;
     }
 
+    .admin-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .admin-stack .sheet h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .admin-status {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+
+    .admin-status strong {
+      color: var(--brand);
+    }
+
+    .codigo-box {
+      font-family: ui-monospace, monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: #eef4f0;
+      border: 1.5px dashed var(--line);
+      border-radius: 0.65rem;
+      padding: 0.7rem 0.85rem;
+      word-break: break-all;
+      margin-bottom: 0.55rem;
+    }
+
+    .admin-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 16rem;
+      overflow: auto;
+    }
+
+    .pix-box {
+      background: #eef4f0;
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 0.95rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .pix-box .label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+    }
+
+    .pix-box .valor {
+      margin-top: 0.15rem;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.02em;
+    }
+
+    .pix-box .chave {
+      margin-top: 0.45rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      word-break: break-all;
+      color: var(--ink);
+    }
+
+    .aviso-teste {
+      display: none;
+      margin: 0 0 0.85rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 0.85rem;
+      background: #f7ece0;
+      border: 1.5px solid #e2c4a4;
+      color: var(--warn);
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.4;
+      animation: rise 0.35s ease-out both;
+    }
+
+    .aviso-teste.show { display: block; }
+
+    .aviso-teste strong { color: var(--brand); }
+
+    .log-item {
+      padding: 0.55rem 0;
+      border-top: 1px solid var(--line);
+      font-size: 0.85rem;
+      line-height: 1.35;
+    }
+
+    .log-item:first-child { border-top: none; }
+
+    .log-item .quando {
+      font-size: 0.75rem;
+      color: var(--ink-soft);
+      margin-top: 0.15rem;
+    }
+
     @keyframes rise {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -838,8 +951,15 @@
         </div>
         <p class="gate-msg" id="bloqueadoMsg">O período de teste acabou. O acesso ficou bloqueado.</p>
         <div class="sheet">
+          <div class="pix-box" id="pixBoxBloqueado">
+            <div class="label">Valor pra liberar</div>
+            <div class="valor" id="bloqueadoValor">R$ 97,00</div>
+            <div class="label" style="margin-top:0.55rem">PIX</div>
+            <div class="chave" id="bloqueadoPix">—</div>
+            <button type="button" class="btn full" id="btnCopiarPix" style="margin-top:0.55rem">Copiar chave PIX</button>
+          </div>
           <p class="subtitle" style="margin-bottom:0.85rem">
-            Se já pagou, digite o <strong>código de liberação</strong> que você recebeu.
+            Depois do pagamento, digite o <strong>código de liberação</strong> que você recebeu.
           </p>
           <label class="field">
             Código de liberação
@@ -847,7 +967,7 @@
           </label>
           <div class="err-login" id="libErro" aria-live="polite"></div>
           <button type="button" class="btn primary full" id="btnLiberar">Liberar acesso</button>
-          <button type="button" class="btn full" id="btnWhatsPagamento" style="margin-top:0.45rem">Falar no WhatsApp</button>
+          <button type="button" class="btn full" id="btnWhatsPagamento" style="margin-top:0.45rem">Avisar no WhatsApp</button>
         </div>
         <button type="button" class="btn ghost full" id="btnSairBloqueado" style="margin-top:0.75rem">Sair</button>
       </div>
@@ -867,9 +987,14 @@
             </div>
             <div class="trial-pill" id="trialPill"></div>
           </div>
-          <button type="button" class="btn ghost" id="btnSair" title="Sair">Sair</button>
+          <div style="display:flex;flex-direction:column;gap:0.35rem;align-items:flex-end">
+            <button type="button" class="btn ghost" id="btnVoltarAdmin" hidden title="Painel admin">Admin</button>
+            <button type="button" class="btn ghost" id="btnSair" title="Sair">Sair</button>
+          </div>
         </div>
       </header>
+
+      <div class="aviso-teste" id="avisoTeste"></div>
 
       <div class="resumo">
         <div>
@@ -1022,6 +1147,119 @@
         </label>
       </div>
     </section>
+
+    <!-- ADMIN -->
+    <section id="viewAdmin" class="view">
+      <div class="topbar">
+        <div class="brand-mark" style="flex:1">
+          <img class="logo" src="./icon.svg" alt="" width="36" height="36" />
+          <div>
+            <h1 style="margin:0">Administrador</h1>
+            <p class="subtitle" style="margin:0">Painel de gestão do Fiado</p>
+          </div>
+        </div>
+        <button type="button" class="btn ghost" id="btnSairAdmin">Sair</button>
+      </div>
+
+      <div class="resumo">
+        <div>
+          <div class="label">Total em aberto</div>
+          <div class="valor alerta" id="adminTotalAberto">R$ 0,00</div>
+        </div>
+        <div>
+          <div class="label">Clientes</div>
+          <div class="valor" id="adminTotalClientes">0</div>
+        </div>
+      </div>
+
+      <div class="admin-stack">
+        <div class="sheet">
+          <h2>Licença / teste</h2>
+          <div class="admin-status" id="adminLicencaStatus">—</div>
+          <div class="codigo-box" id="adminCodigoBox">—</div>
+          <div class="footer-actions row">
+            <button type="button" class="btn" id="btnAdminCopiarCodigo">Copiar código</button>
+            <button type="button" class="btn primary" id="btnAdminLiberar">Liberar pago</button>
+          </div>
+          <div class="footer-actions row" style="margin-top:0.45rem">
+            <button type="button" class="btn" id="btnAdminReiniciarTrial">Reiniciar teste</button>
+            <button type="button" class="btn danger" id="btnAdminBloquear">Bloquear</button>
+          </div>
+        </div>
+
+        <div class="sheet">
+          <h2>Cobrança (PIX)</h2>
+          <p class="subtitle" style="margin-bottom:0.75rem">Aparece na tela quando o teste acaba.</p>
+          <label class="field">
+            Valor (R$)
+            <input id="adminValorLicenca" type="text" inputmode="decimal" placeholder="97" />
+          </label>
+          <label class="field">
+            Chave PIX
+            <input id="adminChavePix" type="text" placeholder="CPF, e-mail ou aleatória" autocomplete="off" />
+          </label>
+          <button type="button" class="btn primary full" id="btnAdminSalvarPix">Salvar cobrança</button>
+        </div>
+
+        <div class="sheet">
+          <h2>Conta do mercado</h2>
+          <p class="subtitle" style="margin-bottom:0.75rem">Login que o dono do mercadinho usa no balcão.</p>
+          <label class="field">
+            Nome do mercado
+            <input id="adminNomeMercado" type="text" placeholder="Ex.: Mercado do Zé" />
+          </label>
+          <label class="field">
+            Usuário do balcão
+            <input id="adminUserBalcao" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            Senha do balcão
+            <input id="adminSenhaBalcao" type="text" autocomplete="off" />
+          </label>
+          <button type="button" class="btn primary full" id="btnAdminSalvarConta">Salvar conta</button>
+        </div>
+
+        <div class="sheet">
+          <h2>Senha do administrador</h2>
+          <p class="subtitle" style="margin-bottom:0.75rem">Só você usa. Usuário continua: <strong id="adminUserLabel">admin</strong></p>
+          <label class="field">
+            Senha atual
+            <input id="adminSenhaAtual" type="password" autocomplete="current-password" />
+          </label>
+          <label class="field">
+            Nova senha
+            <input id="adminSenhaNova" type="password" autocomplete="new-password" />
+          </label>
+          <label class="field">
+            Confirmar nova senha
+            <input id="adminSenhaNova2" type="password" autocomplete="new-password" />
+          </label>
+          <button type="button" class="btn primary full" id="btnAdminTrocarSenha">Trocar senha admin</button>
+        </div>
+
+        <div class="sheet">
+          <h2>Clientes do fiado</h2>
+          <div class="search" style="margin-bottom:0.55rem">
+            <input id="adminBusca" type="search" placeholder="Buscar cliente…" autocomplete="off" />
+          </div>
+          <div class="admin-lista" id="adminListaClientes"></div>
+          <button type="button" class="btn full" id="btnAdminExportarDevedores" style="margin-top:0.65rem">Exportar quem deve</button>
+          <button type="button" class="btn full" id="btnAdminAbrirBalcao" style="margin-top:0.45rem">Abrir app do balcão</button>
+        </div>
+
+        <div class="sheet">
+          <h2>Histórico de ações</h2>
+          <div id="adminLogAcoes" class="admin-lista" style="max-height:12rem"></div>
+          <button type="button" class="btn full" id="btnAdminLimparLog" style="margin-top:0.55rem">Limpar histórico</button>
+        </div>
+
+        <div class="sheet">
+          <h2>Dados</h2>
+          <button type="button" class="btn full" id="btnAdminBackup">Backup / restaurar</button>
+          <button type="button" class="btn danger full" id="btnAdminZerar" style="margin-top:0.45rem">Apagar todos os clientes</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -1031,23 +1269,32 @@
        VOCÊ CONFIGURA AQUI (antes de entregar pro cliente)
        ═══════════════════════════════════════════════ */
     const LICENCA = {
+      // Login do BALCÃO (dono do mercado)
       usuario: "mercado",
       senha: "fiado123",
+      // Login ADMINISTRADOR (você) — senha também pode ser trocada no painel
+      adminUsuario: "admin",
+      adminSenha: "admin123",
       // Dias grátis a partir do 1º login neste celular
       trialDias: 14,
       // Código que VOCÊ manda depois que ele pagar
       codigoLiberacao: "LIBERA-MERCADO-26",
       // Seu WhatsApp (só números, com DDD). Ex.: 11999998888
       seuWhatsApp: "11999999999",
+      // Valor e PIX na tela de bloqueio (editável no admin)
+      valorLicenca: 97,
+      chavePix: "11999999999",
       // Se true, libera pra sempre sem precisar do código
       pagoNaMao: false,
-      // Nome que aparece no WhatsApp de cobrança
+      // Nome que aparece no WhatsApp / app
       nomeApp: "Fiado",
     };
 
     const STORAGE_KEY = "fiado-mercado-v1";
     const AUTH_KEY = "fiado-mercado-auth-v1";
     const LICENSE_KEY = "fiado-mercado-license-v1";
+    const CONFIG_KEY = "fiado-mercado-config-v1";
+    const LOG_KEY = "fiado-mercado-admin-log-v1";
     const $ = (sel) => document.querySelector(sel);
 
     const state = {
@@ -1056,8 +1303,67 @@
       modoForm: "novo",
       tipoMov: null,
       logado: false,
+      role: null,
+      fromAdmin: false,
       filtro: "todos",
     };
+
+    function lerConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(CONFIG_KEY) || "null") || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function salvarConfig(patch) {
+      const next = { ...lerConfig(), ...patch };
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(next));
+      return next;
+    }
+
+    function credenciaisBalcao() {
+      const c = lerConfig();
+      return {
+        usuario: c.usuario || LICENCA.usuario,
+        senha: c.senha || LICENCA.senha,
+        nomeApp: c.nomeApp || LICENCA.nomeApp,
+      };
+    }
+
+    function credenciaisAdmin() {
+      const c = lerConfig();
+      return {
+        usuario: LICENCA.adminUsuario,
+        senha: c.adminSenha || LICENCA.adminSenha,
+      };
+    }
+
+    function dadosCobranca() {
+      const c = lerConfig();
+      const valor = Number(c.valorLicenca);
+      return {
+        valor: Number.isFinite(valor) && valor > 0 ? valor : LICENCA.valorLicenca,
+        chavePix: (c.chavePix != null && String(c.chavePix).trim() !== "")
+          ? String(c.chavePix).trim()
+          : LICENCA.chavePix,
+      };
+    }
+
+    function lerLogAdmin() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function registrarAcao(texto) {
+      const logs = lerLogAdmin();
+      logs.unshift({ id: uid(), texto, ts: Date.now() });
+      localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0, 40)));
+    }
 
     function uid() {
       return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
@@ -1144,11 +1450,19 @@
     function estaPago() {
       if (LICENCA.pagoNaMao) return true;
       const lic = lerLicencaLocal();
+      if (lic.bloqueadoManual) return false;
       return !!lic.liberado && lic.codigoOk === LICENCA.codigoLiberacao;
     }
 
+    function isAdmin() {
+      return state.role === "admin" || lerSessao()?.role === "admin";
+    }
+
     function acessoLiberado() {
+      if (isAdmin()) return true;
       if (estaPago()) return true;
+      const lic = lerLicencaLocal();
+      if (lic.bloqueadoManual) return false;
       return diasRestantesTrial() > 0;
     }
 
@@ -1173,10 +1487,15 @@
 
     function atualizarPillTrial() {
       const el = $("#trialPill");
+      const aviso = $("#avisoTeste");
       if (!el) return;
       if (estaPago()) {
         el.className = "trial-pill pago";
         el.textContent = "Acesso liberado";
+        if (aviso) {
+          aviso.classList.remove("show");
+          aviso.innerHTML = "";
+        }
         return;
       }
       const dias = diasRestantesTrial();
@@ -1188,31 +1507,59 @@
       } else {
         el.textContent = `Teste: ${dias} dias restantes`;
       }
-    }
 
-    function sessaoAtiva() {
-      try {
-        const raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
-        const s = JSON.parse(raw || "null");
-        return !!(s && s.ok && s.user === LICENCA.usuario);
-      } catch {
-        return false;
+      if (aviso) {
+        if (dias > 0 && dias <= 3) {
+          const zap = String(LICENCA.seuWhatsApp || "").replace(/\D/g, "");
+          const cob = dadosCobranca();
+          aviso.classList.add("show");
+          aviso.innerHTML = dias === 1
+            ? `Atenção: <strong>último dia</strong> de teste. Pra liberar: ${formatBRL(cob.valor)}${zap ? ` · WhatsApp ${zap}` : ""}.`
+            : `Atenção: restam <strong>${dias} dias</strong> de teste. Pra liberar: ${formatBRL(cob.valor)}${zap ? ` · WhatsApp ${zap}` : ""}.`;
+        } else {
+          aviso.classList.remove("show");
+          aviso.innerHTML = "";
+        }
       }
     }
 
-    function gravarSessao(permanente) {
-      const payload = JSON.stringify({ ok: true, user: LICENCA.usuario, em: Date.now(), permanente: !!permanente });
+    function lerSessao() {
+      try {
+        const raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
+        return JSON.parse(raw || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function sessaoAtiva() {
+      const s = lerSessao();
+      if (!s || !s.ok) return false;
+      if (s.role === "admin") return s.user === credenciaisAdmin().usuario;
+      return s.user === credenciaisBalcao().usuario;
+    }
+
+    function gravarSessao(permanente, role, user) {
+      const payload = JSON.stringify({
+        ok: true,
+        user,
+        role: role || "user",
+        em: Date.now(),
+        permanente: !!permanente,
+      });
       sessionStorage.removeItem(AUTH_KEY);
       localStorage.removeItem(AUTH_KEY);
       if (permanente) localStorage.setItem(AUTH_KEY, payload);
       else sessionStorage.setItem(AUTH_KEY, payload);
       state.logado = true;
+      state.role = role || "user";
     }
 
     function limparSessao() {
       sessionStorage.removeItem(AUTH_KEY);
       localStorage.removeItem(AUTH_KEY);
       state.logado = false;
+      state.role = null;
     }
 
     function tentarLogin() {
@@ -1220,14 +1567,25 @@
       const pass = $("#loginPass").value || "";
       const lembrar = $("#lembrarLogin").checked;
       const erro = $("#loginErro");
-      if (user !== LICENCA.usuario || pass !== LICENCA.senha) {
+      const balcao = credenciaisBalcao();
+
+      const admin = credenciaisAdmin();
+      if (user === admin.usuario && pass === admin.senha) {
+        erro.textContent = "";
+        gravarSessao(lembrar, "admin", user);
+        $("#loginPass").value = "";
+        abrirAdmin();
+        return;
+      }
+
+      if (user !== balcao.usuario || pass !== balcao.senha) {
         erro.textContent = "Usuário ou senha incorretos.";
         toast("Login inválido", true);
         return;
       }
       erro.textContent = "";
       iniciarTrialSePreciso();
-      gravarSessao(lembrar);
+      gravarSessao(lembrar, "user", user);
       $("#loginPass").value = "";
       entrarNoApp();
     }
@@ -1245,20 +1603,57 @@
         return;
       }
       erro.textContent = "";
-      salvarLicencaLocal({ liberado: true, codigoOk: LICENCA.codigoLiberacao, liberadoEm: new Date().toISOString() });
+      salvarLicencaLocal({
+        liberado: true,
+        bloqueadoManual: false,
+        codigoOk: LICENCA.codigoLiberacao,
+        liberadoEm: new Date().toISOString(),
+      });
+      registrarAcao("Código de liberação usado no balcão");
       toast("Acesso liberado!");
       entrarNoApp();
     }
 
+    function atualizarTelaBloqueado() {
+      const cob = dadosCobranca();
+      $("#bloqueadoValor").textContent = formatBRL(cob.valor);
+      $("#bloqueadoPix").textContent = cob.chavePix || "Peça a chave no WhatsApp";
+    }
+
     function abrirWhatsPagamento() {
+      const cob = dadosCobranca();
+      const nome = credenciaisBalcao().nomeApp || LICENCA.nomeApp;
       const texto = encodeURIComponent(
-        `Oi! Quero liberar o ${LICENCA.nomeApp} (teste acabou). Me passa o valor e o código de liberação.`
+        `Oi! Quero liberar o ${nome}. Valor ${formatBRL(cob.valor)}. Já fiz/ vou fazer o PIX. Me manda o código de liberação.`
       );
       const fone = String(LICENCA.seuWhatsApp || "").replace(/\D/g, "");
       const url = fone
         ? `https://wa.me/55${fone.replace(/^55/, "")}?text=${texto}`
         : `https://wa.me/?text=${texto}`;
       window.open(url, "_blank");
+    }
+
+    async function copiarPixBloqueado() {
+      const chave = dadosCobranca().chavePix;
+      if (!chave) {
+        toast("Chave PIX não cadastrada", true);
+        return;
+      }
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(chave);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = chave;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        toast("Chave PIX copiada");
+      } catch {
+        toast("Não deu pra copiar", true);
+      }
     }
 
     function atualizarHintLogin() {
@@ -1282,25 +1677,309 @@
 
     function entrarNoApp() {
       if (!acessoLiberado()) {
-        $("#bloqueadoMsg").textContent = estaPago()
-          ? "Acesso bloqueado."
-          : `O teste de ${LICENCA.trialDias} dias acabou em ${formatarFimTrial()}. Seus dados continuam salvos.`;
+        const lic = lerLicencaLocal();
+        $("#bloqueadoMsg").textContent = lic.bloqueadoManual
+          ? "Acesso bloqueado pelo administrador. Seus dados continuam salvos."
+          : estaPago()
+            ? "Acesso bloqueado."
+            : `O teste de ${LICENCA.trialDias} dias acabou em ${formatarFimTrial()}. Seus dados continuam salvos.`;
+        atualizarTelaBloqueado();
         mostrar("#viewBloqueado");
         return;
       }
       carregar();
+      atualizarNomeMercadoUI();
       atualizarPillTrial();
+      const btnAdmin = $("#btnVoltarAdmin");
+      if (btnAdmin) btnAdmin.hidden = !isAdmin();
       renderHome();
       mostrar("#viewHome");
     }
 
+    function atualizarNomeMercadoUI() {
+      const nome = credenciaisBalcao().nomeApp || "Fiado";
+      document.querySelectorAll("#viewHome .brand").forEach((el) => {
+        el.textContent = nome;
+      });
+      const sub = document.querySelector("#viewHome .subtitle");
+      if (sub) sub.textContent = "Quem deve e quanto — no balcão.";
+    }
+
+    function abrirAdmin() {
+      carregar();
+      renderAdmin();
+      mostrar("#viewAdmin");
+    }
+
+    function renderAdmin() {
+      const balcao = credenciaisBalcao();
+      const cob = dadosCobranca();
+      const lic = lerLicencaLocal();
+      const dias = diasRestantesTrial();
+      let status = "";
+      if (lic.bloqueadoManual) status = "Status: <strong>bloqueado</strong> pelo admin.";
+      else if (estaPago()) status = "Status: <strong>liberado (pago)</strong>.";
+      else if (!lic.inicioTrial) status = `Status: teste de <strong>${LICENCA.trialDias} dias</strong> ainda não começou.`;
+      else if (dias > 0) status = `Status: teste ativo — <strong>${dias} dia(s)</strong> (até ${formatarFimTrial()}).`;
+      else status = "Status: <strong>teste encerrado</strong> — balcão bloqueado.";
+
+      $("#adminLicencaStatus").innerHTML = status;
+      $("#adminCodigoBox").textContent = LICENCA.codigoLiberacao;
+      $("#adminTotalAberto").textContent = formatBRL(totalAberto());
+      $("#adminTotalClientes").textContent = String(state.clientes.length);
+      $("#adminNomeMercado").value = balcao.nomeApp;
+      $("#adminUserBalcao").value = balcao.usuario;
+      $("#adminSenhaBalcao").value = balcao.senha;
+      $("#adminValorLicenca").value = String(cob.valor).replace(".", ",");
+      $("#adminChavePix").value = cob.chavePix || "";
+      $("#adminUserLabel").textContent = credenciaisAdmin().usuario;
+      $("#adminSenhaAtual").value = "";
+      $("#adminSenhaNova").value = "";
+      $("#adminSenhaNova2").value = "";
+      renderAdminClientes();
+      renderAdminLog();
+    }
+
+    function renderAdminLog() {
+      const box = $("#adminLogAcoes");
+      const logs = lerLogAdmin();
+      if (!logs.length) {
+        box.innerHTML = `<div class="vazio" style="padding:0.8rem">Nenhuma ação ainda.</div>`;
+        return;
+      }
+      box.innerHTML = logs
+        .map((l) => `
+          <div class="log-item">
+            <div>${escapeHtml(l.texto)}</div>
+            <div class="quando">${formatQuando(l.ts)}</div>
+          </div>
+        `)
+        .join("");
+    }
+
+    function renderAdminClientes() {
+      const q = ($("#adminBusca").value || "").trim().toLowerCase();
+      const lista = state.clientes
+        .map((c) => ({ c, saldo: saldoCliente(c) }))
+        .filter(({ c }) => !q || c.nome.toLowerCase().includes(q) || (c.fone || "").includes(q))
+        .sort((a, b) => b.saldo - a.saldo || a.c.nome.localeCompare(b.c.nome, "pt-BR"));
+
+      const box = $("#adminListaClientes");
+      if (!lista.length) {
+        box.innerHTML = `<div class="vazio" style="padding:1rem">Nenhum cliente.</div>`;
+        return;
+      }
+      box.innerHTML = lista
+        .map(({ c, saldo }) => `
+          <button type="button" class="cliente" data-id="${c.id}">
+            <div>
+              <div class="nome">${escapeHtml(c.nome)}</div>
+              <div class="meta">${saldo > 0.009 ? "Em aberto" : "Quitado"}${c.fone ? " · " + escapeHtml(c.fone) : ""}</div>
+            </div>
+            <div class="saldo ${saldo <= 0.009 ? "zero" : ""}">${formatBRL(saldo)}</div>
+          </button>
+        `)
+        .join("");
+      box.querySelectorAll(".cliente").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.fromAdmin = true;
+          abrirDetalhe(btn.dataset.id);
+        });
+      });
+    }
+
+    function adminLiberarPago() {
+      salvarLicencaLocal({
+        liberado: true,
+        bloqueadoManual: false,
+        codigoOk: LICENCA.codigoLiberacao,
+        liberadoEm: new Date().toISOString(),
+      });
+      registrarAcao("Liberou acesso (pago)");
+      toast("Acesso liberado (pago)");
+      renderAdmin();
+    }
+
+    function adminBloquear() {
+      if (!confirm("Bloquear o acesso do balcão neste celular?")) return;
+      salvarLicencaLocal({ bloqueadoManual: true, liberado: false });
+      registrarAcao("Bloqueou o balcão");
+      toast("Balcão bloqueado");
+      renderAdmin();
+    }
+
+    function adminReiniciarTrial() {
+      if (!confirm(`Reiniciar teste de ${LICENCA.trialDias} dias a partir de hoje?`)) return;
+      salvarLicencaLocal({
+        inicioTrial: hojeISO(),
+        liberado: false,
+        bloqueadoManual: false,
+        codigoOk: null,
+      });
+      registrarAcao(`Reiniciou teste de ${LICENCA.trialDias} dias`);
+      toast("Teste reiniciado");
+      renderAdmin();
+    }
+
+    async function adminCopiarCodigo() {
+      const codigo = LICENCA.codigoLiberacao;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(codigo);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = codigo;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        toast("Código copiado");
+      } catch {
+        toast("Não deu pra copiar", true);
+      }
+    }
+
+    function adminSalvarConta() {
+      const nomeApp = ($("#adminNomeMercado").value || "").trim() || LICENCA.nomeApp;
+      const usuario = ($("#adminUserBalcao").value || "").trim();
+      const senha = ($("#adminSenhaBalcao").value || "").trim();
+      if (!usuario || !senha) {
+        toast("Preencha usuário e senha", true);
+        return;
+      }
+      if (usuario === credenciaisAdmin().usuario) {
+        toast("Esse usuário é reservado pro admin", true);
+        return;
+      }
+      salvarConfig({ nomeApp, usuario, senha });
+      registrarAcao(`Atualizou conta do balcão (${usuario})`);
+      toast("Conta do balcão salva");
+      atualizarNomeMercadoUI();
+      renderAdmin();
+    }
+
+    function adminSalvarPix() {
+      const valor = parseMoney($("#adminValorLicenca").value);
+      const chavePix = ($("#adminChavePix").value || "").trim();
+      if (!Number.isFinite(valor) || valor <= 0) {
+        toast("Valor inválido", true);
+        return;
+      }
+      if (!chavePix) {
+        toast("Digite a chave PIX", true);
+        return;
+      }
+      salvarConfig({ valorLicenca: Math.round(valor * 100) / 100, chavePix });
+      registrarAcao(`Atualizou cobrança: ${formatBRL(valor)}`);
+      toast("Cobrança salva");
+      renderAdmin();
+    }
+
+    function adminTrocarSenha() {
+      const atual = $("#adminSenhaAtual").value || "";
+      const nova = $("#adminSenhaNova").value || "";
+      const nova2 = $("#adminSenhaNova2").value || "";
+      if (atual !== credenciaisAdmin().senha) {
+        toast("Senha atual incorreta", true);
+        return;
+      }
+      if (nova.length < 4) {
+        toast("Nova senha: mínimo 4 caracteres", true);
+        return;
+      }
+      if (nova !== nova2) {
+        toast("Confirmação não confere", true);
+        return;
+      }
+      salvarConfig({ adminSenha: nova });
+      registrarAcao("Trocou a senha do administrador");
+      toast("Senha do admin atualizada");
+      renderAdmin();
+    }
+
+    async function adminExportarDevedores() {
+      const lista = state.clientes
+        .map((c) => ({ nome: c.nome, fone: c.fone || "", saldo: saldoCliente(c) }))
+        .filter((x) => x.saldo > 0.009)
+        .sort((a, b) => b.saldo - a.saldo);
+
+      if (!lista.length) {
+        toast("Ninguém deve no momento", true);
+        return;
+      }
+
+      const total = lista.reduce((acc, x) => acc + x.saldo, 0);
+      const linhas = [
+        `*Devedores — ${credenciaisBalcao().nomeApp || "Fiado"}*`,
+        `Data: ${formatDataBR(hojeISO())}`,
+        `Total em aberto: *${formatBRL(total)}*`,
+        "",
+        ...lista.map((x, i) => `${i + 1}. ${x.nome} — ${formatBRL(x.saldo)}${x.fone ? ` (${x.fone})` : ""}`),
+      ];
+      const texto = linhas.join("\n");
+
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "Devedores Fiado", text: texto });
+          registrarAcao(`Exportou ${lista.length} devedor(es)`);
+          toast("Lista enviada");
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = texto;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        registrarAcao(`Copiou lista de ${lista.length} devedor(es)`);
+        toast("Lista copiada");
+      } catch {
+        toast("Não deu pra exportar", true);
+      }
+    }
+
+    function adminZerarClientes() {
+      if (!confirm("Apagar TODOS os clientes e lançamentos deste celular?")) return;
+      if (!confirm("Confirma mesmo? Não dá pra desfazer sem backup.")) return;
+      const qtd = state.clientes.length;
+      state.clientes = [];
+      state.ativoId = null;
+      salvar();
+      registrarAcao(`Apagou todos os clientes (${qtd})`);
+      toast("Tudo apagado");
+      renderAdmin();
+    }
+
+    function adminLimparLog() {
+      if (!confirm("Limpar histórico de ações?")) return;
+      localStorage.removeItem(LOG_KEY);
+      toast("Histórico limpo");
+      renderAdminLog();
+    }
+
     function bootAuth() {
       atualizarHintLogin();
+      const s = lerSessao();
       if (!sessaoAtiva()) {
         mostrar("#viewLogin");
         return;
       }
       state.logado = true;
+      state.role = s.role || "user";
+      if (state.role === "admin") {
+        abrirAdmin();
+        return;
+      }
       iniciarTrialSePreciso();
       entrarNoApp();
     }
@@ -1723,10 +2402,11 @@
     function textoCobranca(c) {
       const saldo = saldoCliente(c);
       const primeiro = (c.nome || "").trim().split(/\s+/)[0] || "tudo bem";
+      const mercado = credenciaisBalcao().nomeApp || "mercado";
       return [
         `Oi, ${primeiro}!`,
         "",
-        `Passando pra lembrar que seu vale no mercado está em *${formatBRL(saldo)}*.`,
+        `Passando pra lembrar que seu vale no *${mercado}* está em *${formatBRL(saldo)}*.`,
         "",
         "Quando puder, passa aqui pra acertar. Obrigado!",
       ].join("\n");
@@ -1880,8 +2560,11 @@
           state.clientes = data.clientes;
           salvar();
           toast("Backup restaurado");
-          mostrar("#viewHome");
-          renderHome();
+          if (isAdmin()) abrirAdmin();
+          else {
+            mostrar("#viewHome");
+            renderHome();
+          }
         } catch {
           toast("Arquivo inválido", true);
         }
@@ -1939,6 +2622,11 @@
     });
     $("#btnSalvarCliente").addEventListener("click", salvarCliente);
     $("#btnVoltarDetalhe").addEventListener("click", () => {
+      if (state.fromAdmin && isAdmin()) {
+        state.fromAdmin = false;
+        abrirAdmin();
+        return;
+      }
       mostrar("#viewHome");
       renderHome();
     });
@@ -1957,6 +2645,10 @@
     $("#busca").addEventListener("input", renderHome);
 
     $("#btnVoltarBackup").addEventListener("click", () => {
+      if (isAdmin()) {
+        abrirAdmin();
+        return;
+      }
       mostrar("#viewHome");
       renderHome();
     });
@@ -1967,7 +2659,37 @@
       e.target.value = "";
     });
 
-    // Atualiza nome do arquivo na tela de backup
+    $("#btnVoltarAdmin").addEventListener("click", () => {
+      if (!isAdmin()) return;
+      abrirAdmin();
+    });
+    $("#btnSairAdmin").addEventListener("click", () => {
+      limparSessao();
+      atualizarHintLogin();
+      mostrar("#viewLogin");
+    });
+    $("#btnAdminLiberar").addEventListener("click", adminLiberarPago);
+    $("#btnAdminBloquear").addEventListener("click", adminBloquear);
+    $("#btnAdminReiniciarTrial").addEventListener("click", adminReiniciarTrial);
+    $("#btnAdminCopiarCodigo").addEventListener("click", adminCopiarCodigo);
+    $("#btnAdminSalvarConta").addEventListener("click", adminSalvarConta);
+    $("#btnAdminSalvarPix").addEventListener("click", adminSalvarPix);
+    $("#btnAdminTrocarSenha").addEventListener("click", adminTrocarSenha);
+    $("#btnAdminExportarDevedores").addEventListener("click", adminExportarDevedores);
+    $("#btnAdminLimparLog").addEventListener("click", adminLimparLog);
+    $("#btnCopiarPix").addEventListener("click", copiarPixBloqueado);
+    $("#btnAdminAbrirBalcao").addEventListener("click", () => {
+      state.fromAdmin = false;
+      entrarNoApp();
+    });
+    $("#btnAdminBackup").addEventListener("click", () => {
+      const elNome = $("#nomeBackupArquivo");
+      if (elNome) elNome.textContent = nomeArquivoBackup();
+      mostrar("#viewBackup");
+    });
+    $("#btnAdminZerar").addEventListener("click", adminZerarClientes);
+    $("#adminBusca").addEventListener("input", renderAdminClientes);
+
     const elNomeBackup = $("#nomeBackupArquivo");
     if (elNomeBackup) elNomeBackup.textContent = nomeArquivoBackup();
 
