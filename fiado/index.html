@@ -111,7 +111,7 @@
 
     .resumo {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
       margin: 0.75rem 0 1rem;
       animation: rise 0.4s 0.05s ease-out both;
@@ -122,6 +122,10 @@
       border: 1.5px solid var(--line);
       border-radius: 0.85rem;
       padding: 0.85rem 0.95rem;
+    }
+
+    .resumo > .destaque {
+      grid-column: 1 / -1;
     }
 
     .resumo .label {
@@ -135,11 +139,15 @@
     .resumo .valor {
       margin-top: 0.2rem;
       font-family: "Bricolage Grotesque", sans-serif;
-      font-size: 1.55rem;
+      font-size: 1.35rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--brand);
       line-height: 1.15;
+    }
+
+    .resumo > .destaque .valor {
+      font-size: 1.65rem;
     }
 
     .resumo .valor.alerta { color: var(--debt); }
@@ -151,6 +159,10 @@
 
     .resumo.duo .valor {
       font-size: 1.45rem;
+    }
+
+    .resumo.duo > .destaque {
+      grid-column: auto;
     }
 
     .secao-clientes {
@@ -383,6 +395,52 @@
       grid-template-columns: 1fr 1fr;
       gap: 0.4rem;
       margin-top: 0.15rem;
+    }
+
+    .cliente-atalhos.um {
+      grid-template-columns: 1fr;
+    }
+
+    .btn-guardar.suave {
+      border-style: dashed;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+
+    .vazio .btn {
+      margin-top: 0.85rem;
+    }
+
+    .banner-local {
+      display: none;
+      margin: 0 0 0.85rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 0.85rem;
+      background: rgba(26, 46, 31, 0.07);
+      border: 1px dashed var(--line);
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      position: relative;
+      padding-right: 2.2rem;
+    }
+
+    .banner-local.show { display: block; }
+
+    .banner-local strong { color: var(--brand); }
+
+    .banner-local .btn-fechar-banner {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.35rem;
+      border: 0;
+      background: transparent;
+      color: var(--ink-soft);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.45rem;
+      cursor: pointer;
     }
 
     .cliente-atalhos .btn {
@@ -1014,14 +1072,10 @@
       align-items: center;
       justify-content: space-between;
       margin-top: 1.1rem;
-      padding-top: 0.75rem;
+      padding: 0.65rem 0 0.2rem;
       border-top: 1.5px dashed var(--line);
-      position: sticky;
-      bottom: 0;
-      background:
-        linear-gradient(180deg, transparent 0%, var(--bg-deep) 28%);
-      padding-bottom: 0.15rem;
-      z-index: 4;
+      background: transparent;
+      position: static;
     }
 
     .home-bar .btn {
@@ -1046,6 +1100,7 @@
       display: flex;
       gap: 0.35rem;
       align-items: center;
+      margin-left: auto;
     }
 
     .mov-actions {
@@ -1382,22 +1437,6 @@
 
     .checklist li.done .check-mark svg { opacity: 1; }
 
-    .banner-local {
-      display: none;
-      margin: 0 0 0.85rem;
-      padding: 0.7rem 0.9rem;
-      border-radius: 0.85rem;
-      background: rgba(26, 46, 31, 0.07);
-      border: 1px dashed var(--line);
-      font-size: 0.82rem;
-      color: var(--ink-soft);
-      line-height: 1.4;
-    }
-
-    .banner-local.show { display: block; }
-
-    .banner-local strong { color: var(--brand); }
-
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -1563,7 +1602,7 @@
         </div>
 
         <div class="resumo" aria-label="Resumo do dia">
-          <div>
+          <div class="destaque">
             <div class="label">Total em aberto</div>
             <div class="valor alerta" id="totalAberto">R$ 0,00</div>
           </div>
@@ -1580,7 +1619,7 @@
         <div class="secao-clientes">
           <div class="secao-head">
             <h2>Clientes</h2>
-            <div class="qtd-badge"><strong id="totalClientes">0</strong> cadastrados</div>
+            <div class="qtd-badge" id="qtdBadge"><strong>0</strong> cadastrados</div>
           </div>
 
           <div class="home-actions">
@@ -1599,12 +1638,13 @@
           </button>
 
           <div class="filtros" role="tablist" aria-label="Filtrar clientes">
-            <button type="button" class="active" data-filtro="todos">Todos</button>
-            <button type="button" data-filtro="aberto">Deve</button>
+            <button type="button" data-filtro="todos">Todos</button>
+            <button type="button" class="active" data-filtro="aberto">Deve</button>
             <button type="button" data-filtro="quitado">Já pagou</button>
           </div>
 
           <div class="banner-local" id="bannerLocal">
+            <button type="button" class="btn-fechar-banner" id="btnFecharBanner" title="Esconder" aria-label="Esconder aviso">×</button>
             <strong>Caderno só neste celular.</strong> Uma vez por semana toque em Guardar caderno e mande pro seu WhatsApp.
           </div>
 
@@ -1618,7 +1658,6 @@
       </div>
 
       <nav class="home-bar" aria-label="Ações da conta">
-        <button type="button" class="btn ghost" id="btnVoltarAdmin" hidden title="Painel admin">Admin</button>
         <div class="trial-pill" id="trialPill"></div>
         <div class="home-bar-right">
           <button type="button" class="btn ghost" id="btnInstalarHome" title="Colocar na tela inicial">Ícone</button>
@@ -1938,7 +1977,7 @@
       logado: false,
       role: null,
       fromAdmin: false,
-      filtro: "todos",
+      filtro: "aberto",
       onboardStep: 0,
     };
 
@@ -2325,9 +2364,6 @@
       carregar();
       atualizarNomeMercadoUI();
       atualizarPillTrial();
-      const btnAdmin = $("#btnVoltarAdmin");
-      // Só aparece se você entrou pelo painel Admin → “Abrir app do balcão”
-      if (btnAdmin) btnAdmin.hidden = !(isAdmin() && state.fromAdmin);
       if (!isAdmin() && !onboardingFeito()) {
         abrirOnboarding();
         return;
@@ -2406,6 +2442,17 @@
     function marcarCadernoGuardado() {
       salvarChecklistMeta({ guardar: true });
       renderChecklist();
+      atualizarBotaoGuardar();
+    }
+
+    function atualizarBotaoGuardar() {
+      const btn = $("#btnBackup");
+      if (!btn) return;
+      const ja = !!lerChecklistMeta().guardar;
+      btn.classList.toggle("suave", ja);
+      btn.innerHTML = ja
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar de novo`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar caderno`;
     }
 
     function renderChecklist() {
@@ -2413,14 +2460,23 @@
       const banner = $("#bannerLocal");
       if (!box) return;
       const p = progressoChecklist();
+      const meta = lerChecklistMeta();
       const completo = p.cliente && p.fiado && p.receber && p.guardar;
       const mostrarCheck = !isAdmin() && !p.dismissed && !completo;
       box.classList.toggle("show", mostrarCheck);
-      if (banner) banner.classList.toggle("show", !mostrarCheck && !isAdmin());
+      // Aviso some depois de guardar, fechar, ou enquanto o checklist ainda aparece
+      const mostrarBanner =
+        !isAdmin() &&
+        !mostrarCheck &&
+        !p.guardar &&
+        !meta.bannerDismissed &&
+        state.clientes.length > 0;
+      if (banner) banner.classList.toggle("show", mostrarBanner);
       box.querySelectorAll("[data-check]").forEach((li) => {
         const key = li.dataset.check;
         li.classList.toggle("done", !!p[key]);
       });
+      atualizarBotaoGuardar();
     }
 
     function atualizarNomeMercadoUI() {
@@ -2796,7 +2852,14 @@
         });
 
       $("#totalAberto").textContent = formatBRL(totalAberto());
-      $("#totalClientes").textContent = String(state.clientes.length);
+      const qtdDevem = state.clientes.filter((c) => saldoCliente(c) > 0.009).length;
+      const badgeWrap = $("#qtdBadge");
+      if (badgeWrap) {
+        badgeWrap.innerHTML =
+          qtdDevem > 0
+            ? `<strong>${qtdDevem}</strong> devem · <strong>${state.clientes.length}</strong> no caderno`
+            : `<strong>${state.clientes.length}</strong> cadastrados`;
+      }
       const hoje = totaisHoje();
       $("#hojeFiado").textContent = formatBRL(hoje.fiado);
       $("#hojeRecebido").textContent = formatBRL(hoje.recebido);
@@ -2808,25 +2871,19 @@
 
       const dica = $("#listaDica");
       if (dica) {
-        dica.hidden = false;
         if (!state.clientes.length) {
+          dica.hidden = false;
           dica.innerHTML =
             'Aqui vai aparecer a <strong>lista dos nomes</strong>. Toque em <strong>Novo</strong> pra cadastrar o primeiro.';
         } else {
-          dica.innerHTML =
-            'Toque no <strong>nome</strong> pra ver o histórico — ou use <strong>Fiado</strong> / <strong>Receber</strong> direto.';
+          dica.hidden = true;
         }
       }
 
       const box = $("#listaClientes");
       if (!lista.length) {
         const semNada = !state.clientes.length;
-        const msgFiltro =
-          state.filtro === "aberto"
-            ? "Ninguém deve agora. Troque o filtro pra Todos."
-            : state.filtro === "quitado"
-              ? "Ninguém quitado ainda. Troque o filtro pra Todos."
-              : "Toque em <strong>Novo</strong> pra cadastrar o primeiro nome.";
+        const soFiltro = state.clientes.length > 0 && state.filtro === "aberto";
         const titulo = semNada
           ? "Ainda sem clientes na lista"
           : q
@@ -2838,11 +2895,16 @@
                 : "Ainda sem clientes na lista";
         const texto = semNada
           ? "Esta área é a lista de nomes. Cadastre alguém e o nome aparece aqui pra você anotar o fiado."
-          : state.clientes.length && (q || state.filtro !== "todos")
-            ? q
-              ? "Nenhum cliente com esse nome."
-              : msgFiltro
-            : msgFiltro;
+          : q
+            ? "Nenhum cliente com esse nome."
+            : state.filtro === "aberto"
+              ? "Todo mundo quitado. Toque em Todos pra ver a lista completa."
+              : state.filtro === "quitado"
+                ? "Ninguém quitado ainda. Troque o filtro pra Todos."
+                : "Toque em <strong>Novo</strong> pra cadastrar o primeiro nome.";
+        const extraBtn = soFiltro && !q
+          ? `<button type="button" class="btn primary" id="btnVerTodos">Ver todos os clientes</button>`
+          : "";
         box.innerHTML = `
           <div class="vazio">
             <svg class="ilustra" viewBox="0 0 160 160" aria-hidden="true">
@@ -2854,7 +2916,15 @@
             </svg>
             <div class="titulo-vazio">${titulo}</div>
             <div>${texto}</div>
+            ${extraBtn}
           </div>`;
+        const verTodos = $("#btnVerTodos");
+        if (verTodos) {
+          verTodos.addEventListener("click", () => {
+            state.filtro = "todos";
+            renderHome();
+          });
+        }
         return;
       }
 
@@ -2862,10 +2932,22 @@
         .map(({ c, saldo }) => {
           const lim = limiteCliente(c);
           const estourou = acimaDoLimite(c, saldo);
-          let meta = saldo > 0.009 ? "Deve" : "Já pagou";
+          const deve = saldo > 0.009;
+          let meta = deve ? "Deve" : "Já pagou · toque pra abrir";
           if (estourou) meta = "Acima do limite";
-          else if (lim != null && saldo > 0.009) meta += ` · limite ${formatBRL(lim)}`;
+          else if (lim != null && deve) meta += ` · limite ${formatBRL(lim)}`;
           if (c.fone) meta += " · " + escapeHtml(c.fone);
+          let atalhos = "";
+          if (deve) {
+            atalhos = `<div class="cliente-atalhos">
+              <button type="button" class="btn accent" data-rapido="debito" data-id="${c.id}">+ Fiado</button>
+              <button type="button" class="btn primary" data-rapido="pagamento" data-id="${c.id}">Receber</button>
+            </div>`;
+          } else if (state.filtro === "quitado") {
+            atalhos = `<div class="cliente-atalhos um">
+              <button type="button" class="btn accent" data-rapido="debito" data-id="${c.id}">+ Fiado</button>
+            </div>`;
+          }
           return `
           <div class="cliente" data-id="${c.id}">
             <button type="button" class="cliente-main" data-abrir="${c.id}">
@@ -2873,12 +2955,9 @@
                 <div class="nome">${escapeHtml(c.nome)}</div>
                 <div class="meta${estourou ? " limite" : ""}">${meta}</div>
               </div>
-              <div class="saldo ${saldo <= 0.009 ? "zero" : ""}">${formatBRL(saldo)}</div>
+              <div class="saldo ${deve ? "" : "zero"}">${formatBRL(saldo)}</div>
             </button>
-            <div class="cliente-atalhos">
-              <button type="button" class="btn accent" data-rapido="debito" data-id="${c.id}">+ Fiado</button>
-              <button type="button" class="btn primary" data-rapido="pagamento" data-id="${c.id}">Receber</button>
-            </div>
+            ${atalhos}
           </div>
         `;
         })
@@ -3546,6 +3625,10 @@
       salvarChecklistMeta({ dismissed: true });
       renderChecklist();
     });
+    $("#btnFecharBanner")?.addEventListener("click", () => {
+      salvarChecklistMeta({ bannerDismissed: true });
+      renderChecklist();
+    });
 
     $("#btnNovoCliente").addEventListener("click", () => {
       if (!acessoLiberado()) return entrarNoApp();
@@ -3610,11 +3693,6 @@
       e.target.value = "";
     });
 
-    $("#btnVoltarAdmin").addEventListener("click", () => {
-      if (!isAdmin()) return;
-      state.fromAdmin = false;
-      abrirAdmin();
-    });
     $("#btnSairAdmin").addEventListener("click", () => {
       limparSessao();
       atualizarHintLogin();
