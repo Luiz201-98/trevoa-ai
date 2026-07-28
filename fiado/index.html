@@ -601,20 +601,38 @@
     .gate::before {
       content: "";
       position: absolute;
-      left: -1rem;
-      right: -1rem;
-      top: 8%;
-      height: 42%;
+      left: 10%;
+      right: -8%;
+      top: auto;
+      bottom: 18%;
+      height: 38%;
       border-radius: 1.5rem;
       background:
-        linear-gradient(135deg, rgba(196, 92, 38, 0.12), transparent 55%),
-        linear-gradient(180deg, rgba(26, 46, 31, 0.08), transparent);
+        linear-gradient(145deg, rgba(196, 92, 38, 0.1), transparent 60%),
+        linear-gradient(180deg, rgba(26, 46, 31, 0.05), transparent);
       pointer-events: none;
-      z-index: -1;
+      z-index: 0;
     }
 
     .gate .brand-mark {
       margin-bottom: 0.55rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .gate .brand-mark .logo {
+      background: var(--cream);
+      border-radius: 1.05rem;
+      padding: 0.15rem;
+      box-shadow: 0 10px 28px rgba(26, 46, 31, 0.14);
+    }
+
+    .gate .gate-msg,
+    .gate .sheet,
+    .gate .hint,
+    .gate .install-hint {
+      position: relative;
+      z-index: 1;
     }
 
     .gate .sheet {
@@ -1326,6 +1344,7 @@
     }
 
     function limiteCliente(c) {
+      if (!c) return null;
       const n = Number(c.limite);
       return Number.isFinite(n) && n > 0 ? n : null;
     }
