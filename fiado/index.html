@@ -111,9 +111,9 @@
 
     .resumo {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1fr;
       gap: 0.5rem;
-      margin: 1rem 0 0.9rem;
+      margin: 0.75rem 0 1rem;
       animation: rise 0.4s 0.05s ease-out both;
     }
 
@@ -121,7 +121,7 @@
       background: var(--cream);
       border: 1.5px solid var(--line);
       border-radius: 0.85rem;
-      padding: 0.85rem 0.9rem;
+      padding: 0.85rem 0.95rem;
     }
 
     .resumo .label {
@@ -135,7 +135,7 @@
     .resumo .valor {
       margin-top: 0.2rem;
       font-family: "Bricolage Grotesque", sans-serif;
-      font-size: 1.45rem;
+      font-size: 1.55rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--brand);
@@ -145,15 +145,50 @@
     .resumo .valor.alerta { color: var(--debt); }
     .resumo .valor.ok { color: var(--ok); }
 
-    .resumo.hoje {
-      grid-template-columns: 1fr 1fr;
-      margin-top: 0;
-      margin-bottom: 0.9rem;
-      animation: rise 0.4s 0.06s ease-out both;
+    .resumo.duo {
+      grid-template-columns: 1.4fr 1fr;
     }
 
-    .resumo.hoje .valor {
-      font-size: 1.2rem;
+    .resumo.duo .valor {
+      font-size: 1.45rem;
+    }
+
+    .secao-clientes {
+      animation: rise 0.4s 0.08s ease-out both;
+    }
+
+    .secao-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .secao-head h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--brand);
+      line-height: 1;
+    }
+
+    .qtd-badge {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      white-space: nowrap;
+    }
+
+    .qtd-badge strong {
+      color: var(--brand);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1rem;
     }
 
     .aviso-limite {
@@ -574,7 +609,18 @@
       border-radius: 0.7rem;
       padding: 0.8rem 0.85rem;
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       resize: vertical;
+    }
+
+    .field input[type="date"] {
+      display: block;
+      min-height: 3rem;
+      line-height: 1.2;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .field input.money {
@@ -591,6 +637,7 @@
       padding: 1rem;
       margin-bottom: 0.9rem;
       animation: rise 0.35s ease-out both;
+      overflow-x: clip;
     }
 
     .sheet h2 {
@@ -799,6 +846,97 @@
       gap: 0.75rem;
     }
 
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: flex-end;
+      max-width: 11rem;
+    }
+
+    .header-actions .btn {
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+    }
+
+    .formas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .formas button {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.7rem 0.5rem;
+      border-radius: 0.7rem;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .formas button.on {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #eef5ef;
+    }
+
+    .confirm-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(20, 32, 24, 0.55);
+      padding: calc(1rem + var(--safe-top)) 1rem calc(1rem + var(--safe-bottom));
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .confirm-modal.show { display: flex; }
+
+    .confirm-modal .sheet {
+      width: min(28rem, 100%);
+      margin: 0;
+      animation: rise 0.3s ease-out both;
+    }
+
+    .confirm-modal h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.45rem;
+    }
+
+    .confirm-modal .resumo-confirm {
+      background: #eef4f0;
+      border: 1.5px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.85rem 0.95rem;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .confirm-modal .resumo-confirm strong {
+      color: var(--brand);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+    }
+
+    .confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+    }
+
     .lembrar {
       display: flex;
       align-items: center;
@@ -848,10 +986,66 @@
 
     .home-actions {
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto;
       gap: 0.45rem;
-      margin-bottom: 0.85rem;
-      animation: rise 0.4s 0.08s ease-out both;
+      margin-bottom: 0.45rem;
+      animation: none;
+    }
+
+    .btn-guardar {
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+
+    #viewHome.active {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100dvh - 2.2rem - var(--safe-top) - var(--safe-bottom));
+    }
+
+    .home-main {
+      flex: 1 1 auto;
+    }
+
+    .home-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.1rem;
+      padding-top: 0.75rem;
+      border-top: 1.5px dashed var(--line);
+      position: sticky;
+      bottom: 0;
+      background:
+        linear-gradient(180deg, transparent 0%, var(--bg-deep) 28%);
+      padding-bottom: 0.15rem;
+      z-index: 4;
+    }
+
+    .home-bar .btn {
+      padding: 0.5rem 0.7rem;
+      font-size: 0.82rem;
+    }
+
+    .home-bar .trial-pill {
+      margin: 0;
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 0.72rem;
+      padding: 0.35rem 0.55rem;
+      min-width: 0;
+    }
+
+    .home-bar .trial-pill:empty {
+      visibility: hidden;
+    }
+
+    .home-bar-right {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
     }
 
     .mov-actions {
@@ -1327,108 +1521,110 @@
 
     <!-- HOME -->
     <section id="viewHome" class="view">
-      <header>
-        <div class="header-row">
-          <div>
-            <div class="brand-mark">
-              <img class="logo" src="./icon.svg" alt="" width="42" height="42" />
-              <div>
-                <div class="brand">Fiado</div>
-                <p class="subtitle">Toque no nome → anota fiado ou recebe.</p>
-              </div>
+      <div class="home-main">
+        <header>
+          <div class="brand-mark">
+            <img class="logo" src="./icon.svg" alt="" width="42" height="42" />
+            <div>
+              <div class="brand">Fiado</div>
+              <p class="subtitle">Toque no nome → anota fiado ou recebe.</p>
             </div>
-            <div class="trial-pill" id="trialPill"></div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:0.35rem;align-items:flex-end">
-            <button type="button" class="btn ghost" id="btnVoltarAdmin" hidden title="Painel admin">Admin</button>
-            <button type="button" class="btn ghost" id="btnInstalarHome" title="Colocar na tela inicial">Ícone</button>
-            <button type="button" class="btn ghost" id="btnSair" title="Sair">Sair</button>
+        </header>
+
+        <div class="aviso-teste" id="avisoTeste"></div>
+
+        <div class="checklist" id="checklistPrimeira">
+          <div class="checklist-top">
+            <div>
+              <strong>Primeiros passos</strong>
+              <span>Faça estes 4 e o app fica no jeito.</span>
+            </div>
+            <button type="button" class="btn ghost" id="btnEsconderChecklist" title="Esconder">OK</button>
           </div>
+          <ol id="listaChecklist">
+            <li data-check="cliente">
+              <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Cadastrar o 1º cliente
+            </li>
+            <li data-check="fiado">
+              <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Anotar um fiado
+            </li>
+            <li data-check="receber">
+              <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Marcar um recebimento
+            </li>
+            <li data-check="guardar">
+              <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Guardar cópia no WhatsApp
+            </li>
+          </ol>
         </div>
-      </header>
 
-      <div class="aviso-teste" id="avisoTeste"></div>
-
-      <div class="checklist" id="checklistPrimeira">
-        <div class="checklist-top">
+        <div class="resumo" aria-label="Resumo do dia">
           <div>
-            <strong>Primeiros passos</strong>
-            <span>Faça estes 4 e o app fica no jeito.</span>
+            <div class="label">Total em aberto</div>
+            <div class="valor alerta" id="totalAberto">R$ 0,00</div>
           </div>
-          <button type="button" class="btn ghost" id="btnEsconderChecklist" title="Esconder">OK</button>
+          <div>
+            <div class="label">Fiado hoje</div>
+            <div class="valor alerta" id="hojeFiado">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="label">Recebido hoje</div>
+            <div class="valor ok" id="hojeRecebido">R$ 0,00</div>
+          </div>
         </div>
-        <ol id="listaChecklist">
-          <li data-check="cliente">
-            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            Cadastrar o 1º cliente
-          </li>
-          <li data-check="fiado">
-            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            Anotar um fiado
-          </li>
-          <li data-check="receber">
-            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            Marcar um recebimento
-          </li>
-          <li data-check="guardar">
-            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            Guardar cópia no WhatsApp
-          </li>
-        </ol>
+
+        <div class="secao-clientes">
+          <div class="secao-head">
+            <h2>Clientes</h2>
+            <div class="qtd-badge"><strong id="totalClientes">0</strong> cadastrados</div>
+          </div>
+
+          <div class="home-actions">
+            <div class="search">
+              <input id="busca" type="search" placeholder="Buscar cliente…" autocomplete="off" />
+            </div>
+            <button type="button" class="btn primary" id="btnNovoCliente">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+              Novo
+            </button>
+          </div>
+
+          <button type="button" class="btn btn-guardar" id="btnBackup" title="Guardar cópia do caderno">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Guardar caderno
+          </button>
+
+          <div class="filtros" role="tablist" aria-label="Filtrar clientes">
+            <button type="button" class="active" data-filtro="todos">Todos</button>
+            <button type="button" data-filtro="aberto">Deve</button>
+            <button type="button" data-filtro="quitado">Já pagou</button>
+          </div>
+
+          <div class="banner-local" id="bannerLocal">
+            <strong>Caderno só neste celular.</strong> Uma vez por semana toque em Guardar caderno e mande pro seu WhatsApp.
+          </div>
+
+          <p class="lista-dica" id="listaDica">
+            Toque no <strong>nome</strong> pra ver o histórico — ou use <strong>Fiado</strong> / <strong>Receber</strong>.
+          </p>
+
+          <div class="lista" id="listaClientes"></div>
+          <p class="hint">Os dados ficam neste celular. Guarde uma cópia de vez em quando.</p>
+        </div>
       </div>
 
-      <div class="banner-local" id="bannerLocal">
-        <strong>Caderno só neste celular.</strong> Uma vez por semana toque em Guardar e mande pro seu WhatsApp.
-      </div>
-
-      <div class="resumo">
-        <div>
-          <div class="label">Total em aberto</div>
-          <div class="valor alerta" id="totalAberto">R$ 0,00</div>
+      <nav class="home-bar" aria-label="Ações da conta">
+        <button type="button" class="btn ghost" id="btnVoltarAdmin" hidden title="Painel admin">Admin</button>
+        <div class="trial-pill" id="trialPill"></div>
+        <div class="home-bar-right">
+          <button type="button" class="btn ghost" id="btnInstalarHome" title="Colocar na tela inicial">Ícone</button>
+          <button type="button" class="btn ghost" id="btnSair" title="Sair">Sair</button>
         </div>
-        <div>
-          <div class="label">Clientes</div>
-          <div class="valor" id="totalClientes">0</div>
-        </div>
-      </div>
-
-      <div class="resumo hoje">
-        <div>
-          <div class="label">Fiado hoje</div>
-          <div class="valor alerta" id="hojeFiado">R$ 0,00</div>
-        </div>
-        <div>
-          <div class="label">Recebido hoje</div>
-          <div class="valor ok" id="hojeRecebido">R$ 0,00</div>
-        </div>
-      </div>
-
-      <div class="home-actions">
-        <div class="search">
-          <input id="busca" type="search" placeholder="Buscar cliente…" autocomplete="off" />
-        </div>
-        <button type="button" class="btn" id="btnBackup" title="Guardar cópia do caderno">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Guardar
-        </button>
-        <button type="button" class="btn primary" id="btnNovoCliente">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-          Novo
-        </button>
-      </div>
-
-      <div class="filtros" role="tablist" aria-label="Filtrar clientes">
-        <button type="button" class="active" data-filtro="todos">Todos</button>
-        <button type="button" data-filtro="aberto">Deve</button>
-        <button type="button" data-filtro="quitado">Já pagou</button>
-      </div>
-
-      <p class="lista-dica" id="listaDica">
-        Aqui fica a <strong>lista dos clientes</strong>. Toque no nome pra abrir — ou use <strong>Fiado</strong> / <strong>Receber</strong>.
-      </p>
-
-      <div class="lista" id="listaClientes"></div>
-      <p class="hint">Os dados ficam neste celular. Guarde uma cópia de vez em quando.</p>
+      </nav>
     </section>
 
     <!-- NOVO / EDITAR CLIENTE -->
@@ -1550,7 +1746,7 @@
         <button type="button" class="btn ghost" id="btnSairAdmin">Sair</button>
       </div>
 
-      <div class="resumo">
+      <div class="resumo duo">
         <div>
           <div class="label">Total em aberto</div>
           <div class="valor alerta" id="adminTotalAberto">R$ 0,00</div>
@@ -1653,6 +1849,18 @@
 
   <div class="toast" id="toast" role="status"></div>
 
+  <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" hidden>
+    <div class="sheet">
+      <h2 id="confirmTitulo">Confirmar?</h2>
+      <div class="resumo-confirm" id="confirmCorpo"></div>
+      <p class="hint" id="confirmDica" style="text-align:left;margin:0 0 0.85rem"></p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" id="btnConfirmNao">Cancelar</button>
+        <button type="button" class="btn primary" id="btnConfirmSim">Sim, confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="install-modal" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installTitulo" hidden>
     <div class="sheet">
       <h2 id="installTitulo">Colocar o Fiado na tela inicial</h2>
@@ -1726,6 +1934,7 @@
       ativoId: null,
       modoForm: "novo",
       tipoMov: null,
+      formaPagamento: null,
       logado: false,
       role: null,
       fromAdmin: false,
@@ -2010,6 +2219,7 @@
       }
       erro.textContent = "";
       iniciarTrialSePreciso();
+      state.fromAdmin = false;
       gravarSessao(lembrar, "user", user);
       $("#loginPass").value = "";
       entrarNoApp();
@@ -2116,7 +2326,8 @@
       atualizarNomeMercadoUI();
       atualizarPillTrial();
       const btnAdmin = $("#btnVoltarAdmin");
-      if (btnAdmin) btnAdmin.hidden = !isAdmin();
+      // Só aparece se você entrou pelo painel Admin → “Abrir app do balcão”
+      if (btnAdmin) btnAdmin.hidden = !(isAdmin() && state.fromAdmin);
       if (!isAdmin() && !onboardingFeito()) {
         abrirOnboarding();
         return;
@@ -2816,24 +3027,37 @@
         return;
       }
       box.innerHTML = movs
-        .map((m) => `
+        .map((m) => {
+          const forma = m.forma ? ` · ${escapeHtml(rotuloForma(m.forma))}` : "";
+          const nota = m.nota ? `<div class="nota">${escapeHtml(m.nota)}</div>` : "";
+          return `
           <div class="mov">
             <div>
-              <div class="tipo ${m.tipo}">${m.tipo === "debito" ? "Fiado" : "Pagamento"}</div>
+              <div class="tipo ${m.tipo}">${m.tipo === "debito" ? "Fiado" : "Pagamento"}${forma}</div>
               <div class="quando">${formatQuando(m.ts)}${m.dataRef ? " · ref. " + formatDataBR(m.dataRef) : ""}</div>
             </div>
             <div class="valor ${m.tipo}">${m.tipo === "debito" ? "+" : "−"} ${formatBRL(m.valor)}</div>
-            ${m.nota ? `<div class="nota">${escapeHtml(m.nota)}</div>` : ""}
+            ${nota}
             <div class="mov-actions">
               <button type="button" class="btn-mini" data-apagar-mov="${m.id}">Apagar</button>
             </div>
-          </div>
-        `)
+          </div>`;
+        })
         .join("");
 
       box.querySelectorAll("[data-apagar-mov]").forEach((btn) => {
         btn.addEventListener("click", () => apagarMovimento(btn.dataset.apagarMov));
       });
+    }
+
+    function rotuloForma(forma) {
+      const map = {
+        dinheiro: "Dinheiro",
+        pix: "Pix",
+        debito: "Débito",
+        credito: "Crédito",
+      };
+      return map[forma] || forma;
     }
 
     function apagarMovimento(movId) {
@@ -2846,7 +3070,7 @@
       if (!confirm(`Apagar este ${tipo} de ${formatBRL(mov.valor)}?`)) return;
       c.movs = c.movs.filter((m) => m.id !== movId);
       salvar();
-      toast("Lançamento apagado");
+      toast("Lançamento apagado — saldo atualizado");
       abrirDetalhe(c.id);
     }
 
@@ -2856,15 +3080,16 @@
       if (!c || !(c.movs || []).length) return;
       const ultimo = [...c.movs].sort((a, b) => b.ts - a.ts)[0];
       const tipo = ultimo.tipo === "debito" ? "fiado" : "pagamento";
-      if (!confirm(`Desfazer o último ${tipo} de ${formatBRL(ultimo.valor)}?`)) return;
+      if (!confirm(`Desfazer o último ${tipo} de ${formatBRL(ultimo.valor)}?\nO valor volta pro saldo.`)) return;
       c.movs = c.movs.filter((m) => m.id !== ultimo.id);
       salvar();
-      toast("Último lançamento desfeito");
+      toast("Desfeito — saldo voltou");
       abrirDetalhe(c.id);
     }
 
     function abrirPainel(tipo) {
       state.tipoMov = tipo;
+      state.formaPagamento = null;
       const isDebito = tipo === "debito";
       const c = clienteAtivo();
       const saldoAtual = c ? Math.round(saldoCliente(c) * 100) / 100 : 0;
@@ -2879,6 +3104,18 @@
           <p class="hint-field" id="movPreviaSaldo" style="margin:-0.35rem 0 0.85rem;font-size:0.85rem;color:var(--ink-soft)">
             Digite quanto recebeu — a conta só zera se o valor for o total.
           </p>`;
+      const blocoForma = isDebito
+        ? ""
+        : `<div class="field" style="margin-bottom:0.35rem">
+            Como pagou?
+            <span class="hint-field">Escolha uma opção</span>
+          </div>
+          <div class="formas" id="formasPagamento" role="group" aria-label="Forma de pagamento">
+            <button type="button" data-forma="dinheiro">Dinheiro</button>
+            <button type="button" data-forma="pix">Pix</button>
+            <button type="button" data-forma="debito">Débito</button>
+            <button type="button" data-forma="credito">Crédito</button>
+          </div>`;
       const btnTudo =
         !isDebito && saldoAtual > 0.009
           ? `<button type="button" class="btn full" id="btnReceberTudo" style="margin-top:0.45rem">
@@ -2892,6 +3129,7 @@
           Valor (R$)
           <input class="money" id="movValor" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" />
         </label>
+        ${blocoForma}
         <label class="field">
           Data
           <input id="movData" type="date" value="${hojeISO()}" />
@@ -2914,6 +3152,14 @@
           confirmarMov(true);
         });
       }
+      document.querySelectorAll("#formasPagamento [data-forma]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.formaPagamento = btn.dataset.forma;
+          document.querySelectorAll("#formasPagamento [data-forma]").forEach((b) => {
+            b.classList.toggle("on", b.dataset.forma === state.formaPagamento);
+          });
+        });
+      });
       const inputValor = $("#movValor");
       if (!isDebito && inputValor) {
         inputValor.addEventListener("input", () => atualizarPreviaPagamento(saldoAtual));
@@ -2944,7 +3190,36 @@
       }
     }
 
-    function confirmarMov(receberTudo) {
+    let confirmResolve = null;
+
+    function pedirConfirmacao({ titulo, corpo, dica, botaoSim }) {
+      return new Promise((resolve) => {
+        confirmResolve = resolve;
+        $("#confirmTitulo").textContent = titulo || "Confirmar?";
+        $("#confirmCorpo").innerHTML = corpo || "";
+        const dicaEl = $("#confirmDica");
+        if (dicaEl) {
+          dicaEl.textContent = dica || "";
+          dicaEl.hidden = !dica;
+        }
+        const sim = $("#btnConfirmSim");
+        if (sim) sim.textContent = botaoSim || "Sim, confirmar";
+        const modal = $("#confirmModal");
+        modal.hidden = false;
+        modal.classList.add("show");
+      });
+    }
+
+    function fecharConfirmacao(ok) {
+      const modal = $("#confirmModal");
+      modal.classList.remove("show");
+      modal.hidden = true;
+      const fn = confirmResolve;
+      confirmResolve = null;
+      if (fn) fn(!!ok);
+    }
+
+    async function confirmarMov(receberTudo) {
       if (!exigirAcesso()) return;
       const c = clienteAtivo();
       if (!c) return;
@@ -2972,28 +3247,36 @@
         valorOk = Math.round(valor * 100) / 100;
       }
 
-      // Travas: pagamento NUNCA usa o saldo “por acidente” — só o que foi digitado (ou Receber tudo).
+      let forma = null;
       if (tipo === "pagamento") {
-        const depois = Math.round((saldoAntes - valorOk) * 100) / 100;
-        let msg;
-        if (depois <= 0.009) {
-          msg =
-            valorOk > saldoAntes + 0.009
-              ? `Receber ${formatBRL(valorOk)}?\nEle só deve ${formatBRL(saldoAntes)} — a conta vai ZERAR.`
-              : `Receber ${formatBRL(valorOk)}?\nIsso ZERA a conta (hoje deve ${formatBRL(saldoAntes)}).`;
-        } else {
-          msg = `Receber ${formatBRL(valorOk)}?\nHoje deve ${formatBRL(saldoAntes)} → fica devendo ${formatBRL(depois)}.`;
+        forma = state.formaPagamento;
+        if (!forma) {
+          toast("Escolha como pagou: Dinheiro, Pix, Débito ou Crédito", true);
+          return;
         }
-        if (!confirm(msg)) return;
+        const depois = Math.round((saldoAntes - valorOk) * 100) / 100;
+        const corpo =
+          depois <= 0.009
+            ? `Receber <strong>${formatBRL(valorOk)}</strong> no <strong>${rotuloForma(forma)}</strong>?<br><br>Hoje deve ${formatBRL(saldoAntes)} → a conta <strong>ZERA</strong>.`
+            : `Receber <strong>${formatBRL(valorOk)}</strong> no <strong>${rotuloForma(forma)}</strong>?<br><br>Hoje deve ${formatBRL(saldoAntes)} → fica <strong>${formatBRL(depois)}</strong>.`;
+        const ok = await pedirConfirmacao({
+          titulo: "Confirmar recebimento",
+          corpo,
+          dica: "Errou? Depois dá pra Desfazer o último lançamento.",
+          botaoSim: "Sim, receber",
+        });
+        if (!ok) return;
       }
 
       if (tipo === "debito") {
         const lim = limiteCliente(c);
         const novoSaldo = saldoAntes + valorOk;
         if (lim != null && novoSaldo > lim + 0.009) {
-          const ok = confirm(
-            `Isso passa do limite de ${formatBRL(lim)}.\nSaldo ficaria em ${formatBRL(novoSaldo)}.\n\nLançar mesmo assim?`
-          );
+          const ok = await pedirConfirmacao({
+            titulo: "Passou do limite",
+            corpo: `Limite ${formatBRL(lim)}.<br>Saldo ficaria em <strong>${formatBRL(novoSaldo)}</strong>.<br><br>Lançar mesmo assim?`,
+            botaoSim: "Sim, lançar",
+          });
           if (!ok) return;
         }
       }
@@ -3008,10 +3291,10 @@
         dataRef,
         ts: Date.now(),
       };
+      if (forma) mov.forma = forma;
       c.movs.push(mov);
       salvar();
 
-      // Guarda: se o saldo não bater com a conta, desfaz o lançamento.
       const saldoDepois = Math.round(saldoCliente(c) * 100) / 100;
       const esperado =
         tipo === "debito"
@@ -3029,8 +3312,8 @@
         const resto = Math.max(0, saldoDepois);
         toast(
           resto <= 0.009
-            ? `Recebido ${formatBRL(valorOk)} — conta zerada`
-            : `Recebido ${formatBRL(valorOk)} — ainda deve ${formatBRL(resto)}`
+            ? `Recebido ${formatBRL(valorOk)} (${rotuloForma(forma)}) — zerou. Errou? use Desfazer`
+            : `Recebido ${formatBRL(valorOk)} (${rotuloForma(forma)}) — ainda deve ${formatBRL(resto)}`
         );
       } else {
         toast("Fiado lançado");
@@ -3329,6 +3612,7 @@
 
     $("#btnVoltarAdmin").addEventListener("click", () => {
       if (!isAdmin()) return;
+      state.fromAdmin = false;
       abrirAdmin();
     });
     $("#btnSairAdmin").addEventListener("click", () => {
@@ -3347,7 +3631,7 @@
     $("#btnAdminLimparLog").addEventListener("click", adminLimparLog);
     $("#btnCopiarPix").addEventListener("click", copiarPixBloqueado);
     $("#btnAdminAbrirBalcao").addEventListener("click", () => {
-      state.fromAdmin = false;
+      state.fromAdmin = true;
       entrarNoApp();
     });
     $("#btnAdminBackup").addEventListener("click", () => {
@@ -3441,6 +3725,11 @@
     $("#btnInstalarHome")?.addEventListener("click", abrirGuiaInstalar);
     $("#installModal")?.addEventListener("click", (e) => {
       if (e.target === $("#installModal")) fecharGuiaInstalar();
+    });
+    $("#btnConfirmNao")?.addEventListener("click", () => fecharConfirmacao(false));
+    $("#btnConfirmSim")?.addEventListener("click", () => fecharConfirmacao(true));
+    $("#confirmModal")?.addEventListener("click", (e) => {
+      if (e.target === $("#confirmModal")) fecharConfirmacao(false);
     });
     atualizarBotoesInstalar();
 
