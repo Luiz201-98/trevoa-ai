@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a2e1f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fiado" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Controle de fiado e vale do mercadinho" />
+  <title>Fiado · Controle de vale</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e4ebe3;
+      --bg-deep: #cfd9cd;
+      --ink: #142018;
+      --ink-soft: #4a5c4f;
+      --brand: #1a2e1f;
+      --accent: #c45c26;
+      --accent-soft: #f3e0d4;
+      --cream: #f4f7f3;
+      --line: #b4c2b5;
+      --ok: #1f6b45;
+      --warn: #a14a1a;
+      --debt: #9b2e2e;
+      --pay: #1f6b45;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: "Manrope", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 90% 55% at 0% -5%, #d5e2d4 0%, transparent 55%),
+        radial-gradient(ellipse 70% 45% at 100% 5%, #e8dccf 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      padding: calc(1.1rem + var(--safe-top)) 1rem calc(1.25rem + var(--safe-bottom));
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(rgba(26, 46, 31, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 46, 31, 0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      z-index: 0;
+    }
+
+    .wrap {
+      max-width: 28rem;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    header { margin-bottom: 1rem; animation: rise 0.4s ease-out both; }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .brand-mark .logo {
+      width: 2.6rem;
+      height: 2.6rem;
+      flex-shrink: 0;
+      filter: drop-shadow(0 6px 14px rgba(26, 46, 31, 0.18));
+      animation: floaty 4.5s ease-in-out infinite;
+    }
+
+    .gate .brand-mark .logo {
+      width: 4.1rem;
+      height: 4.1rem;
+    }
+
+    .brand {
+      font-family: "Bricolage Grotesque", Georgia, sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .gate .brand {
+      font-size: 2.6rem;
+    }
+
+    .subtitle {
+      margin-top: 0.35rem;
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+    }
+
+    .resumo {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 0.5rem;
+      margin: 1rem 0 0.9rem;
+      animation: rise 0.4s 0.05s ease-out both;
+    }
+
+    .resumo > div {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 0.9rem;
+    }
+
+    .resumo .label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+    }
+
+    .resumo .valor {
+      margin-top: 0.2rem;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--brand);
+      line-height: 1.15;
+    }
+
+    .resumo .valor.alerta { color: var(--debt); }
+    .resumo .valor.ok { color: var(--ok); }
+
+    .resumo.hoje {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 0;
+      margin-bottom: 0.9rem;
+      animation: rise 0.4s 0.06s ease-out both;
+    }
+
+    .resumo.hoje .valor {
+      font-size: 1.2rem;
+    }
+
+    .aviso-limite {
+      margin-top: 0.55rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #eef5ef;
+      opacity: 0.9;
+    }
+
+    .aviso-limite.estourou {
+      color: #ffd4a8;
+    }
+
+    .cliente .meta.limite {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .field .hint-field {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink-soft);
+      margin-top: 0.15rem;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      animation: rise 0.4s 0.08s ease-out both;
+    }
+
+    .search {
+      position: relative;
+    }
+
+    .search input {
+      width: 100%;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.7rem;
+      padding: 0.75rem 0.85rem;
+    }
+
+    .search input:focus,
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: 2px solid var(--brand);
+      outline-offset: 1px;
+      border-color: var(--brand);
+    }
+
+    .btn {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border-radius: 0.7rem;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      color: var(--ink);
+      padding: 0.75rem 0.95rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .btn svg {
+      width: 1.05rem;
+      height: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #eef5ef;
+    }
+
+    .btn.accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff7f2;
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .btn.full { width: 100%; }
+
+    .btn.danger {
+      color: var(--debt);
+      border-color: #e0b4b4;
+      background: #f8ecec;
+    }
+
+    .btn.icon-only {
+      padding: 0.7rem;
+      min-width: 2.75rem;
+    }
+
+    .lista {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      animation: rise 0.4s 0.1s ease-out both;
+    }
+
+    .cliente {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 0.95rem;
+      cursor: pointer;
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
+      animation: rise 0.35s ease-out both;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .cliente:nth-child(2) { animation-delay: 0.04s; }
+    .cliente:nth-child(3) { animation-delay: 0.08s; }
+    .cliente:nth-child(4) { animation-delay: 0.12s; }
+    .cliente:nth-child(5) { animation-delay: 0.16s; }
+
+    .cliente:active { transform: scale(0.99); }
+
+    .cliente .nome {
+      font-weight: 700;
+      font-size: 1.02rem;
+      line-height: 1.2;
+    }
+
+    .cliente .meta {
+      margin-top: 0.2rem;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+    }
+
+    .cliente .saldo {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--debt);
+      text-align: right;
+    }
+
+    .cliente .saldo.zero { color: var(--ok); }
+
+    .vazio {
+      text-align: center;
+      padding: 2rem 1rem 1.6rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      background: var(--cream);
+      border: 1.5px dashed var(--line);
+      border-radius: 1rem;
+      animation: rise 0.4s ease-out both;
+    }
+
+    .vazio .ilustra {
+      width: 7.5rem;
+      height: 7.5rem;
+      margin: 0 auto 0.85rem;
+      display: block;
+    }
+
+    .vazio strong { color: var(--brand); }
+
+    .vazio .titulo-vazio {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--brand);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .saldo-bloco .valor.pop {
+      animation: pop 0.45s ease;
+    }
+
+    .install-hint {
+      margin-top: 1rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: 0.85rem;
+      background: rgba(26, 46, 31, 0.06);
+      border: 1px dashed var(--line);
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      text-align: left;
+      animation: rise 0.45s 0.15s ease-out both;
+    }
+
+    .install-hint strong {
+      color: var(--brand);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    .topbar h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      flex: 1;
+    }
+
+    .saldo-bloco {
+      background: var(--brand);
+      color: #eef5ef;
+      border-radius: 1rem;
+      padding: 1.1rem 1.15rem;
+      margin-bottom: 0.9rem;
+      animation: rise 0.35s ease-out both;
+    }
+
+    .saldo-bloco .label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      opacity: 0.75;
+    }
+
+    .saldo-bloco .valor {
+      margin-top: 0.25rem;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .saldo-bloco .fone {
+      margin-top: 0.55rem;
+      font-size: 0.88rem;
+      opacity: 0.8;
+    }
+
+    .acoes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .acoes .btn { padding: 0.9rem 0.5rem; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-soft);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.7rem;
+      padding: 0.8rem 0.85rem;
+      width: 100%;
+      resize: vertical;
+    }
+
+    .field input.money {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .sheet {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 0.9rem;
+      animation: rise 0.35s ease-out both;
+    }
+
+    .sheet h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.02em;
+    }
+
+    .sheet.debito h2 { color: var(--debt); }
+    .sheet.pagamento h2 { color: var(--pay); }
+
+    .historico h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink-soft);
+      margin-bottom: 0.55rem;
+    }
+
+    .mov {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem 0.75rem;
+      padding: 0.7rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .mov:first-of-type { border-top: none; }
+
+    .mov .tipo {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mov .tipo.debito { color: var(--debt); }
+    .mov .tipo.pagamento { color: var(--pay); }
+
+    .mov .quando {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      margin-top: 0.15rem;
+    }
+
+    .mov .nota {
+      grid-column: 1 / -1;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      margin-top: -0.1rem;
+    }
+
+    .mov .valor {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      text-align: right;
+    }
+
+    .mov .valor.debito { color: var(--debt); }
+    .mov .valor.pagamento { color: var(--pay); }
+
+    .footer-actions {
+      display: grid;
+      gap: 0.45rem;
+      margin-top: 1rem;
+    }
+
+    .footer-actions.row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .hint {
+      margin-top: 0.85rem;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(1.25rem + var(--safe-bottom));
+      transform: translateX(-50%) translateY(120%);
+      background: var(--brand);
+      color: #eef5ef;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.75rem 1.1rem;
+      border-radius: 999px;
+      z-index: 50;
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      pointer-events: none;
+      max-width: calc(100% - 2rem);
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.warn { background: var(--warn); }
+
+    .gate {
+      min-height: calc(100dvh - 2.5rem - var(--safe-top) - var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: rise 0.4s ease-out both;
+      position: relative;
+    }
+
+    .gate::before {
+      content: "";
+      position: absolute;
+      left: -1rem;
+      right: -1rem;
+      top: 8%;
+      height: 42%;
+      border-radius: 1.5rem;
+      background:
+        linear-gradient(135deg, rgba(196, 92, 38, 0.12), transparent 55%),
+        linear-gradient(180deg, rgba(26, 46, 31, 0.08), transparent);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .gate .brand-mark {
+      margin-bottom: 0.55rem;
+    }
+
+    .gate .sheet {
+      margin-top: 1.1rem;
+      box-shadow: 0 18px 40px rgba(20, 32, 24, 0.08);
+    }
+
+    .gate-msg {
+      margin-top: 0.35rem;
+      font-size: 0.98rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      max-width: 22rem;
+    }
+
+    .trial-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--brand);
+      background: rgba(26, 46, 31, 0.08);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+    }
+
+    .trial-pill.urgente {
+      color: var(--warn);
+      background: #f7ece0;
+      border-color: #e2c4a4;
+    }
+
+    .trial-pill.pago {
+      color: var(--ok);
+      background: #e4f1ea;
+      border-color: #b5d4c4;
+    }
+
+    .err-login {
+      min-height: 1.2rem;
+      margin: 0.35rem 0 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--debt);
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .lembrar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.15rem 0 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .lembrar input {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--brand);
+    }
+
+    .filtros {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+      animation: rise 0.4s 0.09s ease-out both;
+    }
+
+    .filtros button {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.65rem 0.35rem;
+      border-radius: 0.65rem;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      color: var(--ink-soft);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .filtros button.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #eef5ef;
+    }
+
+    .home-actions {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      animation: rise 0.4s 0.08s ease-out both;
+    }
+
+    .mov-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.15rem;
+    }
+
+    .btn-mini {
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 0.5rem;
+      border: 1.5px solid #e0b4b4;
+      background: #f8ecec;
+      color: var(--debt);
+      cursor: pointer;
+    }
+
+    .btn-desfazer {
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- LOGIN -->
+    <section id="viewLogin" class="view active">
+      <div class="gate">
+        <div class="brand-mark">
+          <img class="logo" src="./icon.svg" alt="" width="66" height="66" />
+          <div class="brand">Fiado</div>
+        </div>
+        <p class="gate-msg">Controle de vale do mercadinho — quem deve, quanto e o que recebeu hoje.</p>
+        <div class="sheet">
+          <label class="field">
+            Usuário
+            <input id="loginUser" type="text" autocomplete="username" placeholder="usuário" />
+          </label>
+          <label class="field">
+            Senha
+            <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+          </label>
+          <label class="lembrar">
+            <input id="lembrarLogin" type="checkbox" checked />
+            Permanecer logado neste celular
+          </label>
+          <div class="err-login" id="loginErro" aria-live="polite"></div>
+          <button type="button" class="btn primary full" id="btnEntrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M10 17l5-5-5-5M4 12h11M14 19h4a2 2 0 002-2V7a2 2 0 00-2-2h-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Entrar
+          </button>
+        </div>
+        <p class="hint" id="loginTrialHint"></p>
+        <div class="install-hint" id="installHint">
+          <strong>Dica:</strong> no celular, use “Adicionar à tela inicial” no menu do navegador. Fica igual um aplicativo.
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUEADO -->
+    <section id="viewBloqueado" class="view">
+      <div class="gate">
+        <div class="brand-mark">
+          <img class="logo" src="./icon.svg" alt="" width="66" height="66" />
+          <div class="brand">Fiado</div>
+        </div>
+        <p class="gate-msg" id="bloqueadoMsg">O período de teste acabou. O acesso ficou bloqueado.</p>
+        <div class="sheet">
+          <p class="subtitle" style="margin-bottom:0.85rem">
+            Se já pagou, digite o <strong>código de liberação</strong> que você recebeu.
+          </p>
+          <label class="field">
+            Código de liberação
+            <input id="codigoLib" type="text" placeholder="Ex.: LIBERA-XXXX" autocomplete="off" />
+          </label>
+          <div class="err-login" id="libErro" aria-live="polite"></div>
+          <button type="button" class="btn primary full" id="btnLiberar">Liberar acesso</button>
+          <button type="button" class="btn full" id="btnWhatsPagamento" style="margin-top:0.45rem">Falar no WhatsApp</button>
+        </div>
+        <button type="button" class="btn ghost full" id="btnSairBloqueado" style="margin-top:0.75rem">Sair</button>
+      </div>
+    </section>
+
+    <!-- HOME -->
+    <section id="viewHome" class="view">
+      <header>
+        <div class="header-row">
+          <div>
+            <div class="brand-mark">
+              <img class="logo" src="./icon.svg" alt="" width="42" height="42" />
+              <div>
+                <div class="brand">Fiado</div>
+                <p class="subtitle">Quem deve e quanto — no balcão.</p>
+              </div>
+            </div>
+            <div class="trial-pill" id="trialPill"></div>
+          </div>
+          <button type="button" class="btn ghost" id="btnSair" title="Sair">Sair</button>
+        </div>
+      </header>
+
+      <div class="resumo">
+        <div>
+          <div class="label">Total em aberto</div>
+          <div class="valor alerta" id="totalAberto">R$ 0,00</div>
+        </div>
+        <div>
+          <div class="label">Clientes</div>
+          <div class="valor" id="totalClientes">0</div>
+        </div>
+      </div>
+
+      <div class="resumo hoje">
+        <div>
+          <div class="label">Fiado hoje</div>
+          <div class="valor alerta" id="hojeFiado">R$ 0,00</div>
+        </div>
+        <div>
+          <div class="label">Recebido hoje</div>
+          <div class="valor ok" id="hojeRecebido">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="home-actions">
+        <div class="search">
+          <input id="busca" type="search" placeholder="Buscar cliente…" autocomplete="off" />
+        </div>
+        <button type="button" class="btn" id="btnBackup" title="Backup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Backup
+        </button>
+        <button type="button" class="btn primary" id="btnNovoCliente">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+          Novo
+        </button>
+      </div>
+
+      <div class="filtros" role="tablist" aria-label="Filtrar clientes">
+        <button type="button" class="active" data-filtro="todos">Todos</button>
+        <button type="button" data-filtro="aberto">Em aberto</button>
+        <button type="button" data-filtro="quitado">Quitados</button>
+      </div>
+
+      <div class="lista" id="listaClientes"></div>
+      <p class="hint">Os dados ficam neste celular. Faça backup de vez em quando.</p>
+    </section>
+
+    <!-- NOVO / EDITAR CLIENTE -->
+    <section id="viewClienteForm" class="view">
+      <div class="topbar">
+        <button type="button" class="btn ghost" id="btnVoltarForm">←</button>
+        <h1 id="tituloForm">Novo cliente</h1>
+      </div>
+      <div class="sheet">
+        <label class="field">
+          Nome
+          <input id="cliNome" type="text" placeholder="Ex.: Dona Maria" autocomplete="name" />
+        </label>
+        <label class="field">
+          Telefone (WhatsApp)
+          <input id="cliFone" type="tel" placeholder="11999999999" inputmode="tel" autocomplete="tel" />
+        </label>
+        <label class="field">
+          Observação
+          <input id="cliObs" type="text" placeholder="Opcional" />
+        </label>
+        <label class="field">
+          Limite de fiado (R$)
+          <input id="cliLimite" type="text" inputmode="decimal" placeholder="Sem limite" />
+          <span class="hint-field">Deixe vazio se não quiser limitar. Ex.: 100</span>
+        </label>
+        <button type="button" class="btn primary full" id="btnSalvarCliente">Salvar</button>
+      </div>
+    </section>
+
+    <!-- DETALHE -->
+    <section id="viewDetalhe" class="view">
+      <div class="topbar">
+        <button type="button" class="btn ghost" id="btnVoltarDetalhe">←</button>
+        <h1 id="detalheNome">Cliente</h1>
+      </div>
+
+      <div class="saldo-bloco">
+        <div class="label">Saldo em aberto</div>
+        <div class="valor" id="detalheSaldo">R$ 0,00</div>
+        <div class="fone" id="detalheFone"></div>
+        <div class="aviso-limite" id="detalheLimite" hidden></div>
+      </div>
+
+      <div class="acoes">
+        <button type="button" class="btn accent" id="btnDebito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>
+          Fiado
+        </button>
+        <button type="button" class="btn primary" id="btnPagamento">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Receber
+        </button>
+      </div>
+
+      <div id="painelMov" class="sheet" hidden></div>
+
+      <div class="historico">
+        <h2>Histórico</h2>
+        <button type="button" class="btn danger btn-desfazer" id="btnDesfazerUltimo" hidden>Desfazer último lançamento</button>
+        <div id="listaMovs"></div>
+      </div>
+
+      <div class="footer-actions row">
+        <button type="button" class="btn accent" id="btnCobrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M7 8h10M7 12h6M8 4h8a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Cobrar no Zap
+        </button>
+        <button type="button" class="btn" id="btnWhats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M8 7h8M8 12h8M8 17h5M6 3h12a1 1 0 011 1v16l-3-2-3 2-3-2-3 2V4a1 1 0 011-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Extrato
+        </button>
+      </div>
+      <div class="footer-actions row">
+        <button type="button" class="btn" id="btnEditarCli">Editar</button>
+        <button type="button" class="btn danger" id="btnApagarCli">Apagar</button>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section id="viewBackup" class="view">
+      <div class="topbar">
+        <button type="button" class="btn ghost" id="btnVoltarBackup">←</button>
+        <h1>Backup</h1>
+      </div>
+      <div class="sheet">
+        <p class="subtitle" style="margin-bottom:0.85rem">
+          Guarde uma cópia dos clientes. No celular, o melhor é <strong>enviar pro WhatsApp</strong> (pra você mesmo) ou salvar em Arquivos.
+        </p>
+        <button type="button" class="btn primary full" id="btnExportar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Enviar / salvar backup
+        </button>
+        <button type="button" class="btn full" id="btnCopiarBackup" style="margin-top:0.45rem">
+          Copiar backup
+        </button>
+        <p class="hint" style="margin-top:0.75rem;text-align:left">
+          Arquivo: <strong id="nomeBackupArquivo">BACKUP-FIADO.json</strong><br />
+          Depois de enviar, confira no WhatsApp ou em Arquivos / Downloads.
+        </p>
+        <label class="field" style="margin-top:1rem">
+          Restaurar arquivo
+          <input id="importFile" type="file" accept="application/json,.json,text/plain,.txt" />
+          <span class="hint-field">Escolha o arquivo que você salvou ou recebeu no WhatsApp</span>
+        </label>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    /* ═══════════════════════════════════════════════
+       VOCÊ CONFIGURA AQUI (antes de entregar pro cliente)
+       ═══════════════════════════════════════════════ */
+    const LICENCA = {
+      usuario: "mercado",
+      senha: "fiado123",
+      // Dias grátis a partir do 1º login neste celular
+      trialDias: 14,
+      // Código que VOCÊ manda depois que ele pagar
+      codigoLiberacao: "LIBERA-MERCADO-26",
+      // Seu WhatsApp (só números, com DDD). Ex.: 11999998888
+      seuWhatsApp: "11999999999",
+      // Se true, libera pra sempre sem precisar do código
+      pagoNaMao: false,
+      // Nome que aparece no WhatsApp de cobrança
+      nomeApp: "Fiado",
+    };
+
+    const STORAGE_KEY = "fiado-mercado-v1";
+    const AUTH_KEY = "fiado-mercado-auth-v1";
+    const LICENSE_KEY = "fiado-mercado-license-v1";
+    const $ = (sel) => document.querySelector(sel);
+
+    const state = {
+      clientes: [],
+      ativoId: null,
+      modoForm: "novo",
+      tipoMov: null,
+      logado: false,
+      filtro: "todos",
+    };
+
+    function uid() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+    }
+
+    function hojeISO() {
+      const d = new Date();
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function formatBRL(n) {
+      return (n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function formatDataBR(iso) {
+      if (!iso) return "—";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function formatQuando(ts) {
+      const d = new Date(ts);
+      return d.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function salvar() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ clientes: state.clientes }));
+    }
+
+    function carregar() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (raw?.clientes && Array.isArray(raw.clientes)) {
+          state.clientes = raw.clientes;
+        }
+      } catch {
+        state.clientes = [];
+      }
+    }
+
+    function toast(msg, warn) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.toggle("warn", !!warn);
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function lerLicencaLocal() {
+      try {
+        return JSON.parse(localStorage.getItem(LICENSE_KEY) || "null") || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function salvarLicencaLocal(data) {
+      const atual = { ...lerLicencaLocal(), ...data };
+      localStorage.setItem(LICENSE_KEY, JSON.stringify(atual));
+      return atual;
+    }
+
+    function diasRestantesTrial() {
+      const lic = lerLicencaLocal();
+      if (!lic.inicioTrial) return LICENCA.trialDias;
+      const inicio = new Date(lic.inicioTrial + "T00:00:00");
+      const fim = new Date(inicio);
+      fim.setDate(fim.getDate() + LICENCA.trialDias);
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      const diff = Math.ceil((fim - hoje) / 86400000);
+      return diff;
+    }
+
+    function estaPago() {
+      if (LICENCA.pagoNaMao) return true;
+      const lic = lerLicencaLocal();
+      return !!lic.liberado && lic.codigoOk === LICENCA.codigoLiberacao;
+    }
+
+    function acessoLiberado() {
+      if (estaPago()) return true;
+      return diasRestantesTrial() > 0;
+    }
+
+    function iniciarTrialSePreciso() {
+      const lic = lerLicencaLocal();
+      if (!lic.inicioTrial) {
+        salvarLicencaLocal({ inicioTrial: hojeISO() });
+      }
+    }
+
+    function formatarFimTrial() {
+      const lic = lerLicencaLocal();
+      const base = lic.inicioTrial || hojeISO();
+      const [y, m, d] = base.split("-").map(Number);
+      const fim = new Date(y, m - 1, d);
+      fim.setDate(fim.getDate() + LICENCA.trialDias - 1);
+      const yy = fim.getFullYear();
+      const mm = String(fim.getMonth() + 1).padStart(2, "0");
+      const dd = String(fim.getDate()).padStart(2, "0");
+      return formatDataBR(`${yy}-${mm}-${dd}`);
+    }
+
+    function atualizarPillTrial() {
+      const el = $("#trialPill");
+      if (!el) return;
+      if (estaPago()) {
+        el.className = "trial-pill pago";
+        el.textContent = "Acesso liberado";
+        return;
+      }
+      const dias = diasRestantesTrial();
+      el.className = "trial-pill" + (dias <= 3 ? " urgente" : "");
+      if (dias <= 0) {
+        el.textContent = "Teste encerrado";
+      } else if (dias === 1) {
+        el.textContent = "Teste: último dia";
+      } else {
+        el.textContent = `Teste: ${dias} dias restantes`;
+      }
+    }
+
+    function sessaoAtiva() {
+      try {
+        const raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
+        const s = JSON.parse(raw || "null");
+        return !!(s && s.ok && s.user === LICENCA.usuario);
+      } catch {
+        return false;
+      }
+    }
+
+    function gravarSessao(permanente) {
+      const payload = JSON.stringify({ ok: true, user: LICENCA.usuario, em: Date.now(), permanente: !!permanente });
+      sessionStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(AUTH_KEY);
+      if (permanente) localStorage.setItem(AUTH_KEY, payload);
+      else sessionStorage.setItem(AUTH_KEY, payload);
+      state.logado = true;
+    }
+
+    function limparSessao() {
+      sessionStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(AUTH_KEY);
+      state.logado = false;
+    }
+
+    function tentarLogin() {
+      const user = ($("#loginUser").value || "").trim();
+      const pass = $("#loginPass").value || "";
+      const lembrar = $("#lembrarLogin").checked;
+      const erro = $("#loginErro");
+      if (user !== LICENCA.usuario || pass !== LICENCA.senha) {
+        erro.textContent = "Usuário ou senha incorretos.";
+        toast("Login inválido", true);
+        return;
+      }
+      erro.textContent = "";
+      iniciarTrialSePreciso();
+      gravarSessao(lembrar);
+      $("#loginPass").value = "";
+      entrarNoApp();
+    }
+
+    function liberarComCodigo() {
+      const codigo = ($("#codigoLib").value || "").trim();
+      const erro = $("#libErro");
+      if (!codigo) {
+        erro.textContent = "Digite o código.";
+        return;
+      }
+      if (codigo !== LICENCA.codigoLiberacao) {
+        erro.textContent = "Código inválido. Confira com quem te vendeu.";
+        toast("Código inválido", true);
+        return;
+      }
+      erro.textContent = "";
+      salvarLicencaLocal({ liberado: true, codigoOk: LICENCA.codigoLiberacao, liberadoEm: new Date().toISOString() });
+      toast("Acesso liberado!");
+      entrarNoApp();
+    }
+
+    function abrirWhatsPagamento() {
+      const texto = encodeURIComponent(
+        `Oi! Quero liberar o ${LICENCA.nomeApp} (teste acabou). Me passa o valor e o código de liberação.`
+      );
+      const fone = String(LICENCA.seuWhatsApp || "").replace(/\D/g, "");
+      const url = fone
+        ? `https://wa.me/55${fone.replace(/^55/, "")}?text=${texto}`
+        : `https://wa.me/?text=${texto}`;
+      window.open(url, "_blank");
+    }
+
+    function atualizarHintLogin() {
+      const hint = $("#loginTrialHint");
+      if (estaPago()) {
+        hint.textContent = "Acesso já liberado neste aparelho.";
+        return;
+      }
+      const lic = lerLicencaLocal();
+      if (!lic.inicioTrial) {
+        hint.textContent = `Teste grátis de ${LICENCA.trialDias} dias começa no primeiro login.`;
+        return;
+      }
+      const dias = diasRestantesTrial();
+      if (dias > 0) {
+        hint.textContent = `Teste até ${formatarFimTrial()} (${dias} dia${dias === 1 ? "" : "s"}).`;
+      } else {
+        hint.textContent = "Teste encerrado — é preciso liberar o acesso.";
+      }
+    }
+
+    function entrarNoApp() {
+      if (!acessoLiberado()) {
+        $("#bloqueadoMsg").textContent = estaPago()
+          ? "Acesso bloqueado."
+          : `O teste de ${LICENCA.trialDias} dias acabou em ${formatarFimTrial()}. Seus dados continuam salvos.`;
+        mostrar("#viewBloqueado");
+        return;
+      }
+      carregar();
+      atualizarPillTrial();
+      renderHome();
+      mostrar("#viewHome");
+    }
+
+    function bootAuth() {
+      atualizarHintLogin();
+      if (!sessaoAtiva()) {
+        mostrar("#viewLogin");
+        return;
+      }
+      state.logado = true;
+      iniciarTrialSePreciso();
+      entrarNoApp();
+    }
+
+    function mostrar(viewId) {
+      document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+      $(viewId).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    }
+
+    function saldoCliente(c) {
+      return (c.movs || []).reduce((acc, m) => {
+        return m.tipo === "debito" ? acc + m.valor : acc - m.valor;
+      }, 0);
+    }
+
+    function totalAberto() {
+      return state.clientes.reduce((acc, c) => acc + Math.max(0, saldoCliente(c)), 0);
+    }
+
+    function dataMov(m) {
+      if (m.dataRef) return m.dataRef;
+      const d = new Date(m.ts);
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function totaisHoje() {
+      const hoje = hojeISO();
+      let fiado = 0;
+      let recebido = 0;
+      state.clientes.forEach((c) => {
+        (c.movs || []).forEach((m) => {
+          if (dataMov(m) !== hoje) return;
+          if (m.tipo === "debito") fiado += m.valor;
+          else recebido += m.valor;
+        });
+      });
+      return { fiado, recebido };
+    }
+
+    function limiteCliente(c) {
+      const n = Number(c.limite);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+
+    function acimaDoLimite(c, saldo) {
+      const lim = limiteCliente(c);
+      if (lim == null) return false;
+      return (saldo == null ? saldoCliente(c) : saldo) > lim + 0.009;
+    }
+
+    function parseMoney(raw) {
+      if (raw == null) return NaN;
+      let s = String(raw).trim();
+      if (!s) return NaN;
+      s = s.replace(/R\$\s?/i, "").replace(/\s/g, "");
+      if (s.includes(",") && s.includes(".")) {
+        s = s.replace(/\./g, "").replace(",", ".");
+      } else if (s.includes(",")) {
+        s = s.replace(",", ".");
+      }
+      const n = Number(s);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function clienteAtivo() {
+      return state.clientes.find((c) => c.id === state.ativoId) || null;
+    }
+
+    function renderHome() {
+      const q = ($("#busca").value || "").trim().toLowerCase();
+      const lista = state.clientes
+        .map((c) => ({ c, saldo: saldoCliente(c) }))
+        .filter(({ c, saldo }) => {
+          const matchBusca = !q || c.nome.toLowerCase().includes(q) || (c.fone || "").includes(q);
+          if (!matchBusca) return false;
+          if (state.filtro === "aberto") return saldo > 0.009;
+          if (state.filtro === "quitado") return saldo <= 0.009;
+          return true;
+        })
+        .sort((a, b) => {
+          if (b.saldo !== a.saldo) return b.saldo - a.saldo;
+          return a.c.nome.localeCompare(b.c.nome, "pt-BR");
+        });
+
+      $("#totalAberto").textContent = formatBRL(totalAberto());
+      $("#totalClientes").textContent = String(state.clientes.length);
+      const hoje = totaisHoje();
+      $("#hojeFiado").textContent = formatBRL(hoje.fiado);
+      $("#hojeRecebido").textContent = formatBRL(hoje.recebido);
+
+      document.querySelectorAll(".filtros button").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.filtro === state.filtro);
+      });
+
+      const box = $("#listaClientes");
+      if (!lista.length) {
+        const semNada = !state.clientes.length;
+        const msgFiltro =
+          state.filtro === "aberto"
+            ? "Ninguém com fiado em aberto."
+            : state.filtro === "quitado"
+              ? "Nenhum cliente quitado."
+              : "Toque em <strong>Novo</strong> pra começar.";
+        const titulo = semNada
+          ? "Caderno ainda vazio"
+          : q
+            ? "Nada encontrado"
+            : state.filtro === "aberto"
+              ? "Ninguém deve agora"
+              : state.filtro === "quitado"
+                ? "Sem quitados"
+                : "Caderno ainda vazio";
+        const texto = semNada
+          ? "Cadastre o primeiro cliente e comece a anotar o fiado."
+          : state.clientes.length && (q || state.filtro !== "todos")
+            ? q
+              ? "Nenhum cliente com esse nome."
+              : msgFiltro
+            : msgFiltro;
+        box.innerHTML = `
+          <div class="vazio">
+            <svg class="ilustra" viewBox="0 0 160 160" aria-hidden="true">
+              <rect x="28" y="24" width="88" height="112" rx="12" fill="#f4f7f3" stroke="#1a2e1f" stroke-width="3"/>
+              <rect x="28" y="24" width="18" height="112" rx="6" fill="#c45c26"/>
+              <path d="M58 56h44M58 76h44M58 96h28" stroke="#1a2e1f" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
+              <circle cx="118" cy="118" r="26" fill="#1a2e1f"/>
+              <path d="M108 118h20M118 108v20" stroke="#f4f7f3" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="titulo-vazio">${titulo}</div>
+            <div>${texto}</div>
+          </div>`;
+        return;
+      }
+
+      box.innerHTML = lista
+        .map(({ c, saldo }) => {
+          const lim = limiteCliente(c);
+          const estourou = acimaDoLimite(c, saldo);
+          let meta = saldo > 0.009 ? "Em aberto" : "Quitado";
+          if (estourou) meta = "Acima do limite";
+          else if (lim != null && saldo > 0.009) meta += ` · limite ${formatBRL(lim)}`;
+          if (c.fone) meta += " · " + escapeHtml(c.fone);
+          return `
+          <button type="button" class="cliente" data-id="${c.id}">
+            <div>
+              <div class="nome">${escapeHtml(c.nome)}</div>
+              <div class="meta${estourou ? " limite" : ""}">${meta}</div>
+            </div>
+            <div class="saldo ${saldo <= 0.009 ? "zero" : ""}">${formatBRL(saldo)}</div>
+          </button>
+        `;
+        })
+        .join("");
+
+      box.querySelectorAll(".cliente").forEach((btn) => {
+        btn.addEventListener("click", () => abrirDetalhe(btn.dataset.id));
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function exigirAcesso() {
+      if (!sessaoAtiva()) {
+        limparSessao();
+        atualizarHintLogin();
+        mostrar("#viewLogin");
+        return false;
+      }
+      if (!acessoLiberado()) {
+        entrarNoApp();
+        return false;
+      }
+      return true;
+    }
+
+    function abrirForm(modo, cli) {
+      if (!exigirAcesso()) return;
+      state.modoForm = modo;
+      $("#tituloForm").textContent = modo === "editar" ? "Editar cliente" : "Novo cliente";
+      $("#cliNome").value = cli?.nome || "";
+      $("#cliFone").value = cli?.fone || "";
+      $("#cliObs").value = cli?.obs || "";
+      $("#cliLimite").value = limiteCliente(cli) != null ? String(cli.limite).replace(".", ",") : "";
+      mostrar("#viewClienteForm");
+      setTimeout(() => $("#cliNome").focus(), 50);
+    }
+
+    function salvarCliente() {
+      const nome = $("#cliNome").value.trim();
+      const fone = $("#cliFone").value.trim();
+      const obs = $("#cliObs").value.trim();
+      const limiteRaw = $("#cliLimite").value.trim();
+      let limite = null;
+      if (limiteRaw) {
+        const n = parseMoney(limiteRaw);
+        if (!Number.isFinite(n) || n < 0) {
+          toast("Limite inválido", true);
+          return;
+        }
+        limite = n === 0 ? null : Math.round(n * 100) / 100;
+      }
+      if (!nome) {
+        toast("Digite o nome", true);
+        return;
+      }
+
+      if (state.modoForm === "editar" && state.ativoId) {
+        const c = clienteAtivo();
+        if (!c) return;
+        c.nome = nome;
+        c.fone = fone;
+        c.obs = obs;
+        c.limite = limite;
+        salvar();
+        toast("Cliente atualizado");
+        abrirDetalhe(c.id);
+        return;
+      }
+
+      const novo = { id: uid(), nome, fone, obs, limite, criadoEm: Date.now(), movs: [] };
+      state.clientes.push(novo);
+      salvar();
+      toast("Cliente salvo");
+      abrirDetalhe(novo.id);
+    }
+
+    function abrirDetalhe(id) {
+      state.ativoId = id;
+      state.tipoMov = null;
+      const c = clienteAtivo();
+      if (!c) {
+        mostrar("#viewHome");
+        renderHome();
+        return;
+      }
+      const saldo = saldoCliente(c);
+      const lim = limiteCliente(c);
+      $("#detalheNome").textContent = c.nome;
+      const elSaldo = $("#detalheSaldo");
+      elSaldo.textContent = formatBRL(saldo);
+      elSaldo.classList.remove("pop");
+      void elSaldo.offsetWidth;
+      elSaldo.classList.add("pop");
+      $("#detalheFone").textContent = c.fone
+        ? c.fone + (c.obs ? " · " + c.obs : "")
+        : c.obs || "Sem telefone";
+      const elLim = $("#detalheLimite");
+      if (lim == null) {
+        elLim.hidden = true;
+        elLim.textContent = "";
+        elLim.classList.remove("estourou");
+      } else {
+        elLim.hidden = false;
+        const resto = lim - saldo;
+        if (saldo > lim + 0.009) {
+          elLim.classList.add("estourou");
+          elLim.textContent = `Limite ${formatBRL(lim)} — passou ${formatBRL(saldo - lim)}`;
+        } else {
+          elLim.classList.remove("estourou");
+          elLim.textContent = `Limite ${formatBRL(lim)} — ainda pode ${formatBRL(Math.max(0, resto))}`;
+        }
+      }
+      $("#painelMov").hidden = true;
+      $("#painelMov").innerHTML = "";
+      renderMovs(c);
+      mostrar("#viewDetalhe");
+    }
+
+    function renderMovs(c) {
+      const box = $("#listaMovs");
+      const btnDesfazer = $("#btnDesfazerUltimo");
+      const movs = [...(c.movs || [])].sort((a, b) => b.ts - a.ts);
+      btnDesfazer.hidden = movs.length === 0;
+      if (!movs.length) {
+        box.innerHTML = `<div class="vazio" style="padding:1.2rem 0.5rem">Nenhum lançamento ainda.</div>`;
+        return;
+      }
+      box.innerHTML = movs
+        .map((m) => `
+          <div class="mov">
+            <div>
+              <div class="tipo ${m.tipo}">${m.tipo === "debito" ? "Fiado" : "Pagamento"}</div>
+              <div class="quando">${formatQuando(m.ts)}${m.dataRef ? " · ref. " + formatDataBR(m.dataRef) : ""}</div>
+            </div>
+            <div class="valor ${m.tipo}">${m.tipo === "debito" ? "+" : "−"} ${formatBRL(m.valor)}</div>
+            ${m.nota ? `<div class="nota">${escapeHtml(m.nota)}</div>` : ""}
+            <div class="mov-actions">
+              <button type="button" class="btn-mini" data-apagar-mov="${m.id}">Apagar</button>
+            </div>
+          </div>
+        `)
+        .join("");
+
+      box.querySelectorAll("[data-apagar-mov]").forEach((btn) => {
+        btn.addEventListener("click", () => apagarMovimento(btn.dataset.apagarMov));
+      });
+    }
+
+    function apagarMovimento(movId) {
+      if (!exigirAcesso()) return;
+      const c = clienteAtivo();
+      if (!c) return;
+      const mov = (c.movs || []).find((m) => m.id === movId);
+      if (!mov) return;
+      const tipo = mov.tipo === "debito" ? "fiado" : "pagamento";
+      if (!confirm(`Apagar este ${tipo} de ${formatBRL(mov.valor)}?`)) return;
+      c.movs = c.movs.filter((m) => m.id !== movId);
+      salvar();
+      toast("Lançamento apagado");
+      abrirDetalhe(c.id);
+    }
+
+    function desfazerUltimo() {
+      if (!exigirAcesso()) return;
+      const c = clienteAtivo();
+      if (!c || !(c.movs || []).length) return;
+      const ultimo = [...c.movs].sort((a, b) => b.ts - a.ts)[0];
+      const tipo = ultimo.tipo === "debito" ? "fiado" : "pagamento";
+      if (!confirm(`Desfazer o último ${tipo} de ${formatBRL(ultimo.valor)}?`)) return;
+      c.movs = c.movs.filter((m) => m.id !== ultimo.id);
+      salvar();
+      toast("Último lançamento desfeito");
+      abrirDetalhe(c.id);
+    }
+
+    function abrirPainel(tipo) {
+      state.tipoMov = tipo;
+      const isDebito = tipo === "debito";
+      const painel = $("#painelMov");
+      painel.hidden = false;
+      painel.className = "sheet " + (isDebito ? "debito" : "pagamento");
+      painel.innerHTML = `
+        <h2>${isDebito ? "Lançar fiado" : "Registrar pagamento"}</h2>
+        <label class="field">
+          Valor (R$)
+          <input class="money" id="movValor" type="text" inputmode="decimal" placeholder="0,00" />
+        </label>
+        <label class="field">
+          Data
+          <input id="movData" type="date" value="${hojeISO()}" />
+        </label>
+        <label class="field">
+          Observação
+          <input id="movNota" type="text" placeholder="${isDebito ? "Ex.: compras do dia" : "Ex.: pagou metade"}" />
+        </label>
+        <button type="button" class="btn ${isDebito ? "accent" : "primary"} full" id="btnConfirmarMov">
+          ${isDebito ? "Confirmar fiado" : "Confirmar recebimento"}
+        </button>
+      `;
+      $("#btnConfirmarMov").addEventListener("click", confirmarMov);
+      setTimeout(() => $("#movValor").focus(), 50);
+    }
+
+    function confirmarMov() {
+      if (!exigirAcesso()) return;
+      const c = clienteAtivo();
+      if (!c) return;
+      const valor = parseMoney($("#movValor").value);
+      if (!Number.isFinite(valor) || valor <= 0) {
+        toast("Valor inválido", true);
+        return;
+      }
+      const valorOk = Math.round(valor * 100) / 100;
+      if (state.tipoMov === "debito") {
+        const lim = limiteCliente(c);
+        const novoSaldo = saldoCliente(c) + valorOk;
+        if (lim != null && novoSaldo > lim + 0.009) {
+          const ok = confirm(
+            `Isso passa do limite de ${formatBRL(lim)}.\nSaldo ficaria em ${formatBRL(novoSaldo)}.\n\nLançar mesmo assim?`
+          );
+          if (!ok) return;
+        }
+      }
+      const nota = $("#movNota").value.trim();
+      const dataRef = $("#movData").value || hojeISO();
+      c.movs.push({
+        id: uid(),
+        tipo: state.tipoMov,
+        valor: valorOk,
+        nota,
+        dataRef,
+        ts: Date.now(),
+      });
+      salvar();
+      toast(state.tipoMov === "debito" ? "Fiado lançado" : "Pagamento registrado");
+      abrirDetalhe(c.id);
+    }
+
+    function textoExtrato(c) {
+      const saldo = saldoCliente(c);
+      const movs = [...(c.movs || [])].sort((a, b) => b.ts - a.ts).slice(0, 12);
+      const linhas = [
+        `*Fiado — ${c.nome}*`,
+        `Saldo em aberto: *${formatBRL(saldo)}*`,
+        "",
+      ];
+      if (!movs.length) {
+        linhas.push("Sem lançamentos.");
+      } else {
+        linhas.push("Últimos lançamentos:");
+        movs.forEach((m) => {
+          const sinal = m.tipo === "debito" ? "+" : "-";
+          const tipo = m.tipo === "debito" ? "Fiado" : "Pagamento";
+          linhas.push(`• ${formatQuando(m.ts)} — ${tipo} ${sinal}${formatBRL(m.valor)}${m.nota ? ` (${m.nota})` : ""}`);
+        });
+      }
+      return linhas.join("\n");
+    }
+
+    function textoCobranca(c) {
+      const saldo = saldoCliente(c);
+      const primeiro = (c.nome || "").trim().split(/\s+/)[0] || "tudo bem";
+      return [
+        `Oi, ${primeiro}!`,
+        "",
+        `Passando pra lembrar que seu vale no mercado está em *${formatBRL(saldo)}*.`,
+        "",
+        "Quando puder, passa aqui pra acertar. Obrigado!",
+      ].join("\n");
+    }
+
+    function abrirWhatsUrl(texto, fone) {
+      const msg = encodeURIComponent(texto);
+      const digits = (fone || "").replace(/\D/g, "");
+      const url = digits
+        ? `https://wa.me/55${digits.replace(/^55/, "")}?text=${msg}`
+        : `https://wa.me/?text=${msg}`;
+      window.open(url, "_blank");
+    }
+
+    function abrirWhats() {
+      const c = clienteAtivo();
+      if (!c) return;
+      if (saldoCliente(c) <= 0.009) {
+        toast("Cliente sem saldo em aberto", true);
+      }
+      abrirWhatsUrl(textoExtrato(c), c.fone);
+    }
+
+    function abrirCobranca() {
+      const c = clienteAtivo();
+      if (!c) return;
+      const saldo = saldoCliente(c);
+      if (saldo <= 0.009) {
+        toast("Não tem nada pra cobrar", true);
+        return;
+      }
+      if (!c.fone) {
+        toast("Cadastre o WhatsApp do cliente pra facilitar", true);
+      }
+      abrirWhatsUrl(textoCobranca(c), c.fone);
+    }
+
+    function apagarCliente() {
+      const c = clienteAtivo();
+      if (!c) return;
+      if (!confirm(`Apagar ${c.nome} e todo o histórico?`)) return;
+      state.clientes = state.clientes.filter((x) => x.id !== c.id);
+      state.ativoId = null;
+      salvar();
+      toast("Cliente apagado");
+      mostrar("#viewHome");
+      renderHome();
+    }
+
+    function nomeArquivoBackup() {
+      const [y, m, d] = hojeISO().split("-");
+      return `BACKUP-FIADO-${d}-${m}-${y}.json`;
+    }
+
+    function payloadBackup() {
+      return JSON.stringify(
+        {
+          app: "Fiado",
+          clientes: state.clientes,
+          exportadoEm: new Date().toISOString(),
+        },
+        null,
+        2
+      );
+    }
+
+    function blobBackup() {
+      return new Blob([payloadBackup()], { type: "application/json" });
+    }
+
+    async function exportar() {
+      const nome = nomeArquivoBackup();
+      const elNome = $("#nomeBackupArquivo");
+      if (elNome) elNome.textContent = nome;
+      const blob = blobBackup();
+      const file = new File([blob], nome, { type: "application/json" });
+
+      try {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "Backup Fiado",
+            text: "Backup do controle de fiado — guarde este arquivo.",
+          });
+          toast("Escolha WhatsApp ou Arquivos pra guardar");
+          return;
+        }
+        if (navigator.share) {
+          // Alguns celulares compartilham só texto
+          await navigator.share({
+            title: "Backup Fiado",
+            text: payloadBackup(),
+          });
+          toast("Cole num bloco de notas ou envie pra você");
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === "AbortError") {
+          toast("Compartilhar cancelado", true);
+          return;
+        }
+      }
+
+      // Fallback: download clássico
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = nome;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+      toast("Salvo. Procure em Downloads / Arquivos");
+    }
+
+    async function copiarBackup() {
+      const texto = payloadBackup();
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = texto;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        toast("Backup copiado — cole no WhatsApp ou Bloco de notas");
+      } catch {
+        toast("Não deu pra copiar", true);
+      }
+    }
+
+    function importar(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          let raw = String(reader.result || "").trim();
+          // Se colaram texto extra no WhatsApp, tenta achar o JSON
+          if (!raw.startsWith("{")) {
+            const i = raw.indexOf("{");
+            const j = raw.lastIndexOf("}");
+            if (i >= 0 && j > i) raw = raw.slice(i, j + 1);
+          }
+          const data = JSON.parse(raw);
+          if (!Array.isArray(data.clientes)) throw new Error("formato");
+          if (!confirm(`Restaurar ${data.clientes.length} clientes?\nIsso substitui os dados atuais.`)) return;
+          state.clientes = data.clientes;
+          salvar();
+          toast("Backup restaurado");
+          mostrar("#viewHome");
+          renderHome();
+        } catch {
+          toast("Arquivo inválido", true);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Events
+    $("#btnEntrar").addEventListener("click", tentarLogin);
+    $("#loginPass").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tentarLogin();
+    });
+    $("#loginUser").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") $("#loginPass").focus();
+    });
+    $("#btnLiberar").addEventListener("click", liberarComCodigo);
+    $("#codigoLib").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") liberarComCodigo();
+    });
+    $("#btnWhatsPagamento").addEventListener("click", abrirWhatsPagamento);
+    $("#btnSair").addEventListener("click", () => {
+      limparSessao();
+      atualizarHintLogin();
+      mostrar("#viewLogin");
+    });
+    $("#btnSairBloqueado").addEventListener("click", () => {
+      limparSessao();
+      atualizarHintLogin();
+      mostrar("#viewLogin");
+    });
+
+    $("#btnNovoCliente").addEventListener("click", () => {
+      if (!acessoLiberado()) return entrarNoApp();
+      abrirForm("novo");
+    });
+    $("#btnBackup").addEventListener("click", () => {
+      if (!exigirAcesso()) return;
+      const elNome = $("#nomeBackupArquivo");
+      if (elNome) elNome.textContent = nomeArquivoBackup();
+      mostrar("#viewBackup");
+    });
+    document.querySelectorAll(".filtros button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.filtro = btn.dataset.filtro;
+        renderHome();
+      });
+    });
+    $("#btnDesfazerUltimo").addEventListener("click", desfazerUltimo);
+    $("#btnVoltarForm").addEventListener("click", () => {
+      if (state.ativoId && state.modoForm === "editar") abrirDetalhe(state.ativoId);
+      else {
+        mostrar("#viewHome");
+        renderHome();
+      }
+    });
+    $("#btnSalvarCliente").addEventListener("click", salvarCliente);
+    $("#btnVoltarDetalhe").addEventListener("click", () => {
+      mostrar("#viewHome");
+      renderHome();
+    });
+    $("#btnDebito").addEventListener("click", () => {
+      if (!exigirAcesso()) return;
+      abrirPainel("debito");
+    });
+    $("#btnPagamento").addEventListener("click", () => {
+      if (!exigirAcesso()) return;
+      abrirPainel("pagamento");
+    });
+    $("#btnWhats").addEventListener("click", abrirWhats);
+    $("#btnCobrar").addEventListener("click", abrirCobranca);
+    $("#btnEditarCli").addEventListener("click", () => abrirForm("editar", clienteAtivo()));
+    $("#btnApagarCli").addEventListener("click", apagarCliente);
+    $("#busca").addEventListener("input", renderHome);
+
+    $("#btnVoltarBackup").addEventListener("click", () => {
+      mostrar("#viewHome");
+      renderHome();
+    });
+    $("#btnExportar").addEventListener("click", exportar);
+    $("#btnCopiarBackup").addEventListener("click", copiarBackup);
+    $("#importFile").addEventListener("change", (e) => {
+      importar(e.target.files?.[0]);
+      e.target.value = "";
+    });
+
+    // Atualiza nome do arquivo na tela de backup
+    const elNomeBackup = $("#nomeBackupArquivo");
+    if (elNomeBackup) elNomeBackup.textContent = nomeArquivoBackup();
+
+    bootAuth();
+  </script>
+</body>
+</html>

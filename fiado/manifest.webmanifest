@@ -1,0 +1,18 @@
+{
+  "name": "Fiado — Controle de vale",
+  "short_name": "Fiado",
+  "description": "Controle de fiado e vale do mercadinho",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#e4ebe3",
+  "theme_color": "#1a2e1f",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
