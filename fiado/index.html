@@ -897,6 +897,203 @@
       100% { transform: scale(1); }
     }
 
+    /* Onboarding */
+    .onboard {
+      min-height: calc(100dvh - 2.5rem - var(--safe-top) - var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: rise 0.4s ease-out both;
+    }
+
+    .onboard-card {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 1.15rem;
+      padding: 1.35rem 1.2rem 1.2rem;
+      text-align: center;
+    }
+
+    .onboard-step {
+      display: none;
+    }
+
+    .onboard-step.active {
+      display: block;
+      animation: rise 0.35s ease-out both;
+    }
+
+    .onboard-ico {
+      width: 4.5rem;
+      height: 4.5rem;
+      margin: 0 auto 1rem;
+      display: grid;
+      place-items: center;
+      border-radius: 1.1rem;
+      background: var(--brand);
+      color: #eef5ef;
+    }
+
+    .onboard-ico svg {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .onboard-ico.accent {
+      background: var(--accent);
+    }
+
+    .onboard h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--brand);
+      line-height: 1.15;
+      margin-bottom: 0.55rem;
+    }
+
+    .onboard p {
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+      margin: 0 auto;
+      max-width: 22rem;
+    }
+
+    .onboard-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin: 1.15rem 0 1rem;
+    }
+
+    .onboard-dots span {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: var(--line);
+      transition: width 0.2s ease, background 0.2s ease;
+    }
+
+    .onboard-dots span.on {
+      width: 1.15rem;
+      background: var(--brand);
+    }
+
+    .onboard-actions {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.45rem;
+    }
+
+    /* Checklist primeira vez */
+    .checklist {
+      display: none;
+      margin: 0 0 0.9rem;
+      padding: 0.9rem 0.95rem;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.95rem;
+      animation: rise 0.4s 0.04s ease-out both;
+    }
+
+    .checklist.show { display: block; }
+
+    .checklist-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .checklist-top strong {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.02em;
+      display: block;
+      line-height: 1.2;
+    }
+
+    .checklist-top span {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+    }
+
+    .checklist-top .btn {
+      flex-shrink: 0;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.78rem;
+    }
+
+    .checklist ol {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .checklist li.done {
+      color: var(--ink-soft);
+      text-decoration: line-through;
+      text-decoration-color: rgba(74, 92, 79, 0.45);
+    }
+
+    .check-mark {
+      width: 1.35rem;
+      height: 1.35rem;
+      flex-shrink: 0;
+      border-radius: 999px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      display: grid;
+      place-items: center;
+    }
+
+    .checklist li.done .check-mark {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #fff;
+    }
+
+    .check-mark svg {
+      width: 0.75rem;
+      height: 0.75rem;
+      opacity: 0;
+    }
+
+    .checklist li.done .check-mark svg { opacity: 1; }
+
+    .banner-local {
+      display: none;
+      margin: 0 0 0.85rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 0.85rem;
+      background: rgba(26, 46, 31, 0.07);
+      border: 1px dashed var(--line);
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    .banner-local.show { display: block; }
+
+    .banner-local strong { color: var(--brand); }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -927,7 +1124,7 @@
           </label>
           <label class="lembrar">
             <input id="lembrarLogin" type="checkbox" checked />
-            Permanecer logado neste celular
+            Continuar logado neste celular
           </label>
           <div class="err-login" id="loginErro" aria-live="polite"></div>
           <button type="button" class="btn primary full" id="btnEntrar">
@@ -973,6 +1170,44 @@
       </div>
     </section>
 
+    <!-- ONBOARDING -->
+    <section id="viewOnboarding" class="view">
+      <div class="onboard">
+        <div class="onboard-card">
+          <div class="onboard-step active" data-step="0">
+            <div class="onboard-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 4h8a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h3" stroke-linecap="round"/></svg>
+            </div>
+            <h2>É o caderno de vale no celular</h2>
+            <p>Em vez do caderno de papel: você anota quem levou fiado, quanto deve e o que já pagou.</p>
+          </div>
+          <div class="onboard-step" data-step="1">
+            <div class="onboard-ico accent" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <h2>Cadastre → anote → marque o pagamento</h2>
+            <p>1) Cadastra o cliente · 2) Toque em <strong>Fiado</strong> quando ele levar · 3) Toque em <strong>Receber</strong> quando pagar.</p>
+          </div>
+          <div class="onboard-step" data-step="2">
+            <div class="onboard-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h2>Os dados ficam neste celular</h2>
+            <p>Uma vez por semana, toque em <strong>Guardar</strong> e envie a cópia pro seu WhatsApp. Se trocar de celular sem guardar, perde o caderno.</p>
+          </div>
+
+          <div class="onboard-dots" id="onboardDots" aria-hidden="true">
+            <span class="on"></span><span></span><span></span>
+          </div>
+
+          <div class="onboard-actions">
+            <button type="button" class="btn ghost" id="btnOnboardPular">Pular</button>
+            <button type="button" class="btn primary" id="btnOnboardProx">Próximo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- HOME -->
     <section id="viewHome" class="view">
       <header>
@@ -995,6 +1230,38 @@
       </header>
 
       <div class="aviso-teste" id="avisoTeste"></div>
+
+      <div class="checklist" id="checklistPrimeira">
+        <div class="checklist-top">
+          <div>
+            <strong>Primeiros passos</strong>
+            <span>Faça estes 4 e o app fica no jeito.</span>
+          </div>
+          <button type="button" class="btn ghost" id="btnEsconderChecklist" title="Esconder">OK</button>
+        </div>
+        <ol id="listaChecklist">
+          <li data-check="cliente">
+            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            Cadastrar o 1º cliente
+          </li>
+          <li data-check="fiado">
+            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            Anotar um fiado
+          </li>
+          <li data-check="receber">
+            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            Marcar um recebimento
+          </li>
+          <li data-check="guardar">
+            <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            Guardar cópia no WhatsApp
+          </li>
+        </ol>
+      </div>
+
+      <div class="banner-local" id="bannerLocal">
+        <strong>Caderno só neste celular.</strong> Uma vez por semana toque em Guardar e mande pro seu WhatsApp.
+      </div>
 
       <div class="resumo">
         <div>
@@ -1022,9 +1289,9 @@
         <div class="search">
           <input id="busca" type="search" placeholder="Buscar cliente…" autocomplete="off" />
         </div>
-        <button type="button" class="btn" id="btnBackup" title="Backup">
+        <button type="button" class="btn" id="btnBackup" title="Guardar cópia do caderno">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Backup
+          Guardar
         </button>
         <button type="button" class="btn primary" id="btnNovoCliente">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
@@ -1034,12 +1301,12 @@
 
       <div class="filtros" role="tablist" aria-label="Filtrar clientes">
         <button type="button" class="active" data-filtro="todos">Todos</button>
-        <button type="button" data-filtro="aberto">Em aberto</button>
-        <button type="button" data-filtro="quitado">Quitados</button>
+        <button type="button" data-filtro="aberto">Deve</button>
+        <button type="button" data-filtro="quitado">Já pagou</button>
       </div>
 
       <div class="lista" id="listaClientes"></div>
-      <p class="hint">Os dados ficam neste celular. Faça backup de vez em quando.</p>
+      <p class="hint">Os dados ficam neste celular. Guarde uma cópia de vez em quando.</p>
     </section>
 
     <!-- NOVO / EDITAR CLIENTE -->
@@ -1062,7 +1329,7 @@
           <input id="cliObs" type="text" placeholder="Opcional" />
         </label>
         <label class="field">
-          Limite de fiado (R$)
+          Quanto pode fiado (R$)
           <input id="cliLimite" type="text" inputmode="decimal" placeholder="Sem limite" />
           <span class="hint-field">Deixe vazio se não quiser limitar. Ex.: 100</span>
         </label>
@@ -1110,7 +1377,7 @@
         </button>
         <button type="button" class="btn" id="btnWhats">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M8 7h8M8 12h8M8 17h5M6 3h12a1 1 0 011 1v16l-3-2-3 2-3-2-3 2V4a1 1 0 011-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Extrato
+          Ver o que deve
         </button>
       </div>
       <div class="footer-actions row">
@@ -1119,31 +1386,31 @@
       </div>
     </section>
 
-    <!-- BACKUP -->
+    <!-- GUARDAR CADERNO -->
     <section id="viewBackup" class="view">
       <div class="topbar">
         <button type="button" class="btn ghost" id="btnVoltarBackup">←</button>
-        <h1>Backup</h1>
+        <h1>Guardar meu caderno</h1>
       </div>
       <div class="sheet">
         <p class="subtitle" style="margin-bottom:0.85rem">
-          Guarde uma cópia dos clientes. No celular, o melhor é <strong>enviar pro WhatsApp</strong> (pra você mesmo) ou salvar em Arquivos.
+          É igual guardar o caderno no Zap. O melhor é <strong>enviar pro seu WhatsApp</strong> (pra você mesmo). Se trocar de celular sem guardar, perde os dados.
         </p>
         <button type="button" class="btn primary full" id="btnExportar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Enviar / salvar backup
+          Enviar pro meu WhatsApp
         </button>
         <button type="button" class="btn full" id="btnCopiarBackup" style="margin-top:0.45rem">
-          Copiar backup
+          Copiar texto da cópia
         </button>
         <p class="hint" style="margin-top:0.75rem;text-align:left">
-          Arquivo: <strong id="nomeBackupArquivo">BACKUP-FIADO.json</strong><br />
+          Arquivo: <strong id="nomeBackupArquivo">CADERNO-FIADO.json</strong><br />
           Depois de enviar, confira no WhatsApp ou em Arquivos / Downloads.
         </p>
         <label class="field" style="margin-top:1rem">
-          Restaurar arquivo
+          Trazer cópia de volta
           <input id="importFile" type="file" accept="application/json,.json,text/plain,.txt" />
-          <span class="hint-field">Escolha o arquivo que você salvou ou recebeu no WhatsApp</span>
+          <span class="hint-field">Escolha o arquivo que você salvou ou recebeu no WhatsApp. Isso substitui o caderno atual.</span>
         </label>
       </div>
     </section>
@@ -1255,7 +1522,7 @@
 
         <div class="sheet">
           <h2>Dados</h2>
-          <button type="button" class="btn full" id="btnAdminBackup">Backup / restaurar</button>
+          <button type="button" class="btn full" id="btnAdminBackup">Guardar / restaurar caderno</button>
           <button type="button" class="btn danger full" id="btnAdminZerar" style="margin-top:0.45rem">Apagar todos os clientes</button>
         </div>
       </div>
@@ -1295,6 +1562,8 @@
     const LICENSE_KEY = "fiado-mercado-license-v1";
     const CONFIG_KEY = "fiado-mercado-config-v1";
     const LOG_KEY = "fiado-mercado-admin-log-v1";
+    const ONBOARDING_KEY = "fiado-mercado-onboarding-v1";
+    const CHECKLIST_KEY = "fiado-mercado-checklist-v1";
     const $ = (sel) => document.querySelector(sel);
 
     const state = {
@@ -1306,6 +1575,7 @@
       role: null,
       fromAdmin: false,
       filtro: "todos",
+      onboardStep: 0,
     };
 
     function lerConfig() {
@@ -1692,8 +1962,99 @@
       atualizarPillTrial();
       const btnAdmin = $("#btnVoltarAdmin");
       if (btnAdmin) btnAdmin.hidden = !isAdmin();
+      if (!isAdmin() && !onboardingFeito()) {
+        abrirOnboarding();
+        return;
+      }
       renderHome();
       mostrar("#viewHome");
+    }
+
+    function onboardingFeito() {
+      return localStorage.getItem(ONBOARDING_KEY) === "1";
+    }
+
+    function marcarOnboardingFeito() {
+      localStorage.setItem(ONBOARDING_KEY, "1");
+    }
+
+    function abrirOnboarding() {
+      state.onboardStep = 0;
+      renderOnboarding();
+      mostrar("#viewOnboarding");
+    }
+
+    function renderOnboarding() {
+      const steps = document.querySelectorAll(".onboard-step");
+      steps.forEach((el, i) => el.classList.toggle("active", i === state.onboardStep));
+      const dots = document.querySelectorAll("#onboardDots span");
+      dots.forEach((el, i) => el.classList.toggle("on", i === state.onboardStep));
+      const btn = $("#btnOnboardProx");
+      if (btn) btn.textContent = state.onboardStep >= steps.length - 1 ? "Começar" : "Próximo";
+    }
+
+    function avancarOnboarding() {
+      const total = document.querySelectorAll(".onboard-step").length;
+      if (state.onboardStep >= total - 1) {
+        concluirOnboarding();
+        return;
+      }
+      state.onboardStep += 1;
+      renderOnboarding();
+    }
+
+    function concluirOnboarding() {
+      marcarOnboardingFeito();
+      renderHome();
+      mostrar("#viewHome");
+    }
+
+    function lerChecklistMeta() {
+      try {
+        return JSON.parse(localStorage.getItem(CHECKLIST_KEY) || "null") || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function salvarChecklistMeta(patch) {
+      const next = { ...lerChecklistMeta(), ...patch };
+      localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next));
+      return next;
+    }
+
+    function progressoChecklist() {
+      const meta = lerChecklistMeta();
+      const temCliente = state.clientes.length > 0;
+      const temFiado = state.clientes.some((c) => (c.movs || []).some((m) => m.tipo === "debito"));
+      const temReceber = state.clientes.some((c) => (c.movs || []).some((m) => m.tipo === "pagamento"));
+      return {
+        cliente: temCliente,
+        fiado: temFiado,
+        receber: temReceber,
+        guardar: !!meta.guardar,
+        dismissed: !!meta.dismissed,
+      };
+    }
+
+    function marcarCadernoGuardado() {
+      salvarChecklistMeta({ guardar: true });
+      renderChecklist();
+    }
+
+    function renderChecklist() {
+      const box = $("#checklistPrimeira");
+      const banner = $("#bannerLocal");
+      if (!box) return;
+      const p = progressoChecklist();
+      const completo = p.cliente && p.fiado && p.receber && p.guardar;
+      const mostrarCheck = !isAdmin() && !p.dismissed && !completo;
+      box.classList.toggle("show", mostrarCheck);
+      if (banner) banner.classList.toggle("show", !mostrarCheck && !isAdmin());
+      box.querySelectorAll("[data-check]").forEach((li) => {
+        const key = li.dataset.check;
+        li.classList.toggle("done", !!p[key]);
+      });
     }
 
     function atualizarNomeMercadoUI() {
@@ -1774,7 +2135,7 @@
           <button type="button" class="cliente" data-id="${c.id}">
             <div>
               <div class="nome">${escapeHtml(c.nome)}</div>
-              <div class="meta">${saldo > 0.009 ? "Em aberto" : "Quitado"}${c.fone ? " · " + escapeHtml(c.fone) : ""}</div>
+              <div class="meta">${saldo > 0.009 ? "Deve" : "Já pagou"}${c.fone ? " · " + escapeHtml(c.fone) : ""}</div>
             </div>
             <div class="saldo ${saldo <= 0.009 ? "zero" : ""}">${formatBRL(saldo)}</div>
           </button>
@@ -2073,6 +2434,7 @@
       const hoje = totaisHoje();
       $("#hojeFiado").textContent = formatBRL(hoje.fiado);
       $("#hojeRecebido").textContent = formatBRL(hoje.recebido);
+      renderChecklist();
 
       document.querySelectorAll(".filtros button").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.filtro === state.filtro);
@@ -2083,9 +2445,9 @@
         const semNada = !state.clientes.length;
         const msgFiltro =
           state.filtro === "aberto"
-            ? "Ninguém com fiado em aberto."
+            ? "Ninguém deve agora."
             : state.filtro === "quitado"
-              ? "Nenhum cliente quitado."
+              ? "Ninguém quitado ainda."
               : "Toque em <strong>Novo</strong> pra começar.";
         const titulo = semNada
           ? "Caderno ainda vazio"
@@ -2122,7 +2484,7 @@
         .map(({ c, saldo }) => {
           const lim = limiteCliente(c);
           const estourou = acimaDoLimite(c, saldo);
-          let meta = saldo > 0.009 ? "Em aberto" : "Quitado";
+          let meta = saldo > 0.009 ? "Deve" : "Já pagou";
           if (estourou) meta = "Acima do limite";
           else if (lim != null && saldo > 0.009) meta += ` · limite ${formatBRL(lim)}`;
           if (c.fone) meta += " · " + escapeHtml(c.fone);
@@ -2447,7 +2809,7 @@
     function apagarCliente() {
       const c = clienteAtivo();
       if (!c) return;
-      if (!confirm(`Apagar ${c.nome} e todo o histórico?`)) return;
+      if (!confirm(`Apagar ${c.nome}?\nSome o histórico todo. Tem certeza?`)) return;
       state.clientes = state.clientes.filter((x) => x.id !== c.id);
       state.ativoId = null;
       salvar();
@@ -2458,7 +2820,7 @@
 
     function nomeArquivoBackup() {
       const [y, m, d] = hojeISO().split("-");
-      return `BACKUP-FIADO-${d}-${m}-${y}.json`;
+      return `CADERNO-FIADO-${d}-${m}-${y}.json`;
     }
 
     function payloadBackup() {
@@ -2488,18 +2850,19 @@
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: "Backup Fiado",
-            text: "Backup do controle de fiado — guarde este arquivo.",
+            title: "Caderno Fiado",
+            text: "Cópia do caderno de fiado — guarde este arquivo no seu WhatsApp.",
           });
-          toast("Escolha WhatsApp ou Arquivos pra guardar");
+          marcarCadernoGuardado();
+          toast("Escolha WhatsApp pra guardar a cópia");
           return;
         }
         if (navigator.share) {
-          // Alguns celulares compartilham só texto
           await navigator.share({
-            title: "Backup Fiado",
+            title: "Caderno Fiado",
             text: payloadBackup(),
           });
+          marcarCadernoGuardado();
           toast("Cole num bloco de notas ou envie pra você");
           return;
         }
@@ -2510,7 +2873,6 @@
         }
       }
 
-      // Fallback: download clássico
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = nome;
@@ -2518,6 +2880,7 @@
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+      marcarCadernoGuardado();
       toast("Salvo. Procure em Downloads / Arquivos");
     }
 
@@ -2536,7 +2899,8 @@
           document.execCommand("copy");
           ta.remove();
         }
-        toast("Backup copiado — cole no WhatsApp ou Bloco de notas");
+        marcarCadernoGuardado();
+        toast("Cópia pronta — cole no seu WhatsApp");
       } catch {
         toast("Não deu pra copiar", true);
       }
@@ -2548,7 +2912,6 @@
       reader.onload = () => {
         try {
           let raw = String(reader.result || "").trim();
-          // Se colaram texto extra no WhatsApp, tenta achar o JSON
           if (!raw.startsWith("{")) {
             const i = raw.indexOf("{");
             const j = raw.lastIndexOf("}");
@@ -2556,17 +2919,18 @@
           }
           const data = JSON.parse(raw);
           if (!Array.isArray(data.clientes)) throw new Error("formato");
-          if (!confirm(`Restaurar ${data.clientes.length} clientes?\nIsso substitui os dados atuais.`)) return;
+          if (!confirm(`Trazer de volta ${data.clientes.length} clientes?\nIsso substitui o caderno atual.`)) return;
           state.clientes = data.clientes;
           salvar();
-          toast("Backup restaurado");
+          marcarCadernoGuardado();
+          toast("Caderno restaurado");
           if (isAdmin()) abrirAdmin();
           else {
             mostrar("#viewHome");
             renderHome();
           }
         } catch {
-          toast("Arquivo inválido", true);
+          toast("Arquivo inválido — escolha a cópia que você guardou", true);
         }
       };
       reader.readAsText(file);
@@ -2594,6 +2958,12 @@
       limparSessao();
       atualizarHintLogin();
       mostrar("#viewLogin");
+    });
+    $("#btnOnboardProx").addEventListener("click", avancarOnboarding);
+    $("#btnOnboardPular").addEventListener("click", concluirOnboarding);
+    $("#btnEsconderChecklist").addEventListener("click", () => {
+      salvarChecklistMeta({ dismissed: true });
+      renderChecklist();
     });
 
     $("#btnNovoCliente").addEventListener("click", () => {
