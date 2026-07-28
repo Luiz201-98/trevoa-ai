@@ -1435,7 +1435,33 @@
       opacity: 0;
     }
 
-    .checklist li.done .check-mark svg { opacity: 1; }
+    .checklist-dica {
+      margin-top: 0.65rem;
+      padding: 0.7rem 0.8rem;
+      border-radius: 0.7rem;
+      background: var(--accent-soft);
+      border: 1.5px solid #e2c4a4;
+      color: var(--warn);
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .checklist-dica:empty { display: none; }
+
+    .cliente.guia {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.18);
+    }
+
+    .cliente.guia .cliente-atalhos .btn.accent {
+      animation: pulse-guia 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-guia {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1577,28 +1603,29 @@
           <div class="checklist-top">
             <div>
               <strong>Primeiros passos</strong>
-              <span>Faça estes 4 e o app fica no jeito.</span>
+              <span>Opcional — pode pular se já souber usar.</span>
             </div>
-            <button type="button" class="btn ghost" id="btnEsconderChecklist" title="Esconder">OK</button>
+            <button type="button" class="btn ghost" id="btnEsconderChecklist" title="Pular">Pular</button>
           </div>
           <ol id="listaChecklist">
             <li data-check="cliente">
               <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              Cadastrar o 1º cliente
+              Cadastrar o 1º cliente (botão <strong>Novo</strong>)
             </li>
             <li data-check="fiado">
               <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              Anotar um fiado
+              Anotar um fiado (botão laranja <strong>+ Fiado</strong>)
             </li>
             <li data-check="receber">
               <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              Marcar um recebimento
+              Marcar um recebimento (botão <strong>Receber</strong>)
             </li>
             <li data-check="guardar">
               <span class="check-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              Guardar cópia no WhatsApp
+              Guardar cópia (botão <strong>Guardar caderno</strong>)
             </li>
           </ol>
+          <div class="checklist-dica" id="checklistDica"></div>
         </div>
 
         <div class="resumo" aria-label="Resumo do dia">
@@ -2364,9 +2391,13 @@
       carregar();
       atualizarNomeMercadoUI();
       atualizarPillTrial();
-      if (!isAdmin() && !onboardingFeito()) {
+      // Se já tem cliente, não força o tour de 3 telas
+      if (!isAdmin() && !onboardingFeito() && state.clientes.length === 0) {
         abrirOnboarding();
         return;
+      }
+      if (!isAdmin() && !onboardingFeito() && state.clientes.length > 0) {
+        marcarOnboardingFeito();
       }
       renderHome();
       mostrar("#viewHome");
@@ -2455,16 +2486,31 @@
         : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar caderno`;
     }
 
+    function checklistAtivo() {
+      const p = progressoChecklist();
+      const completo = p.cliente && p.fiado && p.receber && p.guardar;
+      return !isAdmin() && !p.dismissed && !completo;
+    }
+
+    function proximoPassoChecklist() {
+      const p = progressoChecklist();
+      if (!p.cliente) return "cliente";
+      if (!p.fiado) return "fiado";
+      if (!p.receber) return "receber";
+      if (!p.guardar) return "guardar";
+      return null;
+    }
+
     function renderChecklist() {
       const box = $("#checklistPrimeira");
       const banner = $("#bannerLocal");
+      const dica = $("#checklistDica");
       if (!box) return;
       const p = progressoChecklist();
       const meta = lerChecklistMeta();
       const completo = p.cliente && p.fiado && p.receber && p.guardar;
       const mostrarCheck = !isAdmin() && !p.dismissed && !completo;
       box.classList.toggle("show", mostrarCheck);
-      // Aviso some depois de guardar, fechar, ou enquanto o checklist ainda aparece
       const mostrarBanner =
         !isAdmin() &&
         !mostrarCheck &&
@@ -2476,6 +2522,30 @@
         const key = li.dataset.check;
         li.classList.toggle("done", !!p[key]);
       });
+
+      if (dica) {
+        if (!mostrarCheck) {
+          dica.textContent = "";
+        } else {
+          const passo = proximoPassoChecklist();
+          const nome = state.clientes[0]?.nome;
+          if (passo === "cliente") {
+            dica.textContent = "Agora: toque em + Novo pra cadastrar alguém.";
+          } else if (passo === "fiado") {
+            dica.textContent = nome
+              ? `Agora: no cliente “${nome}”, toque no botão laranja + Fiado e digite um valor.`
+              : "Agora: toque em + Fiado no cliente e digite um valor.";
+          } else if (passo === "receber") {
+            dica.textContent = nome
+              ? `Agora: em “${nome}”, toque em Receber, escolha Pix/Dinheiro e confirme.`
+              : "Agora: toque em Receber no cliente que deve.";
+          } else if (passo === "guardar") {
+            dica.textContent = "Agora: toque em Guardar caderno e envie pro seu WhatsApp.";
+          } else {
+            dica.textContent = "";
+          }
+        }
+      }
       atualizarBotaoGuardar();
     }
 
@@ -2836,6 +2906,16 @@
     }
 
     function renderHome() {
+      // Guia: precisa ver o cliente zerado → muda pra Todos
+      if (checklistAtivo() && proximoPassoChecklist() === "fiado" && state.filtro === "aberto") {
+        state.filtro = "todos";
+      }
+      // Guia: depois do fiado, foca em quem deve
+      if (checklistAtivo() && proximoPassoChecklist() === "receber") {
+        const alguemDeve = state.clientes.some((c) => saldoCliente(c) > 0.009);
+        if (alguemDeve) state.filtro = "aberto";
+      }
+
       const q = ($("#busca").value || "").trim().toLowerCase();
       const lista = state.clientes
         .map((c) => ({ c, saldo: saldoCliente(c) }))
@@ -2881,6 +2961,9 @@
       }
 
       const box = $("#listaClientes");
+      const passoGuia = checklistAtivo() ? proximoPassoChecklist() : null;
+      const idGuia = state.clientes[0]?.id || null;
+
       if (!lista.length) {
         const semNada = !state.clientes.length;
         const soFiltro = state.clientes.length > 0 && state.filtro === "aberto";
@@ -2898,7 +2981,7 @@
           : q
             ? "Nenhum cliente com esse nome."
             : state.filtro === "aberto"
-              ? "Todo mundo quitado. Toque em Todos pra ver a lista completa."
+              ? "Todo mundo quitado. Toque em Todos pra ver a lista — ou lance um fiado."
               : state.filtro === "quitado"
                 ? "Ninguém quitado ainda. Troque o filtro pra Todos."
                 : "Toque em <strong>Novo</strong> pra cadastrar o primeiro nome.";
@@ -2929,7 +3012,7 @@
       }
 
       box.innerHTML = lista
-        .map(({ c, saldo }) => {
+        .map(({ c, saldo }, idx) => {
           const lim = limiteCliente(c);
           const estourou = acimaDoLimite(c, saldo);
           const deve = saldo > 0.009;
@@ -2937,19 +3020,22 @@
           if (estourou) meta = "Acima do limite";
           else if (lim != null && deve) meta += ` · limite ${formatBRL(lim)}`;
           if (c.fone) meta += " · " + escapeHtml(c.fone);
+          const destacar =
+            (passoGuia === "fiado" && c.id === idGuia) ||
+            (passoGuia === "receber" && deve && idx === 0);
           let atalhos = "";
           if (deve) {
             atalhos = `<div class="cliente-atalhos">
               <button type="button" class="btn accent" data-rapido="debito" data-id="${c.id}">+ Fiado</button>
               <button type="button" class="btn primary" data-rapido="pagamento" data-id="${c.id}">Receber</button>
             </div>`;
-          } else if (state.filtro === "quitado") {
+          } else if (passoGuia === "fiado" || state.filtro === "quitado") {
             atalhos = `<div class="cliente-atalhos um">
               <button type="button" class="btn accent" data-rapido="debito" data-id="${c.id}">+ Fiado</button>
             </div>`;
           }
           return `
-          <div class="cliente" data-id="${c.id}">
+          <div class="cliente${destacar ? " guia" : ""}" data-id="${c.id}">
             <button type="button" class="cliente-main" data-abrir="${c.id}">
               <div>
                 <div class="nome">${escapeHtml(c.nome)}</div>
