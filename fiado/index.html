@@ -1796,6 +1796,12 @@
           <input id="importFile" type="file" accept="application/json,.json,text/plain,.txt" />
           <span class="hint-field">Escolha o arquivo que você salvou ou recebeu no WhatsApp. Isso substitui o caderno atual.</span>
         </label>
+        <button type="button" class="btn primary full" id="btnEnviarNuvem" style="margin-top:1rem" hidden>
+          Enviar este caderno pra nuvem
+        </button>
+        <p class="hint" id="hintNuvemBackup" style="margin-top:0.45rem;text-align:left" hidden>
+          Sobe os clientes desta tela pra conta logada (substitui o que está na nuvem).
+        </p>
       </div>
     </section>
 
@@ -1806,7 +1812,7 @@
           <img class="logo" src="./icon.svg" alt="" width="36" height="36" />
           <div>
             <h1 style="margin:0">Administrador</h1>
-            <p class="subtitle" style="margin:0">Painel de gestão do Fiado</p>
+            <p class="subtitle" style="margin:0" id="adminSubtitle">Painel de gestão do Fiado</p>
           </div>
         </div>
         <button type="button" class="btn ghost" id="btnSairAdmin">Sair</button>
@@ -1824,6 +1830,28 @@
       </div>
 
       <div class="admin-stack">
+        <div class="sheet" id="adminCloudSheet" hidden>
+          <h2>Mercados na nuvem</h2>
+          <p class="subtitle" id="adminCloudStatus" style="margin-bottom:0.75rem">—</p>
+          <div class="admin-lista" id="adminListaMercados" style="margin-bottom:0.75rem"></div>
+          <label class="field">
+            Usuário do novo mercado
+            <input id="novoMercadoUser" type="text" placeholder="Ex.: seuluiz" autocomplete="off" />
+          </label>
+          <label class="field">
+            Senha do balcão
+            <input id="novoMercadoSenha" type="text" placeholder="mín. 4 caracteres" autocomplete="off" />
+          </label>
+          <label class="field">
+            Nome na tela
+            <input id="novoMercadoNome" type="text" placeholder="Ex.: Mercado do Luiz" />
+          </label>
+          <button type="button" class="btn primary full" id="btnAdminCriarMercado">Criar mercado</button>
+          <p class="hint" style="margin-top:0.65rem;text-align:left">
+            Depois de criar, toque em <strong>Abrir caderno</strong> pra cadastrar os clientes dele daqui de casa.
+          </p>
+        </div>
+
         <div class="sheet">
           <h2>Licença / teste</h2>
           <div class="admin-status" id="adminLicencaStatus">—</div>
@@ -1852,9 +1880,9 @@
           <button type="button" class="btn primary full" id="btnAdminSalvarPix">Salvar cobrança</button>
         </div>
 
-        <div class="sheet">
-          <h2>Conta do mercado</h2>
-          <p class="subtitle" style="margin-bottom:0.75rem">Login que o dono do mercadinho usa no balcão.</p>
+        <div class="sheet" id="adminContaLocalSheet">
+          <h2>Conta do mercado (modo local)</h2>
+          <p class="subtitle" style="margin-bottom:0.75rem">Só vale se a nuvem estiver desligada. Com nuvem, use “Mercados na nuvem”.</p>
           <label class="field">
             Nome do mercado
             <input id="adminNomeMercado" type="text" placeholder="Ex.: Mercado do Zé" />
@@ -1872,7 +1900,7 @@
 
         <div class="sheet">
           <h2>Senha do administrador</h2>
-          <p class="subtitle" style="margin-bottom:0.75rem">Só você usa. Usuário continua: <strong id="adminUserLabel">admin</strong></p>
+          <p class="subtitle" style="margin-bottom:0.75rem">Só você usa. Usuário: <strong id="adminUserLabel">admin</strong></p>
           <label class="field">
             Senha atual
             <input id="adminSenhaAtual" type="password" autocomplete="current-password" />
@@ -1960,6 +1988,8 @@
     </div>
   </div>
 
+  <script src="./config.js"></script>
+  <script src="./cloud.js"></script>
   <script>
     /* ═══════════════════════════════════════════════
        VOCÊ CONFIGURA AQUI (antes de entregar pro cliente)
@@ -2023,6 +2053,14 @@
     }
 
     function credenciaisBalcao() {
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        return {
+          usuario: meta.mercadoUsuario || meta.usuario || LICENCA.usuario,
+          senha: "",
+          nomeApp: meta.nome || LICENCA.nomeApp,
+        };
+      }
       const c = lerConfig();
       return {
         usuario: c.usuario || LICENCA.usuario,
@@ -2040,6 +2078,16 @@
     }
 
     function dadosCobranca() {
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        const valor = Number(meta.valorLicenca);
+        return {
+          valor: Number.isFinite(valor) && valor > 0 ? valor : LICENCA.valorLicenca,
+          chavePix: (meta.chavePix != null && String(meta.chavePix).trim() !== "")
+            ? String(meta.chavePix).trim()
+            : LICENCA.chavePix,
+        };
+      }
       const c = lerConfig();
       const valor = Number(c.valorLicenca);
       return {
@@ -2097,15 +2145,58 @@
       });
     }
 
-    function salvar() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ clientes: state.clientes }));
+    function cloudOn() {
+      return !!(window.FiadoCloud && FiadoCloud.configured());
     }
 
-    function carregar() {
+    function cacheKeyCaderno() {
+      if (!cloudOn()) return STORAGE_KEY;
+      const meta = FiadoCloud.getMeta() || {};
+      const mid = meta.actingMercadoId || meta.mercadoId || "x";
+      return STORAGE_KEY + ":cloud:" + mid;
+    }
+
+    function salvarLocalCache() {
+      localStorage.setItem(cacheKeyCaderno(), JSON.stringify({ clientes: state.clientes }));
+    }
+
+    function salvar() {
+      salvarLocalCache();
+      if (cloudOn() && FiadoCloud.getToken()) {
+        const meta = FiadoCloud.getMeta() || {};
+        if (meta.role === "admin" && !meta.actingMercadoId) return;
+        clearTimeout(salvar._cloudT);
+        salvar._cloudT = setTimeout(() => {
+          FiadoCloud.salvarCaderno(state.clientes)
+            .then(() => {
+              /* ok silencioso */
+            })
+            .catch((err) => toast("Nuvem: " + (err.message || "falha ao salvar"), true));
+        }, 450);
+      }
+    }
+
+    async function carregar() {
+      if (cloudOn() && FiadoCloud.getToken()) {
+        const meta = FiadoCloud.getMeta() || {};
+        if (meta.role === "admin" && !meta.actingMercadoId) {
+          state.clientes = [];
+          return;
+        }
+        try {
+          state.clientes = await FiadoCloud.carregarCaderno();
+          salvarLocalCache();
+          return;
+        } catch (err) {
+          toast("Sem nuvem agora — usando cópia deste celular", true);
+        }
+      }
       try {
-        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        const raw = JSON.parse(localStorage.getItem(cacheKeyCaderno()) || localStorage.getItem(STORAGE_KEY) || "null");
         if (raw?.clientes && Array.isArray(raw.clientes)) {
           state.clientes = raw.clientes;
+        } else {
+          state.clientes = [];
         }
       } catch {
         state.clientes = [];
@@ -2136,6 +2227,18 @@
     }
 
     function diasRestantesTrial() {
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        const trialDias = Number(meta.trialDias) || LICENCA.trialDias;
+        if (!meta.trialInicio) return trialDias;
+        const inicio = new Date(meta.trialInicio);
+        const fim = new Date(inicio);
+        fim.setDate(fim.getDate() + trialDias);
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        fim.setHours(0, 0, 0, 0);
+        return Math.ceil((fim - hoje) / 86400000);
+      }
       const lic = lerLicencaLocal();
       if (!lic.inicioTrial) return LICENCA.trialDias;
       const inicio = new Date(lic.inicioTrial + "T00:00:00");
@@ -2148,6 +2251,11 @@
     }
 
     function estaPago() {
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        if (meta.bloqueado) return false;
+        return !!meta.pago;
+      }
       if (LICENCA.pagoNaMao) return true;
       const lic = lerLicencaLocal();
       if (lic.bloqueadoManual) return false;
@@ -2160,6 +2268,12 @@
 
     function acessoLiberado() {
       if (isAdmin()) return true;
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        if (meta.bloqueado) return false;
+        if (meta.pago) return true;
+        return diasRestantesTrial() > 0;
+      }
       if (estaPago()) return true;
       const lic = lerLicencaLocal();
       if (lic.bloqueadoManual) return false;
@@ -2167,6 +2281,7 @@
     }
 
     function iniciarTrialSePreciso() {
+      if (cloudOn()) return;
       const lic = lerLicencaLocal();
       if (!lic.inicioTrial) {
         salvarLicencaLocal({ inicioTrial: hojeISO() });
@@ -2174,6 +2289,17 @@
     }
 
     function formatarFimTrial() {
+      if (cloudOn()) {
+        const meta = FiadoCloud.getMeta() || {};
+        const trialDias = Number(meta.trialDias) || LICENCA.trialDias;
+        const base = meta.trialInicio ? new Date(meta.trialInicio) : new Date();
+        const fim = new Date(base);
+        fim.setDate(fim.getDate() + trialDias - 1);
+        const yy = fim.getFullYear();
+        const mm = String(fim.getMonth() + 1).padStart(2, "0");
+        const dd = String(fim.getDate()).padStart(2, "0");
+        return formatDataBR(`${yy}-${mm}-${dd}`);
+      }
       const lic = lerLicencaLocal();
       const base = lic.inicioTrial || hojeISO();
       const [y, m, d] = base.split("-").map(Number);
@@ -2191,7 +2317,7 @@
       if (!el) return;
       if (estaPago()) {
         el.className = "trial-pill pago";
-        el.textContent = "Acesso liberado";
+        el.textContent = cloudOn() ? "Nuvem · liberado" : "Acesso liberado";
         if (aviso) {
           aviso.classList.remove("show");
           aviso.innerHTML = "";
@@ -2200,17 +2326,18 @@
       }
       const dias = diasRestantesTrial();
       el.className = "trial-pill" + (dias <= 3 ? " urgente" : "");
+      const prefix = cloudOn() ? "Nuvem · " : "";
       if (dias <= 0) {
-        el.textContent = "Teste encerrado";
+        el.textContent = prefix + "Teste encerrado";
       } else if (dias === 1) {
-        el.textContent = "Teste: último dia";
+        el.textContent = prefix + "Teste: último dia";
       } else {
-        el.textContent = `Teste: ${dias} dias restantes`;
+        el.textContent = `${prefix}Teste: ${dias} dias restantes`;
       }
 
       if (aviso) {
         if (dias > 0 && dias <= 3) {
-          const zap = String(LICENCA.seuWhatsApp || "").replace(/\D/g, "");
+          const zap = String((cloudOn() && FiadoCloud.getMeta().seuWhatsapp) || LICENCA.seuWhatsApp || "").replace(/\D/g, "");
           const cob = dadosCobranca();
           aviso.classList.add("show");
           aviso.innerHTML = dias === 1
@@ -2224,6 +2351,15 @@
     }
 
     function lerSessao() {
+      if (cloudOn() && FiadoCloud.getToken()) {
+        const meta = FiadoCloud.getMeta() || {};
+        return {
+          ok: true,
+          user: meta.usuario || "user",
+          role: meta.role || "user",
+          cloud: true,
+        };
+      }
       try {
         const raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
         return JSON.parse(raw || "null");
@@ -2233,6 +2369,7 @@
     }
 
     function sessaoAtiva() {
+      if (cloudOn()) return !!FiadoCloud.getToken();
       const s = lerSessao();
       if (!s || !s.ok) return false;
       if (s.role === "admin") return s.user === credenciaisAdmin().usuario;
@@ -2256,22 +2393,51 @@
     }
 
     function limparSessao() {
+      if (cloudOn()) {
+        FiadoCloud.logout();
+      }
       sessionStorage.removeItem(AUTH_KEY);
       localStorage.removeItem(AUTH_KEY);
       state.logado = false;
       state.role = null;
+      state.fromAdmin = false;
     }
 
-    function tentarLogin() {
+    async function tentarLogin() {
       const user = ($("#loginUser").value || "").trim();
       const pass = $("#loginPass").value || "";
       const lembrar = $("#lembrarLogin").checked;
       const erro = $("#loginErro");
-      const balcao = credenciaisBalcao();
+      erro.textContent = "";
 
+      if (cloudOn()) {
+        try {
+          const res = await FiadoCloud.login(user, pass, lembrar);
+          if (!res.ok) {
+            erro.textContent = res.erro || "Login inválido";
+            toast("Login inválido", true);
+            return;
+          }
+          state.logado = true;
+          state.role = res.role;
+          state.fromAdmin = false;
+          $("#loginPass").value = "";
+          if (res.role === "admin") {
+            abrirAdmin();
+            return;
+          }
+          await entrarNoApp();
+          return;
+        } catch (err) {
+          erro.textContent = err.message || "Erro na nuvem";
+          toast("Erro na nuvem", true);
+          return;
+        }
+      }
+
+      const balcao = credenciaisBalcao();
       const admin = credenciaisAdmin();
       if (user === admin.usuario && pass === admin.senha) {
-        erro.textContent = "";
         gravarSessao(lembrar, "admin", user);
         $("#loginPass").value = "";
         abrirAdmin();
@@ -2283,27 +2449,45 @@
         toast("Login inválido", true);
         return;
       }
-      erro.textContent = "";
       iniciarTrialSePreciso();
       state.fromAdmin = false;
       gravarSessao(lembrar, "user", user);
       $("#loginPass").value = "";
-      entrarNoApp();
+      await entrarNoApp();
     }
 
-    function liberarComCodigo() {
+    async function liberarComCodigo() {
       const codigo = ($("#codigoLib").value || "").trim();
       const erro = $("#libErro");
+      const metaCloud = cloudOn() ? FiadoCloud.getMeta() || {} : {};
+      const codigoOk = metaCloud.codigoLiberacao || LICENCA.codigoLiberacao;
       if (!codigo) {
         erro.textContent = "Digite o código.";
         return;
       }
-      if (codigo !== LICENCA.codigoLiberacao) {
+      if (codigo !== codigoOk) {
         erro.textContent = "Código inválido. Confira com quem te vendeu.";
         toast("Código inválido", true);
         return;
       }
       erro.textContent = "";
+      if (cloudOn()) {
+        try {
+          const res = await FiadoCloud.liberarComCodigo(codigo);
+          if (!res || !res.ok) {
+            erro.textContent = (res && res.erro) || "Código inválido";
+            toast(erro.textContent, true);
+            return;
+          }
+          FiadoCloud.patchMeta({ pago: true, bloqueado: false });
+          toast("Acesso liberado na nuvem!");
+          await entrarNoApp();
+          return;
+        } catch (err) {
+          toast(err.message || "Erro ao liberar", true);
+          return;
+        }
+      }
       salvarLicencaLocal({
         liberado: true,
         bloqueadoManual: false,
@@ -2312,7 +2496,7 @@
       });
       registrarAcao("Código de liberação usado no balcão");
       toast("Acesso liberado!");
-      entrarNoApp();
+      await entrarNoApp();
     }
 
     function atualizarTelaBloqueado() {
@@ -2327,7 +2511,8 @@
       const texto = encodeURIComponent(
         `Oi! Quero liberar o ${nome}. Valor ${formatBRL(cob.valor)}. Já fiz/ vou fazer o PIX. Me manda o código de liberação.`
       );
-      const fone = String(LICENCA.seuWhatsApp || "").replace(/\D/g, "");
+      const zapCloud = cloudOn() ? (FiadoCloud.getMeta() || {}).seuWhatsapp : "";
+      const fone = String(zapCloud || LICENCA.seuWhatsApp || "").replace(/\D/g, "");
       const url = fone
         ? `https://wa.me/55${fone.replace(/^55/, "")}?text=${texto}`
         : `https://wa.me/?text=${texto}`;
@@ -2359,6 +2544,11 @@
 
     function atualizarHintLogin() {
       const hint = $("#loginTrialHint");
+      if (!hint) return;
+      if (cloudOn()) {
+        hint.textContent = "Conta na nuvem: use o usuário do seu mercado (ou admin).";
+        return;
+      }
       if (estaPago()) {
         hint.textContent = "Acesso já liberado neste aparelho.";
         return;
@@ -2376,10 +2566,11 @@
       }
     }
 
-    function entrarNoApp() {
+    async function entrarNoApp() {
       if (!acessoLiberado()) {
         const lic = lerLicencaLocal();
-        $("#bloqueadoMsg").textContent = lic.bloqueadoManual
+        const meta = cloudOn() ? FiadoCloud.getMeta() || {} : {};
+        $("#bloqueadoMsg").textContent = (cloudOn() ? meta.bloqueado : lic.bloqueadoManual)
           ? "Acesso bloqueado pelo administrador. Seus dados continuam salvos."
           : estaPago()
             ? "Acesso bloqueado."
@@ -2388,10 +2579,10 @@
         mostrar("#viewBloqueado");
         return;
       }
-      carregar();
+      await carregar();
       atualizarNomeMercadoUI();
       atualizarPillTrial();
-      // Se já tem cliente, não força o tour de 3 telas
+      atualizarBotaoNuvemBackup();
       if (!isAdmin() && !onboardingFeito() && state.clientes.length === 0) {
         abrirOnboarding();
         return;
@@ -2555,42 +2746,173 @@
         el.textContent = nome;
       });
       const sub = document.querySelector("#viewHome .subtitle");
-      if (sub) sub.textContent = "Toque no nome → anota fiado ou recebe.";
+      if (sub) {
+        const meta = cloudOn() ? FiadoCloud.getMeta() || {} : {};
+        sub.textContent = meta.actingMercadoId && isAdmin()
+          ? `Caderno remoto · ${meta.mercadoUsuario || nome}`
+          : "Toque no nome → anota fiado ou recebe.";
+      }
     }
 
-    function abrirAdmin() {
-      carregar();
-      renderAdmin();
+    function mercadoAdminAtivoId() {
+      if (!cloudOn()) return null;
+      const meta = FiadoCloud.getMeta() || {};
+      return meta.actingMercadoId || null;
+    }
+
+    function atualizarBotaoNuvemBackup() {
+      const btn = $("#btnEnviarNuvem");
+      const hint = $("#hintNuvemBackup");
+      const show = cloudOn() && !!FiadoCloud.getToken() && (isAdmin() ? !!mercadoAdminAtivoId() : true);
+      if (btn) btn.hidden = !show;
+      if (hint) hint.hidden = !show;
+    }
+
+    async function abrirAdmin() {
+      await carregar();
+      await renderAdmin();
       mostrar("#viewAdmin");
     }
 
-    function renderAdmin() {
-      const balcao = credenciaisBalcao();
+    async function renderAdmin() {
       const cob = dadosCobranca();
-      const lic = lerLicencaLocal();
-      const dias = diasRestantesTrial();
+      const cloud = cloudOn();
+      const sheetCloud = $("#adminCloudSheet");
+      const sheetLocal = $("#adminContaLocalSheet");
+      if (sheetCloud) sheetCloud.hidden = !cloud;
+      if (sheetLocal) sheetLocal.hidden = !!cloud;
+
       let status = "";
-      if (lic.bloqueadoManual) status = "Status: <strong>bloqueado</strong> pelo admin.";
-      else if (estaPago()) status = "Status: <strong>liberado (pago)</strong>.";
-      else if (!lic.inicioTrial) status = `Status: teste de <strong>${LICENCA.trialDias} dias</strong> ainda não começou.`;
-      else if (dias > 0) status = `Status: teste ativo — <strong>${dias} dia(s)</strong> (até ${formatarFimTrial()}).`;
-      else status = "Status: <strong>teste encerrado</strong> — balcão bloqueado.";
+      let codigo = LICENCA.codigoLiberacao;
+
+      if (cloud) {
+        const meta = FiadoCloud.getMeta() || {};
+        codigo = meta.codigoLiberacao || LICENCA.codigoLiberacao;
+        const mid = meta.actingMercadoId;
+        if (!mid) {
+          status = "Abra um mercado em <strong>Mercados na nuvem</strong> pra ver licença e clientes dele.";
+        } else if (meta.bloqueado) {
+          status = `Status de <strong>${escapeHtml(meta.nome || "mercado")}</strong>: <strong>bloqueado</strong>.`;
+        } else if (meta.pago) {
+          status = `Status de <strong>${escapeHtml(meta.nome || "mercado")}</strong>: <strong>liberado (pago)</strong>.`;
+        } else {
+          const dias = diasRestantesTrial();
+          status = dias > 0
+            ? `Status de <strong>${escapeHtml(meta.nome || "mercado")}</strong>: teste ativo — <strong>${dias} dia(s)</strong> (até ${formatarFimTrial()}).`
+            : `Status de <strong>${escapeHtml(meta.nome || "mercado")}</strong>: <strong>teste encerrado</strong>.`;
+        }
+        const st = $("#adminCloudStatus");
+        if (st) {
+          st.textContent = mid
+            ? `Editando: ${meta.nome || "—"} (@${meta.mercadoUsuario || "—"})`
+            : "Nenhum caderno aberto — crie ou abra um mercado.";
+        }
+        await renderAdminMercados();
+      } else {
+        const lic = lerLicencaLocal();
+        const dias = diasRestantesTrial();
+        if (lic.bloqueadoManual) status = "Status: <strong>bloqueado</strong> pelo admin.";
+        else if (estaPago()) status = "Status: <strong>liberado (pago)</strong>.";
+        else if (!lic.inicioTrial) status = `Status: teste de <strong>${LICENCA.trialDias} dias</strong> ainda não começou.`;
+        else if (dias > 0) status = `Status: teste ativo — <strong>${dias} dia(s)</strong> (até ${formatarFimTrial()}).`;
+        else status = "Status: <strong>teste encerrado</strong> — balcão bloqueado.";
+        const balcao = credenciaisBalcao();
+        $("#adminNomeMercado").value = balcao.nomeApp;
+        $("#adminUserBalcao").value = balcao.usuario;
+        $("#adminSenhaBalcao").value = balcao.senha;
+      }
 
       $("#adminLicencaStatus").innerHTML = status;
-      $("#adminCodigoBox").textContent = LICENCA.codigoLiberacao;
+      $("#adminCodigoBox").textContent = codigo;
       $("#adminTotalAberto").textContent = formatBRL(totalAberto());
       $("#adminTotalClientes").textContent = String(state.clientes.length);
-      $("#adminNomeMercado").value = balcao.nomeApp;
-      $("#adminUserBalcao").value = balcao.usuario;
-      $("#adminSenhaBalcao").value = balcao.senha;
       $("#adminValorLicenca").value = String(cob.valor).replace(".", ",");
       $("#adminChavePix").value = cob.chavePix || "";
-      $("#adminUserLabel").textContent = credenciaisAdmin().usuario;
+      $("#adminUserLabel").textContent = cloud
+        ? (FiadoCloud.getMeta().usuario || "admin")
+        : credenciaisAdmin().usuario;
       $("#adminSenhaAtual").value = "";
       $("#adminSenhaNova").value = "";
       $("#adminSenhaNova2").value = "";
+      const sub = $("#adminSubtitle");
+      if (sub) {
+        sub.textContent = cloud ? "Gestão na nuvem — mercados e cadernos" : "Painel de gestão do Fiado";
+      }
+      atualizarBotaoNuvemBackup();
       renderAdminClientes();
       renderAdminLog();
+    }
+
+    async function renderAdminMercados() {
+      const box = $("#adminListaMercados");
+      if (!box || !cloudOn()) return;
+      box.innerHTML = `<div class="vazio" style="padding:0.8rem">Carregando mercados…</div>`;
+      try {
+        const lista = await FiadoCloud.listarMercados();
+        const ativo = mercadoAdminAtivoId();
+        if (!lista.length) {
+          box.innerHTML = `<div class="vazio" style="padding:0.8rem">Nenhum mercado ainda. Crie o primeiro abaixo.</div>`;
+          return;
+        }
+        box.innerHTML = lista
+          .map((m) => {
+            const aberto = m.id === ativo;
+            const st = m.bloqueado ? "bloqueado" : m.pago ? "pago" : "teste";
+            return `
+              <div class="log-item" style="display:flex;gap:0.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap">
+                <div>
+                  <div><strong>${escapeHtml(m.nome || m.usuario)}</strong> · @${escapeHtml(m.usuario)}</div>
+                  <div class="quando">${st}${aberto ? " · aberto agora" : ""}</div>
+                </div>
+                <button type="button" class="btn ${aberto ? "primary" : ""}" data-abrir-mercado="${m.id}">
+                  ${aberto ? "Já aberto" : "Abrir caderno"}
+                </button>
+              </div>`;
+          })
+          .join("");
+        box.querySelectorAll("[data-abrir-mercado]").forEach((btn) => {
+          btn.addEventListener("click", () => adminAbrirMercado(btn.dataset.abrirMercado));
+        });
+      } catch (err) {
+        box.innerHTML = `<div class="vazio" style="padding:0.8rem">${escapeHtml(err.message || "Erro ao listar")}</div>`;
+      }
+    }
+
+    async function adminCriarMercado() {
+      if (!cloudOn()) return;
+      const usuario = ($("#novoMercadoUser").value || "").trim();
+      const senha = ($("#novoMercadoSenha").value || "").trim();
+      const nome = ($("#novoMercadoNome").value || "").trim() || "Fiado";
+      if (!usuario || senha.length < 4) {
+        toast("Usuário e senha (mín. 4) obrigatórios", true);
+        return;
+      }
+      try {
+        const res = await FiadoCloud.criarMercado(usuario, senha, nome);
+        if (!res || !res.ok) throw new Error((res && res.erro) || "Não criou");
+        $("#novoMercadoUser").value = "";
+        $("#novoMercadoSenha").value = "";
+        $("#novoMercadoNome").value = "";
+        registrarAcao(`Criou mercado @${usuario}`);
+        toast("Mercado criado");
+        if (res.id) await adminAbrirMercado(res.id);
+        else await renderAdmin();
+      } catch (err) {
+        toast(err.message || "Erro ao criar", true);
+      }
+    }
+
+    async function adminAbrirMercado(id) {
+      if (!cloudOn() || !id) return;
+      try {
+        await FiadoCloud.abrirMercado(id);
+        await carregar();
+        registrarAcao(`Abriu caderno do mercado`);
+        toast("Caderno aberto");
+        await renderAdmin();
+      } catch (err) {
+        toast(err.message || "Erro ao abrir", true);
+      }
     }
 
     function renderAdminLog() {
@@ -2641,7 +2963,25 @@
       });
     }
 
-    function adminLiberarPago() {
+    async function adminLiberarPago() {
+      if (cloudOn()) {
+        const mid = mercadoAdminAtivoId();
+        if (!mid) {
+          toast("Abra um mercado antes", true);
+          return;
+        }
+        try {
+          const res = await FiadoCloud.atualizarMercado({ id: mid, pago: true, bloqueado: false });
+          if (res && res.ok === false) throw new Error(res.erro || "Falha");
+          FiadoCloud.patchMeta({ pago: true, bloqueado: false });
+          registrarAcao("Liberou acesso (pago) na nuvem");
+          toast("Acesso liberado (pago)");
+          await renderAdmin();
+        } catch (err) {
+          toast(err.message || "Erro", true);
+        }
+        return;
+      }
       salvarLicencaLocal({
         liberado: true,
         bloqueadoManual: false,
@@ -2653,16 +2993,61 @@
       renderAdmin();
     }
 
-    function adminBloquear() {
-      if (!confirm("Bloquear o acesso do balcão neste celular?")) return;
+    async function adminBloquear() {
+      if (!confirm("Bloquear o acesso do balcão?")) return;
+      if (cloudOn()) {
+        const mid = mercadoAdminAtivoId();
+        if (!mid) {
+          toast("Abra um mercado antes", true);
+          return;
+        }
+        try {
+          const res = await FiadoCloud.atualizarMercado({ id: mid, bloqueado: true, pago: false });
+          if (res && res.ok === false) throw new Error(res.erro || "Falha");
+          FiadoCloud.patchMeta({ bloqueado: true, pago: false });
+          registrarAcao("Bloqueou o balcão na nuvem");
+          toast("Balcão bloqueado");
+          await renderAdmin();
+        } catch (err) {
+          toast(err.message || "Erro", true);
+        }
+        return;
+      }
       salvarLicencaLocal({ bloqueadoManual: true, liberado: false });
       registrarAcao("Bloqueou o balcão");
       toast("Balcão bloqueado");
       renderAdmin();
     }
 
-    function adminReiniciarTrial() {
+    async function adminReiniciarTrial() {
       if (!confirm(`Reiniciar teste de ${LICENCA.trialDias} dias a partir de hoje?`)) return;
+      if (cloudOn()) {
+        const mid = mercadoAdminAtivoId();
+        if (!mid) {
+          toast("Abra um mercado antes", true);
+          return;
+        }
+        try {
+          const res = await FiadoCloud.atualizarMercado({
+            id: mid,
+            reiniciarTrial: true,
+            pago: false,
+            bloqueado: false,
+          });
+          if (res && res.ok === false) throw new Error(res.erro || "Falha");
+          FiadoCloud.patchMeta({
+            pago: false,
+            bloqueado: false,
+            trialInicio: new Date().toISOString(),
+          });
+          registrarAcao(`Reiniciou teste de ${LICENCA.trialDias} dias (nuvem)`);
+          toast("Teste reiniciado");
+          await renderAdmin();
+        } catch (err) {
+          toast(err.message || "Erro", true);
+        }
+        return;
+      }
       salvarLicencaLocal({
         inicioTrial: hojeISO(),
         liberado: false,
@@ -2675,7 +3060,8 @@
     }
 
     async function adminCopiarCodigo() {
-      const codigo = LICENCA.codigoLiberacao;
+      const codigo =
+        (cloudOn() && FiadoCloud.getMeta().codigoLiberacao) || LICENCA.codigoLiberacao;
       try {
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(codigo);
@@ -2694,6 +3080,10 @@
     }
 
     function adminSalvarConta() {
+      if (cloudOn()) {
+        toast("Com nuvem, use Mercados na nuvem", true);
+        return;
+      }
       const nomeApp = ($("#adminNomeMercado").value || "").trim() || LICENCA.nomeApp;
       const usuario = ($("#adminUserBalcao").value || "").trim();
       const senha = ($("#adminSenhaBalcao").value || "").trim();
@@ -2712,7 +3102,7 @@
       renderAdmin();
     }
 
-    function adminSalvarPix() {
+    async function adminSalvarPix() {
       const valor = parseMoney($("#adminValorLicenca").value);
       const chavePix = ($("#adminChavePix").value || "").trim();
       if (!Number.isFinite(valor) || valor <= 0) {
@@ -2723,26 +3113,57 @@
         toast("Digite a chave PIX", true);
         return;
       }
+      if (cloudOn()) {
+        const mid = mercadoAdminAtivoId();
+        if (!mid) {
+          toast("Abra um mercado antes", true);
+          return;
+        }
+        try {
+          const v = Math.round(valor * 100) / 100;
+          const res = await FiadoCloud.atualizarMercado({ id: mid, valor: v, pix: chavePix });
+          if (res && res.ok === false) throw new Error(res.erro || "Falha");
+          FiadoCloud.patchMeta({ valorLicenca: v, chavePix });
+          registrarAcao(`Atualizou cobrança na nuvem: ${formatBRL(v)}`);
+          toast("Cobrança salva na nuvem");
+          await renderAdmin();
+        } catch (err) {
+          toast(err.message || "Erro", true);
+        }
+        return;
+      }
       salvarConfig({ valorLicenca: Math.round(valor * 100) / 100, chavePix });
       registrarAcao(`Atualizou cobrança: ${formatBRL(valor)}`);
       toast("Cobrança salva");
       renderAdmin();
     }
 
-    function adminTrocarSenha() {
+    async function adminTrocarSenha() {
       const atual = $("#adminSenhaAtual").value || "";
       const nova = $("#adminSenhaNova").value || "";
       const nova2 = $("#adminSenhaNova2").value || "";
-      if (atual !== credenciaisAdmin().senha) {
-        toast("Senha atual incorreta", true);
-        return;
-      }
       if (nova.length < 4) {
         toast("Nova senha: mínimo 4 caracteres", true);
         return;
       }
       if (nova !== nova2) {
         toast("Confirmação não confere", true);
+        return;
+      }
+      if (cloudOn()) {
+        try {
+          const res = await FiadoCloud.trocarSenhaAdmin(atual, nova);
+          if (!res || !res.ok) throw new Error((res && res.erro) || "Senha atual incorreta");
+          registrarAcao("Trocou a senha do administrador (nuvem)");
+          toast("Senha do admin atualizada");
+          await renderAdmin();
+        } catch (err) {
+          toast(err.message || "Erro", true);
+        }
+        return;
+      }
+      if (atual !== credenciaisAdmin().senha) {
+        toast("Senha atual incorreta", true);
         return;
       }
       salvarConfig({ adminSenha: nova });
@@ -2820,21 +3241,22 @@
       renderAdminLog();
     }
 
-    function bootAuth() {
+    async function bootAuth() {
       atualizarHintLogin();
-      const s = lerSessao();
+      atualizarBotaoNuvemBackup();
       if (!sessaoAtiva()) {
         mostrar("#viewLogin");
         return;
       }
+      const s = lerSessao();
       state.logado = true;
       state.role = s.role || "user";
       if (state.role === "admin") {
-        abrirAdmin();
+        await abrirAdmin();
         return;
       }
       iniciarTrialSePreciso();
-      entrarNoApp();
+      await entrarNoApp();
     }
 
     function mostrar(viewId) {
@@ -3655,7 +4077,7 @@
     function importar(file) {
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         try {
           let raw = String(reader.result || "").trim();
           if (!raw.startsWith("{")) {
@@ -3668,9 +4090,18 @@
           if (!confirm(`Trazer de volta ${data.clientes.length} clientes?\nIsso substitui o caderno atual.`)) return;
           state.clientes = data.clientes;
           salvar();
+          if (cloudOn() && FiadoCloud.getToken()) {
+            try {
+              await FiadoCloud.salvarCaderno(state.clientes);
+              toast("Caderno restaurado e enviado pra nuvem");
+            } catch (err) {
+              toast("Restaurado neste celular — nuvem: " + (err.message || "falha"), true);
+            }
+          } else {
+            toast("Caderno restaurado");
+          }
           marcarCadernoGuardado();
-          toast("Caderno restaurado");
-          if (isAdmin()) abrirAdmin();
+          if (isAdmin()) await abrirAdmin();
           else {
             mostrar("#viewHome");
             renderHome();
@@ -3680,6 +4111,31 @@
         }
       };
       reader.readAsText(file);
+    }
+
+    async function enviarCadernoPraNuvem() {
+      if (!cloudOn() || !FiadoCloud.getToken()) {
+        toast("Nuvem não configurada ou sem login", true);
+        return;
+      }
+      if (isAdmin() && !mercadoAdminAtivoId()) {
+        toast("Abra um mercado antes de enviar", true);
+        return;
+      }
+      if (!state.clientes.length) {
+        if (!confirm("O caderno desta tela está vazio. Enviar assim mesmo (apaga o da nuvem)?")) return;
+      } else if (!confirm(`Enviar ${state.clientes.length} clientes pra nuvem?\nIsso substitui o caderno remoto da conta.`)) {
+        return;
+      }
+      try {
+        await FiadoCloud.salvarCaderno(state.clientes);
+        salvarLocalCache();
+        marcarCadernoGuardado();
+        registrarAcao(`Enviou caderno pra nuvem (${state.clientes.length} clientes)`);
+        toast("Caderno na nuvem!");
+      } catch (err) {
+        toast(err.message || "Falha ao enviar", true);
+      }
     }
 
     // Events
@@ -3791,12 +4247,18 @@
     $("#btnAdminSalvarConta").addEventListener("click", adminSalvarConta);
     $("#btnAdminSalvarPix").addEventListener("click", adminSalvarPix);
     $("#btnAdminTrocarSenha").addEventListener("click", adminTrocarSenha);
+    $("#btnAdminCriarMercado")?.addEventListener("click", adminCriarMercado);
+    $("#btnEnviarNuvem")?.addEventListener("click", enviarCadernoPraNuvem);
     $("#btnAdminExportarDevedores").addEventListener("click", adminExportarDevedores);
     $("#btnAdminLimparLog").addEventListener("click", adminLimparLog);
     $("#btnCopiarPix").addEventListener("click", copiarPixBloqueado);
-    $("#btnAdminAbrirBalcao").addEventListener("click", () => {
+    $("#btnAdminAbrirBalcao").addEventListener("click", async () => {
+      if (cloudOn() && isAdmin() && !mercadoAdminAtivoId()) {
+        toast("Abra um mercado em Mercados na nuvem primeiro", true);
+        return;
+      }
       state.fromAdmin = true;
-      entrarNoApp();
+      await entrarNoApp();
     });
     $("#btnAdminBackup").addEventListener("click", () => {
       const elNome = $("#nomeBackupArquivo");

@@ -1,0 +1,33 @@
+# Fiado na nuvem — setup (uma vez)
+
+1. Crie um projeto em [supabase.com](https://supabase.com) (plano gratuito).
+2. Abra **SQL Editor** → cole o conteúdo de `supabase-schema.sql` → **Run**.
+3. Em **Project Settings → API**, copie:
+   - **Project URL**
+   - **anon public** key
+4. Edite `config.js`:
+
+```js
+window.FIADO_CLOUD = {
+  enabled: true,
+  url: "https://xxxxx.supabase.co",
+  anonKey: "eyJhbGciOi...",
+};
+```
+
+5. Publique o site (GitHub Pages). Com `enabled: false`, o app continua só no celular (modo antigo).
+
+## Contas padrão (depois do SQL)
+
+| Quem | Usuário | Senha |
+|------|---------|-------|
+| Você (admin) | `admin` | `admin123` |
+| Demo balcão | `mercado` | `fiado123` |
+
+Troque a senha do admin no painel. Crie cada loja em **Mercados na nuvem**.
+
+## Fluxo de venda
+
+1. Admin cria mercado (`seuluiz` + senha).
+2. De casa: **Abrir caderno** → cadastra clientes (fotos da caderneta).
+3. Na loja: abre o link do Fiado → login do mercado → caderno já está na nuvem.
