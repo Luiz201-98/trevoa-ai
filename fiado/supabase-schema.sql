@@ -131,9 +131,10 @@ declare
   a admin_conta;
   m mercados;
   tok text;
+  u text := lower(trim(coalesce(p_usuario, '')));
 begin
   select * into a from admin_conta where id = 1;
-  if a.usuario = p_usuario and a.senha_hash = crypt(p_senha, a.senha_hash) then
+  if lower(a.usuario) = u and a.senha_hash = crypt(p_senha, a.senha_hash) then
     tok := _nova_sessao('admin', null, null);
     return json_build_object(
       'ok', true,
@@ -147,7 +148,7 @@ begin
     );
   end if;
 
-  select * into m from mercados where usuario = p_usuario;
+  select * into m from mercados where lower(usuario) = u;
   if not found or m.senha_hash <> crypt(p_senha, m.senha_hash) then
     return json_build_object('ok', false, 'erro', 'Usuário ou senha incorretos.');
   end if;
@@ -358,20 +359,24 @@ as $$
 declare
   s sessoes;
   mid uuid;
+  u text := lower(trim(coalesce(p_usuario, '')));
 begin
   s := _sessao_ok(p_token);
   if s.role <> 'admin' then
     raise exception 'Só admin';
   end if;
-  if length(trim(p_usuario)) < 2 or length(p_senha) < 4 then
+  if length(u) < 2 or length(p_senha) < 4 then
     raise exception 'Usuário/senha inválidos';
+  end if;
+  if exists (select 1 from mercados where lower(usuario) = u) then
+    return json_build_object('ok', false, 'erro', 'Já existe um mercado com esse usuário.');
   end if;
 
   insert into mercados(usuario, senha_hash, nome, trial_inicio)
-  values (trim(p_usuario), crypt(p_senha, gen_salt('bf')), coalesce(nullif(trim(p_nome), ''), 'Fiado'), now())
+  values (u, crypt(p_senha, gen_salt('bf')), coalesce(nullif(trim(p_nome), ''), 'Fiado'), now())
   returning id into mid;
 
-  return json_build_object('ok', true, 'id', mid, 'usuario', trim(p_usuario));
+  return json_build_object('ok', true, 'id', mid, 'usuario', u);
 exception
   when unique_violation then
     return json_build_object('ok', false, 'erro', 'Já existe um mercado com esse usuário.');

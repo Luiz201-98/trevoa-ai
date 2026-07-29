@@ -813,22 +813,6 @@
       position: relative;
     }
 
-    .gate::before {
-      content: "";
-      position: absolute;
-      left: 10%;
-      right: -8%;
-      top: auto;
-      bottom: 18%;
-      height: 38%;
-      border-radius: 1.5rem;
-      background:
-        linear-gradient(145deg, rgba(196, 92, 38, 0.1), transparent 60%),
-        linear-gradient(180deg, rgba(26, 46, 31, 0.05), transparent);
-      pointer-events: none;
-      z-index: 0;
-    }
-
     .gate .brand-mark {
       margin-bottom: 0.55rem;
       position: relative;
@@ -2404,7 +2388,7 @@
     }
 
     async function tentarLogin() {
-      const user = ($("#loginUser").value || "").trim();
+      const user = ($("#loginUser").value || "").trim().toLowerCase();
       const pass = $("#loginPass").value || "";
       const lembrar = $("#lembrarLogin").checked;
       const erro = $("#loginErro");
@@ -2880,7 +2864,7 @@
 
     async function adminCriarMercado() {
       if (!cloudOn()) return;
-      const usuario = ($("#novoMercadoUser").value || "").trim();
+      const usuario = ($("#novoMercadoUser").value || "").trim().toLowerCase();
       const senha = ($("#novoMercadoSenha").value || "").trim();
       const nome = ($("#novoMercadoNome").value || "").trim() || "Fiado";
       if (!usuario || senha.length < 4) {
