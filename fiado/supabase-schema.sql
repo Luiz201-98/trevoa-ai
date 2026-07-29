@@ -1,6 +1,6 @@
 -- Fiado na nuvem — rode no SQL Editor do Supabase (uma vez)
 -- Extensões
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 -- ─── Tabelas ───────────────────────────────────────────
 create table if not exists public.mercados (
@@ -79,7 +79,7 @@ create or replace function public._nova_sessao(
 ) returns text
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   t text := encode(gen_random_bytes(24), 'hex');
@@ -94,7 +94,7 @@ create or replace function public._sessao_ok(p_token text)
 returns sessoes
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -125,7 +125,7 @@ create or replace function public.fiado_login(p_usuario text, p_senha text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   a admin_conta;
@@ -184,7 +184,7 @@ create or replace function public.fiado_logout(p_token text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 begin
   delete from sessoes where token = p_token;
@@ -197,7 +197,7 @@ create or replace function public.fiado_carregar_caderno(p_token text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -244,7 +244,7 @@ create or replace function public.fiado_salvar_caderno(p_token text, p_clientes 
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -315,7 +315,7 @@ create or replace function public.fiado_admin_listar_mercados(p_token text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -353,7 +353,7 @@ create or replace function public.fiado_admin_criar_mercado(
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -382,7 +382,7 @@ create or replace function public.fiado_admin_abrir_mercado(p_token text, p_merc
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -425,7 +425,7 @@ create or replace function public.fiado_admin_atualizar_mercado(
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -454,7 +454,7 @@ create or replace function public.fiado_admin_trocar_senha(p_token text, p_atual
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -480,7 +480,7 @@ create or replace function public.fiado_liberar_com_codigo(p_token text, p_codig
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
@@ -505,7 +505,7 @@ create or replace function public.fiado_mercado_info(p_token text)
 returns json
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   s sessoes;
