@@ -1648,6 +1648,10 @@
             Guardar caderno
           </button>
 
+          <a class="btn primary full" id="btnAbrirCaixa" href="../caixa/" style="margin-top:0.55rem;text-decoration:none" hidden>
+            Caixa / Estoque
+          </a>
+
           <div class="filtros" role="tablist" aria-label="Filtrar clientes">
             <button type="button" data-filtro="todos">Todos</button>
             <button type="button" class="active" data-filtro="aberto">Deve</button>
@@ -1908,6 +1912,9 @@
           <div class="admin-lista" id="adminListaClientes"></div>
           <button type="button" class="btn full" id="btnAdminExportarDevedores" style="margin-top:0.65rem">Exportar quem deve</button>
           <button type="button" class="btn full" id="btnAdminAbrirBalcao" style="margin-top:0.45rem">Abrir app do balcão</button>
+          <a class="btn primary full" id="btnAdminAbrirCaixa" href="../caixa/" style="margin-top:0.45rem;text-decoration:none" hidden>
+            Abrir Caixa / Estoque
+          </a>
         </div>
 
         <div class="sheet">
@@ -2750,6 +2757,10 @@
       const show = cloudOn() && !!FiadoCloud.getToken() && (isAdmin() ? !!mercadoAdminAtivoId() : true);
       if (btn) btn.hidden = !show;
       if (hint) hint.hidden = !show;
+      const btnCaixa = $("#btnAbrirCaixa");
+      const btnAdminCaixa = $("#btnAdminAbrirCaixa");
+      if (btnCaixa) btnCaixa.hidden = !show;
+      if (btnAdminCaixa) btnAdminCaixa.hidden = !(cloudOn() && !!FiadoCloud.getToken() && !!mercadoAdminAtivoId());
     }
 
     async function abrirAdmin() {

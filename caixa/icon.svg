@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Fiado">
+  <rect width="128" height="128" rx="28" fill="#1a2e1f"/>
+  <rect x="30" y="26" width="56" height="76" rx="10" fill="#f4f7f3"/>
+  <rect x="30" y="26" width="12" height="76" rx="4" fill="#c45c26"/>
+  <path d="M52 48h24M52 64h24M52 80h16" stroke="#1a2e1f" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="96" cy="92" r="20" fill="#c45c26"/>
+  <path d="M88 92h16M96 84v16" stroke="#fff7f2" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a2e1f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Caixa" />
+  <meta name="description" content="Caixa e estoque do mercadinho" />
+  <title>Caixa · Estoque</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e4ebe3;
+      --bg-deep: #cfd9cd;
+      --ink: #142018;
+      --ink-soft: #4a5c4f;
+      --brand: #1a2e1f;
+      --accent: #c45c26;
+      --cream: #f4f7f3;
+      --line: #b4c2b5;
+      --ok: #1f6b45;
+      --debt: #9b2e2e;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100dvh;
+      font-family: "Manrope", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 90% 55% at 0% -5%, #d5e2d4 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      padding: calc(0.85rem + var(--safe-top)) 0.85rem calc(4.8rem + var(--safe-bottom));
+    }
+    .wrap { max-width: 28rem; margin: 0 auto; }
+    .brand {
+      font-family: "Bricolage Grotesque", Georgia, sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--brand);
+      letter-spacing: -0.03em;
+    }
+    .subtitle { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.15rem; }
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin-bottom: 0.85rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border-radius: 0.75rem;
+      padding: 0.7rem 0.95rem;
+      cursor: pointer;
+    }
+    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.ghost { background: transparent; }
+    .btn.full { width: 100%; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn svg { width: 1.1rem; height: 1.1rem; }
+    .sheet {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 1rem;
+      padding: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+    .field input, .field select {
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+      border-radius: 0.7rem;
+      padding: 0.75rem 0.85rem;
+      background: #fff;
+    }
+    .field input:focus, .field select:focus { outline: 2px solid rgba(26, 46, 31, 0.25); border-color: var(--brand); }
+    #scanCodigo { font-size: 1.25rem; letter-spacing: 0.04em; }
+    .total-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.85rem 0;
+      border-top: 1.5px solid var(--line);
+      margin-top: 0.5rem;
+    }
+    .total-box .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
+    .total-box .valor { font-family: "Bricolage Grotesque", Georgia, sans-serif; font-size: 1.85rem; font-weight: 800; color: var(--brand); }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.45rem;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
+    }
+    .cart-item:last-child { border-bottom: 0; }
+    .cart-item .nome { font-weight: 700; font-size: 0.95rem; }
+    .cart-item .meta { font-size: 0.78rem; color: var(--ink-soft); }
+    .cart-item .preco { font-weight: 800; white-space: nowrap; }
+    .qtd-ctrl { display: flex; align-items: center; gap: 0.25rem; }
+    .qtd-ctrl button {
+      width: 2rem; height: 2rem;
+      border-radius: 0.5rem;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .qtd-ctrl span { min-width: 1.4rem; text-align: center; font-weight: 800; }
+    .formas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin: 0.6rem 0 0.85rem; }
+    .formas button {
+      border: 1.5px solid var(--line);
+      background: #fff;
+      border-radius: 0.65rem;
+      padding: 0.55rem 0.2rem;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .formas button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .nav-bottom {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 0.55rem 0.85rem calc(0.55rem + var(--safe-bottom));
+      background: rgba(244, 247, 243, 0.94);
+      border-top: 1.5px solid var(--line);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+    }
+    .nav-bottom .inner {
+      max-width: 28rem;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+    }
+    .nav-bottom button {
+      border: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      padding: 0.45rem 0.2rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+    }
+    .nav-bottom button.on { background: rgba(26, 46, 31, 0.1); color: var(--brand); }
+    .view { display: none; }
+    .view.active { display: block; }
+    .prod-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      background: none;
+      border-left: 0; border-right: 0; border-top: 0;
+      font: inherit;
+      color: inherit;
+    }
+    .prod-row .nome { font-weight: 700; }
+    .prod-row .meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.15rem; }
+    .prod-row .preco { font-weight: 800; white-space: nowrap; }
+    .estoque-baixo { color: var(--debt); }
+    .vazio { text-align: center; color: var(--ink-soft); padding: 1.4rem 0.5rem; font-size: 0.92rem; }
+    .resumo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .resumo-grid > div {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.8rem;
+    }
+    .resumo-grid .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
+    .resumo-grid .valor { font-family: "Bricolage Grotesque", Georgia, sans-serif; font-size: 1.35rem; font-weight: 800; margin-top: 0.2rem; }
+    .venda-card {
+      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
+      padding: 0.7rem 0;
+    }
+    .venda-card .topo { display: flex; justify-content: space-between; font-weight: 700; }
+    .venda-card .itens { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.25rem; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(5.2rem + var(--safe-bottom));
+      transform: translateX(-50%) translateY(120%);
+      background: var(--brand);
+      color: #fff;
+      padding: 0.7rem 1.1rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      opacity: 0;
+      transition: 0.25s ease;
+      z-index: 40;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.warn { background: var(--debt); }
+    .hint { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.4rem; }
+    .err { color: var(--debt); font-weight: 700; font-size: 0.85rem; min-height: 1.2rem; margin: 0.25rem 0; }
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(20, 32, 24, 0.5);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 30;
+      padding: 1rem;
+    }
+    .modal.show { display: flex; }
+    .modal .sheet { width: 100%; max-width: 28rem; margin: 0; max-height: 90dvh; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="brand" id="nomeMercado">Caixa</div>
+        <p class="subtitle" id="subtitulo">Bipa o produto ou digite o código</p>
+      </div>
+      <a class="btn ghost" href="../fiado/" id="btnVoltarFiado">Fiado</a>
+    </div>
+
+    <!-- VENDA -->
+    <section id="viewVenda" class="view active">
+      <div class="sheet">
+        <label class="field">
+          Código (pistola ou teclado)
+          <input id="scanCodigo" type="text" inputmode="numeric" autocomplete="off" placeholder="Aponte a pistola aqui…" autofocus />
+        </label>
+        <p class="err" id="scanErro"></p>
+        <div id="carrinho"></div>
+        <div class="total-box">
+          <span class="label">Total</span>
+          <span class="valor" id="totalVenda">R$ 0,00</span>
+        </div>
+        <div class="formas" id="formasPagamento">
+          <button type="button" data-forma="dinheiro" class="on">Dinheiro</button>
+          <button type="button" data-forma="pix">Pix</button>
+          <button type="button" data-forma="debito">Débito</button>
+          <button type="button" data-forma="credito">Crédito</button>
+        </div>
+        <button type="button" class="btn accent full" id="btnConfirmarVenda" disabled>Confirmar venda</button>
+        <p class="hint">Deixe esta tela aberta. A pistolinha digita o código sozinha.</p>
+      </div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="viewProdutos" class="view">
+      <button type="button" class="btn primary full" id="btnNovoProduto" style="margin-bottom:0.75rem">+ Novo produto</button>
+      <div class="sheet">
+        <label class="field" style="margin-bottom:0.5rem">
+          Buscar
+          <input id="buscaProduto" type="search" placeholder="Nome ou código…" autocomplete="off" />
+        </label>
+        <div id="listaProdutos"></div>
+      </div>
+    </section>
+
+    <!-- HOJE -->
+    <section id="viewHoje" class="view">
+      <div class="resumo-grid">
+        <div>
+          <div class="label">Vendido hoje</div>
+          <div class="valor" id="hojeTotal">R$ 0,00</div>
+        </div>
+        <div>
+          <div class="label">Vendas</div>
+          <div class="valor" id="hojeQtd">0</div>
+        </div>
+      </div>
+      <div class="sheet">
+        <div id="hojeFormas" style="margin-bottom:0.75rem;font-size:0.88rem;color:var(--ink-soft)"></div>
+        <div id="listaVendas"></div>
+      </div>
+      <button type="button" class="btn full" id="btnAtualizarHoje" style="margin-top:0.5rem">Atualizar</button>
+    </section>
+  </div>
+
+  <nav class="nav-bottom" aria-label="Navegação">
+    <div class="inner">
+      <button type="button" class="on" data-nav="venda">Venda</button>
+      <button type="button" data-nav="produtos">Produtos</button>
+      <button type="button" data-nav="hoje">Hoje</button>
+      <button type="button" id="btnSairCaixa">Sair</button>
+    </div>
+  </nav>
+
+  <div class="modal" id="modalProduto" hidden>
+    <div class="sheet">
+      <h2 style="font-family:'Bricolage Grotesque',Georgia,sans-serif;font-size:1.25rem;margin-bottom:0.75rem" id="tituloProduto">Novo produto</h2>
+      <label class="field">Nome<input id="prodNome" type="text" autocomplete="off" /></label>
+      <label class="field">Código de barras<input id="prodBarras" type="text" inputmode="numeric" autocomplete="off" placeholder="Bipa ou digite" /></label>
+      <label class="field">Código reduzido<input id="prodReduzido" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex.: 123" /></label>
+      <label class="field">Preço (R$)<input id="prodPreco" type="text" inputmode="decimal" placeholder="0,00" /></label>
+      <label class="field">Estoque<input id="prodEstoque" type="text" inputmode="decimal" placeholder="0" /></label>
+      <p class="err" id="prodErro"></p>
+      <button type="button" class="btn primary full" id="btnSalvarProduto">Salvar</button>
+      <button type="button" class="btn full" id="btnFecharProduto" style="margin-top:0.45rem">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../fiado/config.js"></script>
+  <script src="../fiado/cloud.js"></script>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const state = {
+      cart: [],
+      forma: "dinheiro",
+      produtos: [],
+      editId: null,
+      busy: false,
+    };
+
+    function toast(msg, warn) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.toggle("warn", !!warn);
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function formatBRL(n) {
+      return (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function parseMoney(raw) {
+      if (raw == null) return NaN;
+      let s = String(raw).trim().replace(/R\$\s?/i, "").replace(/\s/g, "");
+      if (!s) return NaN;
+      if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
+      else if (s.includes(",")) s = s.replace(",", ".");
+      return Number(s);
+    }
+
+    function exigirSessao() {
+      if (!window.FiadoCloud || !FiadoCloud.configured() || !FiadoCloud.getToken()) {
+        location.href = "../fiado/";
+        return false;
+      }
+      const meta = FiadoCloud.getMeta() || {};
+      if (meta.role === "admin" && !meta.actingMercadoId) {
+        toast("Abra um mercado no admin antes", true);
+        setTimeout(() => { location.href = "../fiado/"; }, 1200);
+        return false;
+      }
+      return true;
+    }
+
+    function mostrar(id) {
+      document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+      $(id).classList.add("active");
+      document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
+        b.classList.toggle("on", "#" + b.dataset.nav === id.replace("view", "").toLowerCase() || b.dataset.nav === id.replace("#view", "").toLowerCase());
+      });
+      // fix nav highlight
+      const map = { "#viewVenda": "venda", "#viewProdutos": "produtos", "#viewHoje": "hoje" };
+      document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
+        b.classList.toggle("on", b.dataset.nav === map[id]);
+      });
+      if (id === "#viewVenda") {
+        setTimeout(() => $("#scanCodigo").focus(), 80);
+      }
+    }
+
+    function totalCarrinho() {
+      return state.cart.reduce((acc, i) => acc + i.preco * i.qtd, 0);
+    }
+
+    function renderCarrinho() {
+      const box = $("#carrinho");
+      if (!state.cart.length) {
+        box.innerHTML = `<div class="vazio">Nenhum item — bipa o primeiro produto</div>`;
+      } else {
+        box.innerHTML = state.cart
+          .map(
+            (i, idx) => `
+          <div class="cart-item">
+            <div>
+              <div class="nome">${escapeHtml(i.nome)}</div>
+              <div class="meta">${formatBRL(i.preco)} · estoque ${i.estoque}</div>
+            </div>
+            <div class="qtd-ctrl">
+              <button type="button" data-menos="${idx}">−</button>
+              <span>${i.qtd}</span>
+              <button type="button" data-mais="${idx}">+</button>
+            </div>
+            <div class="preco">${formatBRL(i.preco * i.qtd)}</div>
+          </div>`
+          )
+          .join("");
+        box.querySelectorAll("[data-menos]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const i = Number(b.dataset.menos);
+            state.cart[i].qtd -= 1;
+            if (state.cart[i].qtd <= 0) state.cart.splice(i, 1);
+            renderCarrinho();
+            $("#scanCodigo").focus();
+          })
+        );
+        box.querySelectorAll("[data-mais]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const i = Number(b.dataset.mais);
+            if (state.cart[i].qtd + 1 > state.cart[i].estoque) {
+              toast("Estoque insuficiente", true);
+              return;
+            }
+            state.cart[i].qtd += 1;
+            renderCarrinho();
+            $("#scanCodigo").focus();
+          })
+        );
+      }
+      $("#totalVenda").textContent = formatBRL(totalCarrinho());
+      $("#btnConfirmarVenda").disabled = !state.cart.length || state.busy;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    async function biparCodigo() {
+      const codigo = ($("#scanCodigo").value || "").trim();
+      const erro = $("#scanErro");
+      erro.textContent = "";
+      if (!codigo) return;
+      $("#scanCodigo").value = "";
+      try {
+        const res = await FiadoCloud.buscarCodigo(codigo);
+        if (!res || !res.ok) {
+          erro.textContent = (res && res.erro) || "Não encontrado";
+          toast(erro.textContent, true);
+          return;
+        }
+        const p = res.produto;
+        const est = Number(p.estoque);
+        if (est <= 0) {
+          erro.textContent = "Sem estoque: " + p.nome;
+          toast(erro.textContent, true);
+          return;
+        }
+        const existente = state.cart.find((c) => c.produtoId === p.id);
+        if (existente) {
+          if (existente.qtd + 1 > est) {
+            toast("Estoque insuficiente", true);
+            return;
+          }
+          existente.qtd += 1;
+        } else {
+          state.cart.push({
+            produtoId: p.id,
+            nome: p.nome,
+            preco: Number(p.preco),
+            estoque: est,
+            qtd: 1,
+          });
+        }
+        toast(p.nome);
+        renderCarrinho();
+      } catch (err) {
+        erro.textContent = err.message || "Erro";
+        toast(erro.textContent, true);
+      } finally {
+        $("#scanCodigo").focus();
+      }
+    }
+
+    async function confirmarVenda() {
+      if (!state.cart.length || state.busy) return;
+      state.busy = true;
+      $("#btnConfirmarVenda").disabled = true;
+      try {
+        const res = await FiadoCloud.registrarVenda(
+          state.cart.map((c) => ({ produtoId: c.produtoId, qtd: c.qtd })),
+          state.forma
+        );
+        toast("Venda " + formatBRL(res.total));
+        state.cart = [];
+        renderCarrinho();
+      } catch (err) {
+        toast(err.message || "Falha na venda", true);
+      } finally {
+        state.busy = false;
+        $("#btnConfirmarVenda").disabled = !state.cart.length;
+        $("#scanCodigo").focus();
+      }
+    }
+
+    async function carregarProdutos() {
+      try {
+        state.produtos = await FiadoCloud.listarProdutos();
+        renderProdutos();
+      } catch (err) {
+        toast(err.message || "Erro ao listar", true);
+      }
+    }
+
+    function renderProdutos() {
+      const q = ($("#buscaProduto").value || "").trim().toLowerCase();
+      const lista = state.produtos.filter(
+        (p) =>
+          !q ||
+          (p.nome || "").toLowerCase().includes(q) ||
+          (p.codigoBarras || "").includes(q) ||
+          (p.codigoReduzido || "").includes(q)
+      );
+      const box = $("#listaProdutos");
+      if (!lista.length) {
+        box.innerHTML = `<div class="vazio">Nenhum produto. Cadastre o catálogo aqui.</div>`;
+        return;
+      }
+      box.innerHTML = lista
+        .map((p) => {
+          const est = Number(p.estoque);
+          return `
+          <button type="button" class="prod-row" data-id="${p.id}">
+            <div>
+              <div class="nome">${escapeHtml(p.nome)}</div>
+              <div class="meta ${est <= 5 ? "estoque-baixo" : ""}">
+                ${escapeHtml(p.codigoReduzido || p.codigoBarras || "—")} · estoque ${est}
+              </div>
+            </div>
+            <div class="preco">${formatBRL(p.preco)}</div>
+          </button>`;
+        })
+        .join("");
+      box.querySelectorAll("[data-id]").forEach((btn) => {
+        btn.addEventListener("click", () => abrirFormProduto(btn.dataset.id));
+      });
+    }
+
+    function abrirFormProduto(id) {
+      state.editId = id || null;
+      const p = id ? state.produtos.find((x) => x.id === id) : null;
+      $("#tituloProduto").textContent = p ? "Editar produto" : "Novo produto";
+      $("#prodNome").value = p?.nome || "";
+      $("#prodBarras").value = p?.codigoBarras || "";
+      $("#prodReduzido").value = p?.codigoReduzido || "";
+      $("#prodPreco").value = p ? String(p.preco).replace(".", ",") : "";
+      $("#prodEstoque").value = p != null ? String(p.estoque) : "0";
+      $("#prodErro").textContent = "";
+      const m = $("#modalProduto");
+      m.hidden = false;
+      m.classList.add("show");
+    }
+
+    function fecharFormProduto() {
+      const m = $("#modalProduto");
+      m.classList.remove("show");
+      m.hidden = true;
+      state.editId = null;
+    }
+
+    async function salvarProduto() {
+      const nome = ($("#prodNome").value || "").trim();
+      const codigoBarras = ($("#prodBarras").value || "").trim();
+      const codigoReduzido = ($("#prodReduzido").value || "").trim();
+      const preco = parseMoney($("#prodPreco").value);
+      const estoque = parseMoney($("#prodEstoque").value);
+      const erro = $("#prodErro");
+      erro.textContent = "";
+      if (!nome) {
+        erro.textContent = "Digite o nome";
+        return;
+      }
+      if (!codigoBarras && !codigoReduzido) {
+        erro.textContent = "Informe barras ou código reduzido";
+        return;
+      }
+      if (!Number.isFinite(preco) || preco < 0) {
+        erro.textContent = "Preço inválido";
+        return;
+      }
+      if (!Number.isFinite(estoque) || estoque < 0) {
+        erro.textContent = "Estoque inválido";
+        return;
+      }
+      try {
+        await FiadoCloud.salvarProduto({
+          id: state.editId,
+          nome,
+          codigoBarras,
+          codigoReduzido,
+          preco: Math.round(preco * 100) / 100,
+          estoque,
+        });
+        toast("Produto salvo");
+        fecharFormProduto();
+        await carregarProdutos();
+      } catch (err) {
+        erro.textContent = err.message || "Erro ao salvar";
+      }
+    }
+
+    async function carregarHoje() {
+      try {
+        const r = await FiadoCloud.resumoDia();
+        $("#hojeTotal").textContent = formatBRL(r.total);
+        $("#hojeQtd").textContent = String(r.qtdVendas || 0);
+        const pf = r.porForma || {};
+        const labels = { dinheiro: "Dinheiro", pix: "Pix", debito: "Débito", credito: "Crédito" };
+        const partes = Object.keys(pf).map((k) => `${labels[k] || k}: ${formatBRL(pf[k])}`);
+        $("#hojeFormas").textContent = partes.length ? partes.join(" · ") : "Nenhuma venda ainda hoje.";
+        const box = $("#listaVendas");
+        const vendas = r.vendas || [];
+        if (!vendas.length) {
+          box.innerHTML = `<div class="vazio">Sem vendas hoje</div>`;
+          return;
+        }
+        box.innerHTML = vendas
+          .map((v) => {
+            const hora = v.criadoEm
+              ? new Date(v.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+              : "";
+            const itens = (v.itens || [])
+              .map((i) => `${i.qtd}× ${i.nome}`)
+              .join(", ");
+            return `
+              <div class="venda-card">
+                <div class="topo">
+                  <span>${hora} · ${escapeHtml(labels[v.forma] || v.forma)}</span>
+                  <span>${formatBRL(v.total)}</span>
+                </div>
+                <div class="itens">${escapeHtml(itens)}</div>
+              </div>`;
+          })
+          .join("");
+      } catch (err) {
+        toast(err.message || "Erro no resumo", true);
+      }
+    }
+
+    // Events
+    $("#scanCodigo").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        biparCodigo();
+      }
+    });
+    $("#btnConfirmarVenda").addEventListener("click", confirmarVenda);
+    $("#formasPagamento").querySelectorAll("button").forEach((b) => {
+      b.addEventListener("click", () => {
+        state.forma = b.dataset.forma;
+        $("#formasPagamento").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+        $("#scanCodigo").focus();
+      });
+    });
+    document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
+      b.addEventListener("click", async () => {
+        const nav = b.dataset.nav;
+        if (nav === "venda") mostrar("#viewVenda");
+        if (nav === "produtos") {
+          mostrar("#viewProdutos");
+          await carregarProdutos();
+        }
+        if (nav === "hoje") {
+          mostrar("#viewHoje");
+          await carregarHoje();
+        }
+      });
+    });
+    $("#btnNovoProduto").addEventListener("click", () => abrirFormProduto(null));
+    $("#btnSalvarProduto").addEventListener("click", salvarProduto);
+    $("#btnFecharProduto").addEventListener("click", fecharFormProduto);
+    $("#buscaProduto").addEventListener("input", renderProdutos);
+    $("#btnAtualizarHoje").addEventListener("click", carregarHoje);
+    $("#btnSairCaixa").addEventListener("click", async () => {
+      try { await FiadoCloud.logout(); } catch (_) {}
+      location.href = "../fiado/";
+    });
+    $("#modalProduto").addEventListener("click", (e) => {
+      if (e.target.id === "modalProduto") fecharFormProduto();
+    });
+
+    // Keep focus on scan when on venda (helps pistolinha)
+    document.addEventListener("click", (e) => {
+      if (!$("#viewVenda").classList.contains("active")) return;
+      if (e.target.closest("input,button,select,a,.modal")) return;
+      $("#scanCodigo").focus();
+    });
+
+    (function boot() {
+      if (!exigirSessao()) return;
+      const meta = FiadoCloud.getMeta() || {};
+      $("#nomeMercado").textContent = meta.nome || "Caixa";
+      $("#subtitulo").textContent =
+        meta.role === "admin" ? "Cadastro / venda · mercado aberto" : "Bipa o produto ou digite o código";
+      renderCarrinho();
+      mostrar("#viewVenda");
+    })();
+  </script>
+</body>
+</html>

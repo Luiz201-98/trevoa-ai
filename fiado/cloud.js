@@ -240,6 +240,56 @@
     });
   }
 
+  async function listarProdutos() {
+    const data = await rpc("estoque_listar_produtos", { p_token: getToken() });
+    if (!data || !data.ok) throw new Error((data && data.erro) || "Não listou produtos");
+    return data.produtos || [];
+  }
+
+  async function salvarProduto(p) {
+    const data = await rpc("estoque_salvar_produto", {
+      p_token: getToken(),
+      p_id: p.id || null,
+      p_nome: p.nome,
+      p_codigo_barras: p.codigoBarras || null,
+      p_codigo_reduzido: p.codigoReduzido || null,
+      p_preco: p.preco,
+      p_estoque: p.estoque,
+      p_ativo: p.ativo !== false,
+    });
+    if (!data || !data.ok) throw new Error((data && data.erro) || "Não salvou produto");
+    return data;
+  }
+
+  async function buscarCodigo(codigo) {
+    return rpc("estoque_buscar_codigo", {
+      p_token: getToken(),
+      p_codigo: codigo,
+    });
+  }
+
+  async function registrarVenda(itens, forma) {
+    const payload = (itens || []).map((i) => ({
+      produtoId: i.produtoId,
+      qtd: i.qtd,
+    }));
+    const data = await rpc("estoque_registrar_venda", {
+      p_token: getToken(),
+      p_itens: payload,
+      p_forma: forma || "dinheiro",
+    });
+    if (!data || !data.ok) throw new Error((data && data.erro) || "Não registrou venda");
+    return data;
+  }
+
+  async function resumoDia(dataIso) {
+    const args = { p_token: getToken() };
+    if (dataIso) args.p_data = dataIso;
+    const data = await rpc("estoque_resumo_dia", args);
+    if (!data || !data.ok) throw new Error((data && data.erro) || "Não carregou o dia");
+    return data;
+  }
+
   function tokenPermanente() {
     return !!localStorage.getItem(TOKEN_KEY);
   }
@@ -267,5 +317,10 @@
     trocarSenhaAdmin,
     liberarComCodigo,
     mercadoInfo,
+    listarProdutos,
+    salvarProduto,
+    buscarCodigo,
+    registrarVenda,
+    resumoDia,
   };
 })(window);
