@@ -31,8 +31,3 @@ Troque a senha do admin no painel. Crie cada loja em **Mercados na nuvem**.
 1. Admin cria mercado (`seuluiz` + senha).
 2. De casa: **Abrir caderno** → cadastra clientes (fotos da caderneta).
 3. Na loja: abre o link do Fiado → login do mercado → caderno já está na nuvem.
-
-## Caixa PDV (outro app)
-
-O Caixa é um produto separado em `caixa/` — não aparece dentro do Fiado.
-Abra direto: `…/caixa/` (login próprio). SQL: `caixa/estoque-schema.sql`.

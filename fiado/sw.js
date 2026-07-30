@@ -1,5 +1,5 @@
 /* Service worker mínimo — ajuda o Chrome a oferecer “Instalar app”. */
-const CACHE = "fiado-v4";
+const CACHE = "fiado-v5-sem-caixa";
 const ASSETS = [
   "./",
   "./index.html",
