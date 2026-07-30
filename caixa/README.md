@@ -1,11 +1,11 @@
-# Caixa / Estoque
+# Caixa PDV
 
-PDV simples (venda + estoque), separado do módulo Fiado.
+Sistema de **caixa e estoque** — produto separado do Fiado (caderno de vale).
 
 ## Links
 
-- App: `…/caixa/` (GitHub Pages)
-- Login: usa a mesma conta do Fiado (`../fiado/`)
+- App: `…/caixa/` (tem login próprio)
+- Mesma nuvem/conta do mercado, mas interface e marca distintas
 - SQL: rode `estoque-schema.sql` no Supabase **depois** de `fiado/supabase-schema.sql`
 
 ## Pasta

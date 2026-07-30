@@ -3,221 +3,322 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a2e1f" />
+  <meta name="theme-color" content="#0f2d5c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Caixa" />
-  <meta name="description" content="Caixa e estoque do mercadinho" />
-  <title>Caixa · Estoque</title>
+  <meta name="apple-mobile-web-app-title" content="Caixa PDV" />
+  <meta name="description" content="PDV e estoque do mercadinho" />
+  <title>Caixa PDV</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon-192.png" type="image/png" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #e4ebe3;
-      --bg-deep: #cfd9cd;
-      --ink: #142018;
-      --ink-soft: #4a5c4f;
-      --brand: #1a2e1f;
-      --accent: #c45c26;
-      --cream: #f4f7f3;
-      --line: #b4c2b5;
-      --ok: #1f6b45;
-      --debt: #9b2e2e;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-top: env(safe-area-inset-top, 0px);
+      --navy: #0f2d5c;
+      --navy-2: #1a4480;
+      --bg: #e8eef6;
+      --panel: #ffffff;
+      --ink: #0e1a2b;
+      --muted: #5a6b82;
+      --line: #c5d0e0;
+      --ok: #0d7a4f;
+      --warn: #b42318;
+      --accent: #e85d04;
+      --total-bg: #0f2d5c;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-t: env(safe-area-inset-top, 0px);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       min-height: 100dvh;
-      font-family: "Manrope", system-ui, sans-serif;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
       color: var(--ink);
-      background:
-        radial-gradient(ellipse 90% 55% at 0% -5%, #d5e2d4 0%, transparent 55%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-      padding: calc(0.85rem + var(--safe-top)) 0.85rem calc(4.8rem + var(--safe-bottom));
+      background: var(--bg);
+      padding-bottom: calc(0.75rem + var(--safe-b));
     }
-    .wrap { max-width: 28rem; margin: 0 auto; }
-    .brand {
-      font-family: "Bricolage Grotesque", Georgia, sans-serif;
-      font-size: 1.55rem;
-      font-weight: 800;
-      color: var(--brand);
-      letter-spacing: -0.03em;
+    .app-header {
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: #fff;
+      padding: calc(0.65rem + var(--safe-t)) 0.85rem 0.75rem;
     }
-    .subtitle { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.15rem; }
-    .topbar {
+    .app-header .row {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
-      gap: 0.6rem;
-      margin-bottom: 0.85rem;
-    }
-    .btn {
-      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      border: 1.5px solid var(--line);
-      background: var(--cream);
-      color: var(--ink);
-      font: inherit;
+      gap: 0.5rem;
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+    .app-header h1 {
+      font-size: 1.05rem;
       font-weight: 700;
-      font-size: 0.92rem;
-      border-radius: 0.75rem;
-      padding: 0.7rem 0.95rem;
+      letter-spacing: 0.02em;
+    }
+    .app-header .status {
+      font-size: 1.35rem;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0.45rem;
+      letter-spacing: 0.04em;
+    }
+    .app-header .loja {
+      text-align: center;
+      font-size: 0.82rem;
+      opacity: 0.85;
+      margin-top: 0.15rem;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      max-width: 56rem;
+      margin: 0.7rem auto 0;
+    }
+    .menu button {
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.55rem 0.3rem;
+      border-radius: 0.45rem;
       cursor: pointer;
     }
-    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
-    .btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .btn.ghost { background: transparent; }
-    .btn.full { width: 100%; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn svg { width: 1.1rem; height: 1.1rem; }
-    .sheet {
-      background: var(--cream);
-      border: 1.5px solid var(--line);
-      border-radius: 1rem;
-      padding: 0.95rem;
-      margin-bottom: 0.75rem;
+    .menu button.on { background: #fff; color: var(--navy); border-color: #fff; }
+    .wrap { max-width: 56rem; margin: 0.75rem auto; padding: 0 0.75rem; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .pdv-grid {
+      display: grid;
+      gap: 0.65rem;
     }
-    .field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
-    .field input, .field select {
+    @media (min-width: 800px) {
+      .pdv-grid { grid-template-columns: 1fr 1.2fr; align-items: start; }
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .panel h2 {
+      background: #f0f4fa;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--navy);
+      padding: 0.55rem 0.75rem;
+    }
+    .panel .body { padding: 0.75rem; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .field input {
       font: inherit;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 600;
+      font-family: "IBM Plex Mono", monospace;
       text-transform: none;
-      letter-spacing: 0;
+      border: 2px solid var(--line);
+      border-radius: 0.4rem;
+      padding: 0.7rem 0.75rem;
       color: var(--ink);
-      border: 1.5px solid var(--line);
-      border-radius: 0.7rem;
-      padding: 0.75rem 0.85rem;
-      background: #fff;
     }
-    .field input:focus, .field select:focus { outline: 2px solid rgba(26, 46, 31, 0.25); border-color: var(--brand); }
-    #scanCodigo { font-size: 1.25rem; letter-spacing: 0.04em; }
-    .total-box {
+    .field input:focus { outline: none; border-color: var(--navy); }
+    .metricas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .metrica {
+      border: 1px solid var(--line);
+      border-radius: 0.4rem;
+      padding: 0.55rem 0.65rem;
+      background: #f8fafc;
+    }
+    .metrica .l { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .metrica .v {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-top: 0.15rem;
+      color: var(--navy);
+    }
+    .ultimo {
+      margin-top: 0.65rem;
+      border: 1px dashed var(--line);
+      border-radius: 0.4rem;
+      padding: 0.65rem;
+      min-height: 4.2rem;
+    }
+    .ultimo .nome { font-weight: 700; font-size: 1.05rem; }
+    .ultimo .meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+    .tabela-wrap { max-height: 42vh; overflow: auto; }
+    table.itens {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+    table.itens th {
+      text-align: left;
+      background: #f0f4fa;
+      color: var(--muted);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      padding: 0.45rem 0.4rem;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+    }
+    table.itens td {
+      padding: 0.5rem 0.4rem;
+      border-bottom: 1px solid #e8eef5;
+      vertical-align: middle;
+    }
+    table.itens tr:last-child td { border-bottom: 0; }
+    .qtd-ctrl { display: inline-flex; align-items: center; gap: 0.2rem; }
+    .qtd-ctrl button {
+      width: 1.7rem; height: 1.7rem;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 0.3rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .subtotal-box {
+      background: var(--total-bg);
+      color: #fff;
+      border-radius: 0.5rem;
+      padding: 0.85rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 0.85rem 0;
-      border-top: 1.5px solid var(--line);
-      margin-top: 0.5rem;
+      margin-top: 0.65rem;
     }
-    .total-box .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
-    .total-box .valor { font-family: "Bricolage Grotesque", Georgia, sans-serif; font-size: 1.85rem; font-weight: 800; color: var(--brand); }
-    .cart-item {
+    .subtotal-box .l { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; }
+    .subtotal-box .v {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .formas {
       display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 0.45rem;
-      align-items: center;
-      padding: 0.65rem 0;
-      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      margin: 0.65rem 0;
     }
-    .cart-item:last-child { border-bottom: 0; }
-    .cart-item .nome { font-weight: 700; font-size: 0.95rem; }
-    .cart-item .meta { font-size: 0.78rem; color: var(--ink-soft); }
-    .cart-item .preco { font-weight: 800; white-space: nowrap; }
-    .qtd-ctrl { display: flex; align-items: center; gap: 0.25rem; }
-    .qtd-ctrl button {
-      width: 2rem; height: 2rem;
-      border-radius: 0.5rem;
-      border: 1.5px solid var(--line);
-      background: #fff;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .qtd-ctrl span { min-width: 1.4rem; text-align: center; font-weight: 800; }
-    .formas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin: 0.6rem 0 0.85rem; }
     .formas button {
-      border: 1.5px solid var(--line);
+      border: 1px solid var(--line);
       background: #fff;
-      border-radius: 0.65rem;
-      padding: 0.55rem 0.2rem;
+      border-radius: 0.4rem;
+      padding: 0.6rem 0.2rem;
       font: inherit;
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
     }
-    .formas button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
-    .nav-bottom {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      padding: 0.55rem 0.85rem calc(0.55rem + var(--safe-bottom));
-      background: rgba(244, 247, 243, 0.94);
-      border-top: 1.5px solid var(--line);
-      backdrop-filter: blur(8px);
-      z-index: 20;
-    }
-    .nav-bottom .inner {
-      max-width: 28rem;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    .formas button.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       gap: 0.35rem;
-    }
-    .nav-bottom button {
-      border: 0;
-      background: transparent;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
       font: inherit;
-      font-size: 0.72rem;
       font-weight: 700;
-      color: var(--ink-soft);
-      padding: 0.45rem 0.2rem;
-      border-radius: 0.6rem;
+      font-size: 0.95rem;
+      border-radius: 0.45rem;
+      padding: 0.75rem 1rem;
       cursor: pointer;
     }
-    .nav-bottom button.on { background: rgba(26, 46, 31, 0.1); color: var(--brand); }
-    .view { display: none; }
-    .view.active { display: block; }
+    .btn.full { width: 100%; }
+    .btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); font-size: 1.05rem; padding: 0.9rem; }
+    .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,0.4); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .err { color: var(--warn); font-weight: 700; font-size: 0.85rem; min-height: 1.15rem; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.45rem; line-height: 1.35; }
+    .vazio { text-align: center; color: var(--muted); padding: 1.5rem 0.5rem; }
     .prod-row {
+      width: 100%;
       display: flex;
       justify-content: space-between;
       gap: 0.6rem;
-      align-items: center;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
-      cursor: pointer;
-      text-align: left;
-      width: 100%;
+      padding: 0.7rem 0;
+      border: 0;
+      border-bottom: 1px solid #e8eef5;
       background: none;
-      border-left: 0; border-right: 0; border-top: 0;
       font: inherit;
+      text-align: left;
+      cursor: pointer;
       color: inherit;
     }
     .prod-row .nome { font-weight: 700; }
-    .prod-row .meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.15rem; }
-    .prod-row .preco { font-weight: 800; white-space: nowrap; }
-    .estoque-baixo { color: var(--debt); }
-    .vazio { text-align: center; color: var(--ink-soft); padding: 1.4rem 0.5rem; font-size: 0.92rem; }
-    .resumo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-    }
+    .prod-row .meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+    .estoque-baixo { color: var(--warn); }
+    .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.65rem; }
     .resumo-grid > div {
-      background: var(--cream);
-      border: 1.5px solid var(--line);
-      border-radius: 0.85rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
       padding: 0.8rem;
     }
-    .resumo-grid .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); }
-    .resumo-grid .valor { font-family: "Bricolage Grotesque", Georgia, sans-serif; font-size: 1.35rem; font-weight: 800; margin-top: 0.2rem; }
-    .venda-card {
-      border-bottom: 1px solid rgba(180, 194, 181, 0.55);
-      padding: 0.7rem 0;
-    }
+    .resumo-grid .l { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .resumo-grid .v { font-family: "IBM Plex Mono", monospace; font-size: 1.4rem; font-weight: 700; margin-top: 0.2rem; color: var(--navy); }
+    .venda-card { border-bottom: 1px solid #e8eef5; padding: 0.7rem 0; }
     .venda-card .topo { display: flex; justify-content: space-between; font-weight: 700; }
-    .venda-card .itens { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.25rem; }
+    .venda-card .itens { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+    .login-wrap {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(1rem + var(--safe-t)) 1rem calc(1rem + var(--safe-b));
+      background: linear-gradient(160deg, #0f2d5c 0%, #1a4480 45%, #e8eef6 45%);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 22rem;
+      background: #fff;
+      border-radius: 0.65rem;
+      border: 1px solid var(--line);
+      padding: 1.25rem;
+      box-shadow: 0 16px 40px rgba(15, 45, 92, 0.18);
+    }
+    .login-card h1 { font-size: 1.4rem; color: var(--navy); margin-bottom: 0.25rem; }
+    .login-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(14, 26, 43, 0.55);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 40;
+      padding: 1rem;
+    }
+    .modal.show { display: flex; }
+    .modal .panel { width: 100%; max-width: 28rem; max-height: 90dvh; overflow: auto; }
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(5.2rem + var(--safe-bottom));
+      bottom: calc(1.2rem + var(--safe-b));
       transform: translateX(-50%) translateY(120%);
-      background: var(--brand);
+      background: var(--navy);
       color: #fff;
       padding: 0.7rem 1.1rem;
       border-radius: 999px;
@@ -225,113 +326,190 @@
       font-size: 0.88rem;
       opacity: 0;
       transition: 0.25s ease;
-      z-index: 40;
-      max-width: 90vw;
+      z-index: 50;
+      max-width: 92vw;
       text-align: center;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.warn { background: var(--debt); }
-    .hint { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.35; margin-top: 0.4rem; }
-    .err { color: var(--debt); font-weight: 700; font-size: 0.85rem; min-height: 1.2rem; margin: 0.25rem 0; }
-    .modal {
-      position: fixed; inset: 0;
-      background: rgba(20, 32, 24, 0.5);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 30;
-      padding: 1rem;
+    .toast.warn { background: var(--warn); }
+    .atalhos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.55rem;
+      font-size: 0.72rem;
+      color: var(--muted);
     }
-    .modal.show { display: flex; }
-    .modal .sheet { width: 100%; max-width: 28rem; margin: 0; max-height: 90dvh; overflow: auto; }
+    .atalhos span {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 0.3rem;
+      padding: 0.2rem 0.4rem;
+    }
+    #appShell { display: none; }
+    #appShell.show { display: block; }
+    #viewLogin { display: none; }
+    #viewLogin.show { display: flex; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <div class="brand" id="nomeMercado">Caixa</div>
-        <p class="subtitle" id="subtitulo">Bipa o produto ou digite o código</p>
-      </div>
-      <a class="btn ghost" href="../fiado/" id="btnVoltarFiado">Fiado</a>
+  <!-- LOGIN PRÓPRIO DO CAIXA -->
+  <section id="viewLogin" class="login-wrap show">
+    <div class="login-card">
+      <h1>Caixa PDV</h1>
+      <p>Controle de venda e estoque. Use o usuário do mercado.</p>
+      <label class="field">Usuário<input id="loginUser" type="text" autocomplete="username" /></label>
+      <label class="field">Senha<input id="loginPass" type="password" autocomplete="current-password" /></label>
+      <label style="display:flex;gap:0.45rem;align-items:center;font-size:0.88rem;margin:0.4rem 0 0.8rem;color:var(--muted)">
+        <input type="checkbox" id="lembrarLogin" checked /> Continuar logado
+      </label>
+      <p class="err" id="loginErro"></p>
+      <button type="button" class="btn primary full" id="btnEntrar">Entrar no caixa</button>
     </div>
+  </section>
 
-    <!-- VENDA -->
-    <section id="viewVenda" class="view active">
-      <div class="sheet">
-        <label class="field">
-          Código (pistola ou teclado)
-          <input id="scanCodigo" type="text" inputmode="numeric" autocomplete="off" placeholder="Aponte a pistola aqui…" autofocus />
-        </label>
-        <p class="err" id="scanErro"></p>
-        <div id="carrinho"></div>
-        <div class="total-box">
-          <span class="label">Total</span>
-          <span class="valor" id="totalVenda">R$ 0,00</span>
-        </div>
-        <div class="formas" id="formasPagamento">
-          <button type="button" data-forma="dinheiro" class="on">Dinheiro</button>
-          <button type="button" data-forma="pix">Pix</button>
-          <button type="button" data-forma="debito">Débito</button>
-          <button type="button" data-forma="credito">Crédito</button>
-        </div>
-        <button type="button" class="btn accent full" id="btnConfirmarVenda" disabled>Confirmar venda</button>
-        <p class="hint">Deixe esta tela aberta. A pistolinha digita o código sozinha.</p>
+  <div id="appShell">
+    <header class="app-header">
+      <div class="row">
+        <h1>CAIXA PDV</h1>
+        <button type="button" class="btn ghost" id="btnSair" style="padding:0.4rem 0.7rem;font-size:0.8rem">Sair</button>
       </div>
-    </section>
+      <div class="status" id="statusCaixa">CAIXA ABERTO</div>
+      <div class="loja" id="nomeLoja">—</div>
+      <nav class="menu" aria-label="Menu do caixa">
+        <button type="button" class="on" data-nav="venda">Caixa</button>
+        <button type="button" data-nav="produtos">Produtos</button>
+        <button type="button" data-nav="hoje">Fechamento</button>
+        <button type="button" id="btnNovaVenda">Nova venda</button>
+      </nav>
+    </header>
 
-    <!-- PRODUTOS -->
-    <section id="viewProdutos" class="view">
-      <button type="button" class="btn primary full" id="btnNovoProduto" style="margin-bottom:0.75rem">+ Novo produto</button>
-      <div class="sheet">
-        <label class="field" style="margin-bottom:0.5rem">
-          Buscar
-          <input id="buscaProduto" type="search" placeholder="Nome ou código…" autocomplete="off" />
-        </label>
-        <div id="listaProdutos"></div>
-      </div>
-    </section>
+    <div class="wrap">
+      <!-- CAIXA / VENDA -->
+      <section id="viewVenda" class="view active">
+        <div class="pdv-grid">
+          <div class="panel">
+            <h2>Código de barras</h2>
+            <div class="body">
+              <label class="field">
+                Digite ou aponte a pistola
+                <input id="scanCodigo" type="text" inputmode="numeric" autocomplete="off" placeholder="Código…" autofocus />
+              </label>
+              <p class="err" id="scanErro"></p>
+              <div class="metricas">
+                <div class="metrica">
+                  <div class="l">Valor unitário</div>
+                  <div class="v" id="valorUnit">R$ 0,00</div>
+                </div>
+                <div class="metrica">
+                  <div class="l">Total do item</div>
+                  <div class="v" id="totalItem">R$ 0,00</div>
+                </div>
+              </div>
+              <div class="ultimo" id="ultimoItem">
+                <div class="meta">Nenhum produto bipado ainda</div>
+              </div>
+              <div class="atalhos">
+                <span>Enter = bipar</span>
+                <span>Produtos = cadastrar</span>
+              </div>
+            </div>
+          </div>
 
-    <!-- HOJE -->
-    <section id="viewHoje" class="view">
-      <div class="resumo-grid">
-        <div>
-          <div class="label">Vendido hoje</div>
-          <div class="valor" id="hojeTotal">R$ 0,00</div>
+          <div>
+            <div class="panel">
+              <h2>Lista de produtos da venda</h2>
+              <div class="tabela-wrap">
+                <table class="itens">
+                  <thead>
+                    <tr>
+                      <th>Nº</th>
+                      <th>Descrição</th>
+                      <th>Qtd</th>
+                      <th>Unit.</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="carrinhoBody">
+                    <tr><td colspan="5" class="vazio">Bipa o primeiro produto</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="subtotal-box">
+              <span class="l">Subtotal</span>
+              <span class="v" id="totalVenda">R$ 0,00</span>
+            </div>
+            <div class="formas" id="formasPagamento">
+              <button type="button" data-forma="dinheiro" class="on">Dinheiro</button>
+              <button type="button" data-forma="pix">Pix</button>
+              <button type="button" data-forma="debito">Débito</button>
+              <button type="button" data-forma="credito">Crédito</button>
+            </div>
+            <button type="button" class="btn accent full" id="btnConfirmarVenda" disabled>Finalizar venda</button>
+            <p class="hint">Sem nota fiscal — só controle interno de estoque e vendas do dia.</p>
+          </div>
         </div>
-        <div>
-          <div class="label">Vendas</div>
-          <div class="valor" id="hojeQtd">0</div>
+      </section>
+
+      <!-- PRODUTOS -->
+      <section id="viewProdutos" class="view">
+        <div class="panel" style="margin-bottom:0.65rem">
+          <h2>Cadastrar / editar produto</h2>
+          <div class="body">
+            <p class="hint" style="margin:0 0 0.75rem">Cadastre nome, código de barras (ou reduzido), preço e estoque. A pistola usa esse cadastro.</p>
+            <button type="button" class="btn primary full" id="btnNovoProduto">+ Novo produto</button>
+          </div>
         </div>
-      </div>
-      <div class="sheet">
-        <div id="hojeFormas" style="margin-bottom:0.75rem;font-size:0.88rem;color:var(--ink-soft)"></div>
-        <div id="listaVendas"></div>
-      </div>
-      <button type="button" class="btn full" id="btnAtualizarHoje" style="margin-top:0.5rem">Atualizar</button>
-    </section>
+        <div class="panel">
+          <h2>Catálogo</h2>
+          <div class="body">
+            <label class="field">
+              Buscar produto
+              <input id="buscaProduto" type="search" placeholder="Nome ou código…" autocomplete="off" style="font-family:inherit" />
+            </label>
+            <div id="listaProdutos"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FECHAMENTO -->
+      <section id="viewHoje" class="view">
+        <div class="resumo-grid">
+          <div>
+            <div class="l">Vendido hoje</div>
+            <div class="v" id="hojeTotal">R$ 0,00</div>
+          </div>
+          <div>
+            <div class="l">Qtd. vendas</div>
+            <div class="v" id="hojeQtd">0</div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Vendas do dia</h2>
+          <div class="body">
+            <div id="hojeFormas" class="hint" style="margin-bottom:0.75rem"></div>
+            <div id="listaVendas"></div>
+            <button type="button" class="btn full" id="btnAtualizarHoje" style="margin-top:0.75rem">Atualizar</button>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <nav class="nav-bottom" aria-label="Navegação">
-    <div class="inner">
-      <button type="button" class="on" data-nav="venda">Venda</button>
-      <button type="button" data-nav="produtos">Produtos</button>
-      <button type="button" data-nav="hoje">Hoje</button>
-      <button type="button" id="btnSairCaixa">Sair</button>
-    </div>
-  </nav>
-
   <div class="modal" id="modalProduto" hidden>
-    <div class="sheet">
-      <h2 style="font-family:'Bricolage Grotesque',Georgia,sans-serif;font-size:1.25rem;margin-bottom:0.75rem" id="tituloProduto">Novo produto</h2>
-      <label class="field">Nome<input id="prodNome" type="text" autocomplete="off" /></label>
-      <label class="field">Código de barras<input id="prodBarras" type="text" inputmode="numeric" autocomplete="off" placeholder="Bipa ou digite" /></label>
-      <label class="field">Código reduzido<input id="prodReduzido" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex.: 123" /></label>
-      <label class="field">Preço (R$)<input id="prodPreco" type="text" inputmode="decimal" placeholder="0,00" /></label>
-      <label class="field">Estoque<input id="prodEstoque" type="text" inputmode="decimal" placeholder="0" /></label>
-      <p class="err" id="prodErro"></p>
-      <button type="button" class="btn primary full" id="btnSalvarProduto">Salvar</button>
-      <button type="button" class="btn full" id="btnFecharProduto" style="margin-top:0.45rem">Cancelar</button>
+    <div class="panel">
+      <h2 id="tituloProduto">Novo produto</h2>
+      <div class="body">
+        <label class="field">Nome<input id="prodNome" type="text" autocomplete="off" style="font-family:inherit" /></label>
+        <label class="field">Código de barras<input id="prodBarras" type="text" inputmode="numeric" autocomplete="off" placeholder="Bipa ou digite" /></label>
+        <label class="field">Código reduzido<input id="prodReduzido" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex.: 123" /></label>
+        <label class="field">Preço (R$)<input id="prodPreco" type="text" inputmode="decimal" placeholder="0,00" style="font-family:inherit" /></label>
+        <label class="field">Estoque<input id="prodEstoque" type="text" inputmode="decimal" placeholder="0" style="font-family:inherit" /></label>
+        <p class="err" id="prodErro"></p>
+        <button type="button" class="btn primary full" id="btnSalvarProduto">Salvar produto</button>
+        <button type="button" class="btn full" id="btnFecharProduto" style="margin-top:0.45rem">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -347,6 +525,7 @@
       produtos: [],
       editId: null,
       busy: false,
+      ultimo: null,
     };
 
     function toast(msg, warn) {
@@ -371,72 +550,102 @@
       return Number(s);
     }
 
-    function exigirSessao() {
-      if (!window.FiadoCloud || !FiadoCloud.configured() || !FiadoCloud.getToken()) {
-        location.href = "../fiado/";
-        return false;
-      }
+    function escapeHtml(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function sessaoOk() {
+      if (!window.FiadoCloud || !FiadoCloud.configured() || !FiadoCloud.getToken()) return false;
       const meta = FiadoCloud.getMeta() || {};
-      if (meta.role === "admin" && !meta.actingMercadoId) {
-        toast("Abra um mercado no admin antes", true);
-        setTimeout(() => { location.href = "../fiado/"; }, 1200);
-        return false;
-      }
-      return true;
+      if (meta.role === "admin" && !meta.actingMercadoId) return false;
+      if (meta.role === "admin") return false; // caixa é do balcão; admin usa Fiado pra abrir mercado
+      return meta.role === "user";
+    }
+
+    function mostrarApp() {
+      $("#viewLogin").classList.remove("show");
+      $("#appShell").classList.add("show");
+      const meta = FiadoCloud.getMeta() || {};
+      $("#nomeLoja").textContent = meta.nome || meta.usuario || "Mercado";
+      renderCarrinho();
+      mostrar("#viewVenda");
+    }
+
+    function mostrarLogin() {
+      $("#appShell").classList.remove("show");
+      $("#viewLogin").classList.add("show");
     }
 
     function mostrar(id) {
-      document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+      document.querySelectorAll(".wrap .view").forEach((v) => v.classList.remove("active"));
       $(id).classList.add("active");
-      document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
-        b.classList.toggle("on", "#" + b.dataset.nav === id.replace("view", "").toLowerCase() || b.dataset.nav === id.replace("#view", "").toLowerCase());
-      });
-      // fix nav highlight
       const map = { "#viewVenda": "venda", "#viewProdutos": "produtos", "#viewHoje": "hoje" };
-      document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
+      document.querySelectorAll(".menu [data-nav]").forEach((b) => {
         b.classList.toggle("on", b.dataset.nav === map[id]);
       });
-      if (id === "#viewVenda") {
-        setTimeout(() => $("#scanCodigo").focus(), 80);
-      }
+      if (id === "#viewVenda") setTimeout(() => $("#scanCodigo").focus(), 80);
     }
 
     function totalCarrinho() {
       return state.cart.reduce((acc, i) => acc + i.preco * i.qtd, 0);
     }
 
+    function atualizarUltimo() {
+      const box = $("#ultimoItem");
+      if (!state.ultimo) {
+        box.innerHTML = `<div class="meta">Nenhum produto bipado ainda</div>`;
+        $("#valorUnit").textContent = formatBRL(0);
+        $("#totalItem").textContent = formatBRL(0);
+        return;
+      }
+      const u = state.ultimo;
+      box.innerHTML = `
+        <div class="nome">${escapeHtml(u.nome)}</div>
+        <div class="meta">Estoque: ${u.estoque} · ${formatBRL(u.preco)} cada</div>`;
+      $("#valorUnit").textContent = formatBRL(u.preco);
+      $("#totalItem").textContent = formatBRL(u.preco * u.qtdNaVenda);
+    }
+
     function renderCarrinho() {
-      const box = $("#carrinho");
+      const body = $("#carrinhoBody");
       if (!state.cart.length) {
-        box.innerHTML = `<div class="vazio">Nenhum item — bipa o primeiro produto</div>`;
+        body.innerHTML = `<tr><td colspan="5" class="vazio">Bipa o primeiro produto</td></tr>`;
       } else {
-        box.innerHTML = state.cart
+        body.innerHTML = state.cart
           .map(
             (i, idx) => `
-          <div class="cart-item">
-            <div>
-              <div class="nome">${escapeHtml(i.nome)}</div>
-              <div class="meta">${formatBRL(i.preco)} · estoque ${i.estoque}</div>
-            </div>
-            <div class="qtd-ctrl">
-              <button type="button" data-menos="${idx}">−</button>
-              <span>${i.qtd}</span>
-              <button type="button" data-mais="${idx}">+</button>
-            </div>
-            <div class="preco">${formatBRL(i.preco * i.qtd)}</div>
-          </div>`
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${escapeHtml(i.nome)}</strong></td>
+            <td>
+              <div class="qtd-ctrl">
+                <button type="button" data-menos="${idx}">−</button>
+                <span>${i.qtd}</span>
+                <button type="button" data-mais="${idx}">+</button>
+              </div>
+            </td>
+            <td>${formatBRL(i.preco)}</td>
+            <td><strong>${formatBRL(i.preco * i.qtd)}</strong></td>
+          </tr>`
           )
           .join("");
-        box.querySelectorAll("[data-menos]").forEach((b) =>
+        body.querySelectorAll("[data-menos]").forEach((b) =>
           b.addEventListener("click", () => {
             const i = Number(b.dataset.menos);
             state.cart[i].qtd -= 1;
             if (state.cart[i].qtd <= 0) state.cart.splice(i, 1);
+            if (state.ultimo && state.cart[i]) {
+              state.ultimo.qtdNaVenda = state.cart[i].qtd;
+            }
             renderCarrinho();
             $("#scanCodigo").focus();
           })
         );
-        box.querySelectorAll("[data-mais]").forEach((b) =>
+        body.querySelectorAll("[data-mais]").forEach((b) =>
           b.addEventListener("click", () => {
             const i = Number(b.dataset.mais);
             if (state.cart[i].qtd + 1 > state.cart[i].estoque) {
@@ -444,6 +653,9 @@
               return;
             }
             state.cart[i].qtd += 1;
+            if (state.ultimo && state.ultimo.produtoId === state.cart[i].produtoId) {
+              state.ultimo.qtdNaVenda = state.cart[i].qtd;
+            }
             renderCarrinho();
             $("#scanCodigo").focus();
           })
@@ -451,14 +663,7 @@
       }
       $("#totalVenda").textContent = formatBRL(totalCarrinho());
       $("#btnConfirmarVenda").disabled = !state.cart.length || state.busy;
-    }
-
-    function escapeHtml(s) {
-      return String(s || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+      atualizarUltimo();
     }
 
     async function biparCodigo() {
@@ -470,7 +675,7 @@
       try {
         const res = await FiadoCloud.buscarCodigo(codigo);
         if (!res || !res.ok) {
-          erro.textContent = (res && res.erro) || "Não encontrado";
+          erro.textContent = (res && res.erro) || "Produto não cadastrado";
           toast(erro.textContent, true);
           return;
         }
@@ -481,22 +686,30 @@
           toast(erro.textContent, true);
           return;
         }
-        const existente = state.cart.find((c) => c.produtoId === p.id);
-        if (existente) {
-          if (existente.qtd + 1 > est) {
+        let linha = state.cart.find((c) => c.produtoId === p.id);
+        if (linha) {
+          if (linha.qtd + 1 > est) {
             toast("Estoque insuficiente", true);
             return;
           }
-          existente.qtd += 1;
+          linha.qtd += 1;
         } else {
-          state.cart.push({
+          linha = {
             produtoId: p.id,
             nome: p.nome,
             preco: Number(p.preco),
             estoque: est,
             qtd: 1,
-          });
+          };
+          state.cart.push(linha);
         }
+        state.ultimo = {
+          produtoId: p.id,
+          nome: p.nome,
+          preco: Number(p.preco),
+          estoque: est,
+          qtdNaVenda: linha.qtd,
+        };
         toast(p.nome);
         renderCarrinho();
       } catch (err) {
@@ -516,8 +729,9 @@
           state.cart.map((c) => ({ produtoId: c.produtoId, qtd: c.qtd })),
           state.forma
         );
-        toast("Venda " + formatBRL(res.total));
+        toast("Venda finalizada · " + formatBRL(res.total));
         state.cart = [];
+        state.ultimo = null;
         renderCarrinho();
       } catch (err) {
         toast(err.message || "Falha na venda", true);
@@ -528,12 +742,21 @@
       }
     }
 
+    function novaVenda() {
+      if (state.cart.length && !confirm("Limpar a venda atual?")) return;
+      state.cart = [];
+      state.ultimo = null;
+      renderCarrinho();
+      mostrar("#viewVenda");
+      $("#scanCodigo").focus();
+    }
+
     async function carregarProdutos() {
       try {
         state.produtos = await FiadoCloud.listarProdutos();
         renderProdutos();
       } catch (err) {
-        toast(err.message || "Erro ao listar", true);
+        toast(err.message || "Erro ao listar produtos", true);
       }
     }
 
@@ -548,7 +771,7 @@
       );
       const box = $("#listaProdutos");
       if (!lista.length) {
-        box.innerHTML = `<div class="vazio">Nenhum produto. Cadastre o catálogo aqui.</div>`;
+        box.innerHTML = `<div class="vazio">Nenhum produto cadastrado. Toque em “Novo produto”.</div>`;
         return;
       }
       box.innerHTML = lista
@@ -559,10 +782,10 @@
             <div>
               <div class="nome">${escapeHtml(p.nome)}</div>
               <div class="meta ${est <= 5 ? "estoque-baixo" : ""}">
-                ${escapeHtml(p.codigoReduzido || p.codigoBarras || "—")} · estoque ${est}
+                Barras: ${escapeHtml(p.codigoBarras || "—")} · Reduzido: ${escapeHtml(p.codigoReduzido || "—")} · Estoque ${est}
               </div>
             </div>
-            <div class="preco">${formatBRL(p.preco)}</div>
+            <div style="font-weight:800;white-space:nowrap">${formatBRL(p.preco)}</div>
           </button>`;
         })
         .join("");
@@ -601,22 +824,10 @@
       const estoque = parseMoney($("#prodEstoque").value);
       const erro = $("#prodErro");
       erro.textContent = "";
-      if (!nome) {
-        erro.textContent = "Digite o nome";
-        return;
-      }
-      if (!codigoBarras && !codigoReduzido) {
-        erro.textContent = "Informe barras ou código reduzido";
-        return;
-      }
-      if (!Number.isFinite(preco) || preco < 0) {
-        erro.textContent = "Preço inválido";
-        return;
-      }
-      if (!Number.isFinite(estoque) || estoque < 0) {
-        erro.textContent = "Estoque inválido";
-        return;
-      }
+      if (!nome) return (erro.textContent = "Digite o nome");
+      if (!codigoBarras && !codigoReduzido) return (erro.textContent = "Informe barras ou código reduzido");
+      if (!Number.isFinite(preco) || preco < 0) return (erro.textContent = "Preço inválido");
+      if (!Number.isFinite(estoque) || estoque < 0) return (erro.textContent = "Estoque inválido");
       try {
         await FiadoCloud.salvarProduto({
           id: state.editId,
@@ -654,9 +865,7 @@
             const hora = v.criadoEm
               ? new Date(v.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
               : "";
-            const itens = (v.itens || [])
-              .map((i) => `${i.qtd}× ${i.nome}`)
-              .join(", ");
+            const itens = (v.itens || []).map((i) => `${i.qtd}× ${i.nome}`).join(", ");
             return `
               <div class="venda-card">
                 <div class="topo">
@@ -668,11 +877,41 @@
           })
           .join("");
       } catch (err) {
-        toast(err.message || "Erro no resumo", true);
+        toast(err.message || "Erro no fechamento", true);
       }
     }
 
-    // Events
+    async function tentarLogin() {
+      const user = ($("#loginUser").value || "").trim().toLowerCase();
+      const pass = $("#loginPass").value || "";
+      const erro = $("#loginErro");
+      erro.textContent = "";
+      if (!window.FiadoCloud || !FiadoCloud.configured()) {
+        erro.textContent = "Nuvem não configurada";
+        return;
+      }
+      try {
+        const res = await FiadoCloud.login(user, pass, $("#lembrarLogin").checked);
+        if (!res.ok) {
+          erro.textContent = res.erro || "Login inválido";
+          return;
+        }
+        if (res.role === "admin") {
+          await FiadoCloud.logout();
+          erro.textContent = "Use o usuário do mercado (não o admin).";
+          return;
+        }
+        $("#loginPass").value = "";
+        mostrarApp();
+      } catch (err) {
+        erro.textContent = err.message || "Erro na nuvem";
+      }
+    }
+
+    $("#btnEntrar").addEventListener("click", tentarLogin);
+    $("#loginPass").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tentarLogin();
+    });
     $("#scanCodigo").addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -687,7 +926,7 @@
         $("#scanCodigo").focus();
       });
     });
-    document.querySelectorAll(".nav-bottom [data-nav]").forEach((b) => {
+    document.querySelectorAll(".menu [data-nav]").forEach((b) => {
       b.addEventListener("click", async () => {
         const nav = b.dataset.nav;
         if (nav === "venda") mostrar("#viewVenda");
@@ -701,34 +940,31 @@
         }
       });
     });
+    $("#btnNovaVenda").addEventListener("click", novaVenda);
     $("#btnNovoProduto").addEventListener("click", () => abrirFormProduto(null));
     $("#btnSalvarProduto").addEventListener("click", salvarProduto);
     $("#btnFecharProduto").addEventListener("click", fecharFormProduto);
     $("#buscaProduto").addEventListener("input", renderProdutos);
     $("#btnAtualizarHoje").addEventListener("click", carregarHoje);
-    $("#btnSairCaixa").addEventListener("click", async () => {
+    $("#btnSair").addEventListener("click", async () => {
       try { await FiadoCloud.logout(); } catch (_) {}
-      location.href = "../fiado/";
+      state.cart = [];
+      state.ultimo = null;
+      mostrarLogin();
     });
     $("#modalProduto").addEventListener("click", (e) => {
       if (e.target.id === "modalProduto") fecharFormProduto();
     });
-
-    // Keep focus on scan when on venda (helps pistolinha)
     document.addEventListener("click", (e) => {
       if (!$("#viewVenda").classList.contains("active")) return;
+      if (!$("#appShell").classList.contains("show")) return;
       if (e.target.closest("input,button,select,a,.modal")) return;
       $("#scanCodigo").focus();
     });
 
     (function boot() {
-      if (!exigirSessao()) return;
-      const meta = FiadoCloud.getMeta() || {};
-      $("#nomeMercado").textContent = meta.nome || "Caixa";
-      $("#subtitulo").textContent =
-        meta.role === "admin" ? "Cadastro / venda · mercado aberto" : "Bipa o produto ou digite o código";
-      renderCarrinho();
-      mostrar("#viewVenda");
+      if (sessaoOk()) mostrarApp();
+      else mostrarLogin();
     })();
   </script>
 </body>

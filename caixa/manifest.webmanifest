@@ -1,13 +1,13 @@
 {
-  "name": "Caixa — Estoque do mercadinho",
+  "name": "Caixa PDV",
   "short_name": "Caixa",
-  "description": "Venda com código de barras e controle de estoque",
+  "description": "PDV com código de barras e estoque",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#e4ebe3",
-  "theme_color": "#1a2e1f",
+  "orientation": "any",
+  "background_color": "#e8eef6",
+  "theme_color": "#0f2d5c",
   "lang": "pt-BR",
   "icons": [
     {
@@ -27,12 +27,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ]
 }
