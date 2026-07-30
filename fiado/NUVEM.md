@@ -32,11 +32,7 @@ Troque a senha do admin no painel. Crie cada loja em **Mercados na nuvem**.
 2. De casa: **Abrir caderno** → cadastra clientes (fotos da caderneta).
 3. Na loja: abre o link do Fiado → login do mercado → caderno já está na nuvem.
 
-## Caixa / Estoque (pasta separada)
+## Caixa PDV (outro app)
 
-O PDV fica em `../caixa/` (não mistura com o Fiado).
-
-1. Rode `caixa/estoque-schema.sql` no SQL Editor (depois do schema do Fiado).
-2. Login no Fiado → botão **Caixa / Estoque**, ou abra `…/caixa/`.
-3. Em **Produtos**, cadastre nome, código, preço e estoque.
-4. Em **Venda**, use a pistolinha; em **Hoje**, veja o caixa do dia.
+O Caixa é um produto separado em `caixa/` — não aparece dentro do Fiado.
+Abra direto: `…/caixa/` (login próprio). SQL: `caixa/estoque-schema.sql`.
