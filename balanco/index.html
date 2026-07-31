@@ -37,7 +37,7 @@
         radial-gradient(ellipse 120% 80% at 10% -20%, #c5e4d4 0%, transparent 55%),
         radial-gradient(ellipse 90% 60% at 100% 0%, #dceee4 0%, transparent 45%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-      padding: calc(0.9rem + var(--safe-top)) 0.85rem calc(7.8rem + var(--safe-bottom));
+      padding: calc(0.9rem + var(--safe-top)) 0.85rem calc(1.25rem + var(--safe-bottom));
     }
 
     .wrap {
@@ -110,13 +110,6 @@
       padding-top: 0.75rem;
     }
 
-    .meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.55rem;
-    }
-
-    .meta label,
     .toolbar label,
     .field-label {
       display: flex;
@@ -129,7 +122,6 @@
       color: var(--ink-soft);
     }
 
-    .meta input,
     .toolbar input,
     .toolbar select,
     .card input {
@@ -147,7 +139,6 @@
       -webkit-appearance: none;
     }
 
-    .meta input:focus,
     .toolbar input:focus,
     .toolbar select:focus,
     .card input:focus,
@@ -166,19 +157,6 @@
 
     .toolbar .grow { grid-column: 1 / -1; }
     .toolbar .full { grid-column: 1 / -1; }
-
-    .hint {
-      font-size: 0.8rem;
-      color: var(--ink-soft);
-      line-height: 1.4;
-      margin: 0.5rem 0 0.75rem;
-    }
-
-    .hint strong { color: var(--leaf-deep); font-weight: 700; }
-
-    .exemplo {
-      display: none;
-    }
 
     .filter-row {
       display: flex;
@@ -368,101 +346,6 @@
       font-weight: 700;
     }
 
-    .summary {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      animation: rise 0.4s 0.1s ease-out both;
-    }
-
-    .stat {
-      background: var(--cream);
-      border: 1.5px solid var(--line);
-      border-radius: 0.85rem;
-      padding: 0.75rem 0.8rem;
-    }
-
-    .stat.destaque {
-      grid-column: 1 / -1;
-      border-color: var(--leaf);
-      background: linear-gradient(160deg, #f7fbf8 0%, #e5f3eb 100%);
-    }
-
-    .stat .label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--ink-soft);
-    }
-
-    .stat .value {
-      margin-top: 0.2rem;
-      font-family: "Fraunces", Georgia, serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--leaf-deep);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .stat .sub {
-      margin-top: 0.15rem;
-      font-size: 0.74rem;
-      color: var(--ink-soft);
-      font-weight: 500;
-      line-height: 1.3;
-    }
-
-    .actions {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 0.5rem 0.85rem calc(0.65rem + var(--safe-bottom));
-      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.95) 22%, var(--bg-deep) 100%);
-      display: flex;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    .actions-inner {
-      width: 100%;
-      max-width: 28rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.45rem;
-    }
-
-    .bar-total {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--leaf-deep);
-      color: #f0faf5;
-      border-radius: 0.85rem;
-      padding: 0.65rem 0.9rem;
-      margin-bottom: 0.1rem;
-    }
-
-    .bar-total .lbl {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      opacity: 0.85;
-    }
-
-    .bar-total .val {
-      font-family: "Fraunces", Georgia, serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .actions-inner .btn-deep { grid-column: 1 / -1; }
-
     button.btn {
       font: inherit;
       font-weight: 700;
@@ -478,27 +361,15 @@
 
     button.btn:active { transform: scale(0.97); }
 
-    .btn-ghost {
-      background: var(--cream);
-      color: var(--ink-soft);
-      border: 1.5px solid var(--line);
-    }
-
     .btn-leaf {
       background: var(--leaf);
       color: #f0faf5;
     }
 
-    .btn-deep {
-      background: var(--leaf-deep);
-      color: #f0faf5;
-      box-shadow: 0 4px 16px rgba(11, 61, 46, 0.28);
-    }
-
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(7rem + var(--safe-bottom));
+      bottom: calc(1.25rem + var(--safe-bottom));
       transform: translateX(-50%) translateY(0.5rem);
       background: var(--leaf-deep);
       color: #f0faf5;
@@ -528,43 +399,8 @@
 
     @media (min-width: 720px) {
       body { padding-left: 1.25rem; padding-right: 1.25rem; }
-      .wrap, .actions-inner { max-width: 36rem; }
-      .exemplo {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
-        align-items: center;
-        background: rgba(11, 61, 46, 0.06);
-        border: 1px dashed var(--line);
-        border-radius: 0.75rem;
-        padding: 0.7rem 0.9rem;
-        margin-bottom: 0.75rem;
-        font-size: 0.86rem;
-        color: var(--ink-soft);
-        line-height: 1.35;
-      }
-      .exemplo strong { color: var(--leaf-deep); }
-      .exemplo .pill {
-        background: var(--leaf-deep);
-        color: #f0faf5;
-        font-weight: 700;
-        font-size: 0.8rem;
-        padding: 0.35rem 0.65rem;
-        border-radius: 999px;
-        white-space: nowrap;
-      }
+      .wrap { max-width: 36rem; }
       .brand { font-size: 1.85rem; }
-    }
-
-    @media print {
-      body {
-        background: #fff;
-        padding: 0.5rem;
-        color: #000;
-      }
-      .actions, .toast, .filter-row, .btn-icon, details.panel { display: none !important; }
-      .card { break-inside: avoid; opacity: 1 !important; }
-      body { padding-bottom: 0; }
     }
   </style>
 </head>
@@ -572,37 +408,8 @@
   <div class="wrap">
     <header>
       <p class="brand">Trevo <span>Balanço</span></p>
-      <p class="subtitle">Contagem × kg/un = total · feito pro celular</p>
+      <p class="subtitle">Contagem × kg/un = total pra passar na folha</p>
     </header>
-
-    <details class="panel">
-      <summary>Dados do balanço</summary>
-      <div class="panel-body">
-        <div class="meta">
-          <label>Mês / período
-            <input type="text" id="mes" placeholder="JULHO/2026" autocomplete="off" />
-          </label>
-          <label>Nome
-            <input type="text" id="nome" placeholder="Loja" autocomplete="organization" />
-          </label>
-          <label>Responsável
-            <input type="text" id="responsavel" placeholder="Quem fechou" autocomplete="name" />
-          </label>
-          <label>Contador 1
-            <input type="text" id="contador" placeholder="Quem contou" autocomplete="name" />
-          </label>
-        </div>
-      </div>
-    </details>
-
-    <div class="exemplo">
-      <span class="pill">Como funciona</span>
-      <span>
-        <strong>Contagem</strong> × <strong>kg de cada un</strong> =
-        <strong>total em kg</strong>
-        · Ex.: Cupuaçu <strong>4</strong> × <strong>5</strong> = <strong>20 kg</strong>
-      </span>
-    </div>
 
     <div class="filter-row">
       <input type="search" id="busca" placeholder="Buscar código ou produto…" autocomplete="off" enterkeyhint="search" />
@@ -633,48 +440,10 @@
           </label>
           <button type="button" class="btn btn-leaf full" id="btnAdd">Adicionar na lista</button>
         </div>
-        <p class="hint" style="margin-bottom:0">
-          UN/CX/PCT/LT com <strong>kg/un = 1</strong> só contam — não entram na soma de kilos.
-        </p>
       </div>
     </details>
 
     <div class="lista" id="lista"></div>
-
-    <div class="summary">
-      <div class="stat destaque">
-        <div class="label">Soma dos kilos</div>
-        <div class="value" id="statTotalKg">0</div>
-        <div class="sub" id="statTotalKgSub">só o que vira kg</div>
-      </div>
-      <div class="stat">
-        <div class="label">Com multiplicação</div>
-        <div class="value" id="statMulti">0</div>
-        <div class="sub" id="statMultiSub">fator ≠ 1</div>
-      </div>
-      <div class="stat">
-        <div class="label">Só contagem</div>
-        <div class="value" id="statContagem">0</div>
-        <div class="sub" id="statContagemSub">UN / CX / PCT / LT</div>
-      </div>
-      <div class="stat" style="grid-column:1/-1">
-        <div class="label">Itens na lista</div>
-        <div class="value" id="statItens">0</div>
-        <div class="sub" id="statComQtdSub">0 com quantidade</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="actions">
-    <div class="actions-inner">
-      <div class="bar-total">
-        <span class="lbl">Soma kg</span>
-        <span class="val" id="barTotalKg">0</span>
-      </div>
-      <button type="button" class="btn btn-ghost" id="btnClear">Zerar</button>
-      <button type="button" class="btn btn-leaf" id="btnPrint">Imprimir</button>
-      <button type="button" class="btn btn-deep" id="btnCopy">Copiar resumo</button>
-    </div>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -839,10 +608,6 @@
     }
 
     let state = {
-      mes: "JULHO",
-      nome: "",
-      responsavel: "",
-      contador: "",
       produtos: produtosIniciais(),
     };
 
@@ -910,10 +675,6 @@
         const saved = JSON.parse(raw);
         if (!saved || !Array.isArray(saved.produtos) || !saved.produtos.length) return;
         state = {
-          mes: saved.mes ?? state.mes,
-          nome: saved.nome ?? "",
-          responsavel: saved.responsavel ?? "",
-          contador: saved.contador ?? "",
           produtos: saved.produtos.map((p, i) => ({
             id: p.id || uid(),
             codigo: String(p.codigo ?? ""),
@@ -931,20 +692,6 @@
 
     function save() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function syncMetaInputs() {
-      $("#mes").value = state.mes;
-      $("#nome").value = state.nome;
-      $("#responsavel").value = state.responsavel;
-      $("#contador").value = state.contador;
-    }
-
-    function readMeta() {
-      state.mes = $("#mes").value.trim();
-      state.nome = $("#nome").value.trim();
-      state.responsavel = $("#responsavel").value.trim();
-      state.contador = $("#contador").value.trim();
     }
 
     function filtrados() {
@@ -995,14 +742,6 @@
       });
 
       $("#chipCount").textContent = String(list.length);
-      atualizarResumo();
-    }
-
-    function escapeAttr(s) {
-      return String(s)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;");
     }
 
     function escapeHtml(s) {
@@ -1014,59 +753,6 @@
 
     function findById(id) {
       return state.produtos.find((p) => p.id === id);
-    }
-
-    function atualizarResumo() {
-      const all = state.produtos;
-      let com = 0;
-      let somaKg = 0;
-      let nKg = 0;
-      let nMulti = 0;
-      let somaMulti = 0;
-      let nContagem = 0;
-      const porMedida = {};
-
-      all.forEach((p) => {
-        const q = parseNum(p.qtd);
-        if (q != null && q !== 0) com += 1;
-
-        if (viraKg(p)) {
-          const t = totalKg(p);
-          if (t != null) {
-            somaKg += t;
-            nKg += 1;
-          }
-          if (kgPorUn(p) !== 1 && q != null) {
-            nMulti += 1;
-            somaMulti += t || 0;
-          }
-        } else if (q != null) {
-          nContagem += 1;
-          const m = String(p.medida || "?").toUpperCase();
-          porMedida[m] = (porMedida[m] || 0) + q;
-        }
-      });
-
-      const somaFmt = formatNum(roundNum(somaKg));
-      $("#statItens").textContent = String(all.length);
-      $("#statComQtdSub").textContent = `${com} com quantidade`;
-      $("#statTotalKg").textContent = somaFmt;
-      $("#barTotalKg").textContent = somaFmt;
-      $("#statTotalKgSub").textContent =
-        nKg === 0
-          ? "nenhum item em kg ainda"
-          : `${nKg} produtos somados em kg`;
-      $("#statMulti").textContent = String(nMulti);
-      $("#statMultiSub").textContent =
-        nMulti === 0
-          ? "nenhuma caixa/bag com fator"
-          : `somam ${formatNum(roundNum(somaMulti))} kg`;
-      $("#statContagem").textContent = String(nContagem);
-      const partes = Object.entries(porMedida)
-        .map(([m, v]) => `${formatNum(roundNum(v))} ${m}`)
-        .join(" · ");
-      $("#statContagemSub").textContent =
-        nContagem === 0 ? "UN / CX / PCT / LT" : partes;
     }
 
     function toast(msg, warn) {
@@ -1106,76 +792,6 @@
       toast("Produto adicionado");
     }
 
-    function textoResumo() {
-      readMeta();
-      const linhas = [
-        `*Balanço Trevo — ${state.mes || "—"}*`,
-      ];
-      if (state.nome) linhas.push(`Nome: ${state.nome}`);
-      if (state.responsavel) linhas.push(`Responsável: ${state.responsavel}`);
-      if (state.contador) linhas.push(`Contador: ${state.contador}`);
-      linhas.push("");
-
-      const list = [...state.produtos].sort((a, b) => a.ordem - b.ordem);
-      let somaKg = 0;
-      list.forEach((p) => {
-        const q = parseNum(p.qtd);
-        if (q == null) {
-          linhas.push(`${p.codigo} ${p.nome} | ${p.medida} | —`);
-          return;
-        }
-        const w = kgPorUn(p);
-        if (viraKg(p)) {
-          const tot = totalKg(p);
-          somaKg += tot || 0;
-          if (w !== 1) {
-            linhas.push(
-              `${p.codigo} ${p.nome} | ${formatNum(q)} × ${formatNum(w)} kg = *${formatNum(tot)} kg*`
-            );
-          } else {
-            linhas.push(`${p.codigo} ${p.nome} | *${formatNum(tot)} kg*`);
-          }
-        } else {
-          linhas.push(`${p.codigo} ${p.nome} | ${formatNum(q)} ${p.medida}`);
-        }
-      });
-
-      linhas.push("");
-      linhas.push(`*Soma dos kilos: ${formatNum(roundNum(somaKg))} kg*`);
-      return linhas.join("\n");
-    }
-
-    async function copiar() {
-      const texto = textoResumo();
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(texto);
-        } else {
-          const ta = document.createElement("textarea");
-          ta.value = texto;
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-        }
-        toast("Resumo copiado!");
-      } catch {
-        toast("Não deu pra copiar", true);
-      }
-    }
-
-    function zerarQtds() {
-      if (!confirm("Zerar todas as quantidades? (pesos/un ficam iguais)")) return;
-      state.produtos.forEach((p) => {
-        p.qtd = "";
-      });
-      save();
-      render();
-      toast("Quantidades zeradas");
-    }
-
     $("#lista").addEventListener("input", (e) => {
       const input = e.target.closest("input[data-f]");
       if (!input) return;
@@ -1195,7 +811,6 @@
       if (resultado) resultado.innerHTML = htmlResultado(p);
       const qNum = parseNum(p.qtd);
       card.classList.toggle("zero", qNum === 0);
-      atualizarResumo();
       save();
     });
 
@@ -1219,24 +834,13 @@
       }
     });
 
-    ["mes", "nome", "responsavel", "contador"].forEach((id) => {
-      $("#" + id).addEventListener("input", () => {
-        readMeta();
-        save();
-      });
-    });
-
     $("#busca").addEventListener("input", render);
     $("#btnAdd").addEventListener("click", adicionarProduto);
     $("#newNome").addEventListener("keydown", (e) => {
       if (e.key === "Enter") adicionarProduto();
     });
-    $("#btnCopy").addEventListener("click", copiar);
-    $("#btnClear").addEventListener("click", zerarQtds);
-    $("#btnPrint").addEventListener("click", () => window.print());
 
     load();
-    syncMetaInputs();
     render();
   </script>
 </body>
