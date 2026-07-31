@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b3d2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Balanço · Trevo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e8f2ec;
+      --bg-deep: #d4e8dc;
+      --ink: #0f2a22;
+      --ink-soft: #3d5c52;
+      --leaf: #1a6b4a;
+      --leaf-deep: #0b3d2e;
+      --cream: #f7fbf8;
+      --line: #b8d4c6;
+      --ok: #1a6b4a;
+      --warn: #9a5b1a;
+      --danger: #9b2e2e;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 120% 80% at 10% -20%, #c5e4d4 0%, transparent 55%),
+        radial-gradient(ellipse 90% 60% at 100% 0%, #dceee4 0%, transparent 45%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      padding: calc(1.1rem + var(--safe-top)) 1rem calc(5.5rem + var(--safe-bottom));
+    }
+
+    .wrap {
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 1.25rem;
+      animation: rise 0.4s ease-out both;
+    }
+
+    .brand-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+    }
+
+    .brand {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--leaf-deep);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .brand span {
+      font-weight: 600;
+      color: var(--leaf);
+      font-size: 1.1rem;
+      margin-left: 0.35rem;
+    }
+
+    .subtitle {
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+      gap: 0.55rem 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .meta label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+    }
+
+    .meta input {
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.65rem;
+      padding: 0.6rem 0.7rem;
+      width: 100%;
+    }
+
+    .meta input:focus,
+    .toolbar input:focus,
+    .toolbar select:focus,
+    td input:focus {
+      outline: 2px solid var(--leaf);
+      outline-offset: 1px;
+      border-color: var(--leaf);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 0.75rem;
+      align-items: end;
+      animation: rise 0.4s 0.05s ease-out both;
+    }
+
+    .toolbar label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      flex: 1;
+      min-width: 6rem;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.6rem;
+      padding: 0.55rem 0.65rem;
+      width: 100%;
+    }
+
+    .toolbar .grow { flex: 2; min-width: 10rem; }
+
+    .hint {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+
+    .hint strong { color: var(--leaf-deep); font-weight: 700; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1.5px solid var(--line);
+      border-radius: 0.9rem;
+      background: var(--cream);
+      box-shadow: 0 8px 28px rgba(11, 61, 46, 0.08);
+      animation: rise 0.4s 0.1s ease-out both;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 58rem;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: 0.75rem 0.55rem;
+      white-space: nowrap;
+    }
+
+    thead th:first-child { border-radius: 0.75rem 0 0 0; padding-left: 0.8rem; }
+    thead th:last-child { border-radius: 0 0.75rem 0 0; padding-right: 0.8rem; }
+
+    tbody tr {
+      border-top: 1px solid var(--line);
+      transition: background 0.12s ease;
+    }
+
+    tbody tr:nth-child(even) { background: rgba(26, 107, 74, 0.04); }
+    tbody tr:hover { background: rgba(26, 107, 74, 0.09); }
+    tbody tr.zero { opacity: 0.55; }
+
+    td {
+      padding: 0.4rem 0.45rem;
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+
+    td:first-child { padding-left: 0.75rem; color: var(--ink-soft); font-size: 0.78rem; font-weight: 600; }
+    td:last-child { padding-right: 0.65rem; }
+
+    .codigo {
+      font-weight: 700;
+      color: var(--leaf-deep);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .nome { font-weight: 600; line-height: 1.25; min-width: 12rem; }
+
+    .medida {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--leaf);
+      background: rgba(26, 107, 74, 0.12);
+      border-radius: 0.35rem;
+      padding: 0.2rem 0.4rem;
+    }
+
+    td input[type="number"],
+    td input[type="text"] {
+      width: 100%;
+      min-width: 4.2rem;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--leaf-deep);
+      background: #eef7f2;
+      border: 1.5px solid var(--line);
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.45rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      -moz-appearance: textfield;
+    }
+
+    td input.nome-input,
+    td input.codigo-input {
+      text-align: left;
+      font-weight: 600;
+      min-width: 5rem;
+    }
+
+    td input[type="number"]::-webkit-outer-spin-button,
+    td input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .conta-cell {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-size: 0.84rem;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+
+    .conta-cell .op {
+      margin: 0 0.15rem;
+      opacity: 0.7;
+    }
+
+    .total-cell {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--leaf-deep);
+      white-space: nowrap;
+      text-align: right;
+      min-width: 6.5rem;
+    }
+
+    .total-cell em {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 0.75rem;
+      color: var(--ink-soft);
+      margin-left: 0.2rem;
+    }
+
+    .total-cell.contagem {
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+
+    .th-hint {
+      display: block;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+      opacity: 0.8;
+      margin-top: 0.15rem;
+    }
+
+    .stat.destaque {
+      border-color: var(--leaf);
+      background: linear-gradient(160deg, #f7fbf8 0%, #e5f3eb 100%);
+    }
+
+    .stat .sub {
+      margin-top: 0.2rem;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .exemplo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+      background: rgba(11, 61, 46, 0.06);
+      border: 1px dashed var(--line);
+      border-radius: 0.75rem;
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 0.85rem;
+      font-size: 0.86rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+    }
+
+    .exemplo strong { color: var(--leaf-deep); }
+
+    .exemplo .pill {
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .btn-icon {
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      cursor: pointer;
+      padding: 0.25rem 0.4rem;
+      border-radius: 0.4rem;
+      line-height: 1;
+    }
+
+    .btn-icon:hover { background: rgba(155, 46, 46, 0.12); color: var(--danger); }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: 0.6rem;
+      margin-top: 1rem;
+      animation: rise 0.4s 0.15s ease-out both;
+    }
+
+    .stat {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+    }
+
+    .stat .label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+    }
+
+    .stat .value {
+      margin-top: 0.25rem;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--leaf-deep);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.65rem 1rem calc(0.75rem + var(--safe-bottom));
+      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.92) 28%, var(--bg-deep) 100%);
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .actions-inner {
+      width: 100%;
+      max-width: 72rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr;
+      gap: 0.5rem;
+    }
+
+    button.btn {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      border-radius: 0.85rem;
+      padding: 0.9rem 0.65rem;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button.btn:active { transform: scale(0.97); }
+
+    .btn-ghost {
+      background: var(--cream);
+      color: var(--ink-soft);
+      border: 1.5px solid var(--line);
+    }
+
+    .btn-leaf {
+      background: var(--leaf);
+      color: #f0faf5;
+    }
+
+    .btn-deep {
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      box-shadow: 0 4px 16px rgba(11, 61, 46, 0.28);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(4.8rem + var(--safe-bottom));
+      transform: translateX(-50%) translateY(0.5rem);
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.7rem 1.15rem;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 20;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.warn { background: var(--warn); }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      align-items: center;
+    }
+
+    .filter-row input {
+      flex: 1;
+      min-width: 12rem;
+      font: inherit;
+      font-size: 0.95rem;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.65rem;
+      padding: 0.6rem 0.75rem;
+      color: var(--ink);
+    }
+
+    .chip {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(11, 61, 46, 0.06);
+      border-radius: 999px;
+      padding: 0.4rem 0.7rem;
+      white-space: nowrap;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .actions-inner { grid-template-columns: 1fr 1fr; }
+      .actions-inner .btn-deep { grid-column: 1 / -1; }
+      .brand { font-size: 1.55rem; }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0.5rem;
+        color: #000;
+      }
+      .toolbar, .actions, .toast, .filter-row, .btn-icon { display: none !important; }
+      .table-wrap { box-shadow: none; border-color: #ccc; }
+      thead th { background: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      tbody tr.zero { opacity: 1; }
+      body { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-row">
+        <p class="brand">Trevo <span>Balanço</span></p>
+      </div>
+      <p class="subtitle">Contagem do mês — a conta de cada produto aparece na linha</p>
+      <div class="meta">
+        <label>Mês / período
+          <input type="text" id="mes" placeholder="Ex: JULHO/2026" autocomplete="off" />
+        </label>
+        <label>Nome
+          <input type="text" id="nome" placeholder="Loja / unidade" autocomplete="organization" />
+        </label>
+        <label>Responsável
+          <input type="text" id="responsavel" placeholder="Quem fechou" autocomplete="name" />
+        </label>
+        <label>Contador 1
+          <input type="text" id="contador" placeholder="Quem contou" autocomplete="name" />
+        </label>
+      </div>
+    </header>
+
+    <div class="exemplo">
+      <span class="pill">Como funciona</span>
+      <span>
+        <strong>Contagem</strong> × <strong>kg de cada un</strong> =
+        <strong>total em kg</strong>
+        &nbsp;·&nbsp; Ex.: Cupuaçu <strong>4</strong> caixas × <strong>5</strong> kg =
+        <strong>20 kg</strong>
+      </span>
+    </div>
+    <p class="hint">
+      Em produto por unidade (UN, CX, PCT, LT), deixe <strong>kg de cada un = 1</strong> —
+      aí só conta a quantidade (não entra na soma de kilos).
+      Se a unidade pesa (ex.: bag de 2 kg), mude o <strong>kg de cada un</strong>.
+    </p>
+
+    <div class="filter-row">
+      <input type="search" id="busca" placeholder="Buscar código ou produto…" autocomplete="off" />
+      <span class="chip" id="chipCount">0 itens</span>
+    </div>
+
+    <div class="toolbar" id="addForm">
+      <label style="flex:0.7;min-width:5rem">Código
+        <input type="text" id="newCodigo" placeholder="Ex: 999" inputmode="numeric" />
+      </label>
+      <label class="grow">Produto
+        <input type="text" id="newNome" placeholder="Nome do produto" />
+      </label>
+      <label style="flex:0.6;min-width:5rem">Medida
+        <select id="newMedida">
+          <option>KG</option>
+          <option>UN</option>
+          <option>PCT</option>
+          <option>CX</option>
+          <option>LT</option>
+        </select>
+      </label>
+      <label style="flex:0.7;min-width:5.5rem">Kg de cada un
+        <input type="number" id="newPeso" min="0" step="any" value="1" inputmode="decimal" />
+      </label>
+      <button type="button" class="btn btn-leaf" id="btnAdd" style="flex:0 0 auto;padding:0.55rem 1rem;align-self:end">+ Produto</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Código</th>
+            <th>Produto</th>
+            <th>Medida</th>
+            <th>Contagem<span class="th-hint">quanto tem</span></th>
+            <th>Kg de cada un<span class="th-hint">fator · editável</span></th>
+            <th>Conta<span class="th-hint">contagem × kg/un</span></th>
+            <th>Resultado<span class="th-hint">soma em kg</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="summary">
+      <div class="stat destaque">
+        <div class="label">Soma dos kilos</div>
+        <div class="value" id="statTotalKg">0</div>
+        <div class="sub" id="statTotalKgSub">só o que vira kg (qtd × kg/un)</div>
+      </div>
+      <div class="stat">
+        <div class="label">Com multiplicação</div>
+        <div class="value" id="statMulti">0</div>
+        <div class="sub" id="statMultiSub">itens com kg/un diferente de 1</div>
+      </div>
+      <div class="stat">
+        <div class="label">Só contagem</div>
+        <div class="value" id="statContagem">0</div>
+        <div class="sub" id="statContagemSub">UN / CX / PCT / LT (não somam kg)</div>
+      </div>
+      <div class="stat">
+        <div class="label">Itens na lista</div>
+        <div class="value" id="statItens">0</div>
+        <div class="sub" id="statComQtdSub">0 com quantidade</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <button type="button" class="btn btn-ghost" id="btnClear">Zerar qtds</button>
+      <button type="button" class="btn btn-leaf" id="btnPrint">Imprimir</button>
+      <button type="button" class="btn btn-deep" id="btnCopy">Copiar resumo</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "trevo-balanco-v1";
+
+    /** Folha impressa — ordem das imagens. qtdPapel = anotação manuscrita (total em kg/medida). */
+    const FOLHA = [
+      // —— Página 1 ——
+      { codigo: "1003", nome: "COBERTURA BANANA FINI", medida: "KG", qtdPapel: 0 },
+      { codigo: "1004", nome: "COBERTURA BEIJO FINI", medida: "KG", qtdPapel: 2 },
+      { codigo: "1005", nome: "COBERTURA DENTADURA FINI", medida: "KG", qtdPapel: 2 },
+      { codigo: "101", nome: "CREME CUPUACU CX 5KG", medida: "KG", qtdPapel: 20 },
+      { codigo: "1011", nome: "AVENTAL GRANDE", medida: "UN", qtdPapel: 0 },
+      { codigo: "1014", nome: "TUBETES BAUNILHA", medida: "KG", qtdPapel: 1.046 },
+      { codigo: "1017", nome: "COBERTURA CARAMELO", medida: "KG", qtdPapel: 2.6 },
+      { codigo: "1019", nome: "COLHER FORTE", medida: "UN", qtdPapel: 5 },
+      { codigo: "1035", nome: "CHOCO POWER BALL MINI P/B", medida: "KG", qtdPapel: 1.5 },
+      { codigo: "1043", nome: "LEITE CONDENSADO MOCA", medida: "KG", qtdPapel: 10.27 },
+      { codigo: "1048", nome: "LEITE NINHO PO", medida: "KG", qtdPapel: 60 },
+      { codigo: "1049", nome: "FARINHA LACTEA", medida: "KG", qtdPapel: 0 },
+      { codigo: "106", nome: "CASTANHA BANDA", medida: "KG", qtdPapel: 0 },
+      { codigo: "107", nome: "CASTANHA XEREM", medida: "KG", qtdPapel: 8 },
+      { codigo: "1079", nome: "VARIEGATO TREVONUT TREVO (I)", medida: "KG", qtdPapel: null },
+      { codigo: "108", nome: "AMENDOIM", medida: "KG", qtdPapel: 0 },
+      { codigo: "1085", nome: "GRANOLA CACAU", medida: "KG", qtdPapel: 2 },
+      { codigo: "1093", nome: "PAPEL TOALHA 2000 FOLHAS", medida: "PCT", qtdPapel: 4 },
+      { codigo: "111", nome: "M&M CHOCOLATE", medida: "KG", qtdPapel: 0 },
+      { codigo: "1112", nome: "COPO 50ML", medida: "UN", qtdPapel: 5 },
+      { codigo: "1113", nome: "POTE ACAI MEDIO 480ML", medida: "UN", qtdPapel: 7 },
+      { codigo: "1117", nome: "TREVO ACAI ESPECIAL CX 20KG", medida: "KG", qtdPapel: 2.1 },
+      { codigo: "1121", nome: "PACOCA DE AMENDOIM", medida: "KG", qtdPapel: 0 },
+      { codigo: "1122", nome: "POTE ACAI PEQUENO 100ML", medida: "UN", qtdPapel: 0 },
+      { codigo: "1123", nome: "POTE ACAI GRANDE 980ML", medida: "UN", qtdPapel: 14 },
+      { codigo: "113", nome: "FLOCOS DE TAPIOCA", medida: "KG", qtdPapel: 0 },
+      { codigo: "115", nome: "GRANOLA MIX", medida: "KG", qtdPapel: 0 },
+      { codigo: "1178", nome: "COBERTURA DE CHOCOLATE AO LEITE", medida: "KG", qtdPapel: 2.6 },
+      { codigo: "1179", nome: "COBERTURA MORANGO", medida: "KG", qtdPapel: 2.6 },
+      { codigo: "1190", nome: "BANANA FRUTA", medida: "KG", qtdPapel: 1.586 },
+      { codigo: "1223", nome: "CANETA ESFEROGRAFICA", medida: "UN", qtdPapel: 2 },
+      { codigo: "1228", nome: "ELASTICO (LIGA)", medida: "PCT", qtdPapel: 0 },
+      { codigo: "1234", nome: "FITA DUREX 45X45", medida: "UN", qtdPapel: 1 },
+      { codigo: "1236", nome: "GRAMPEADOR", medida: "UN", qtdPapel: 2 },
+      { codigo: "1237", nome: "GRAMPO 26/6", medida: "CX", qtdPapel: 1 },
+      { codigo: "1302", nome: "MORANGO TREVO FRUTA (I)", medida: "KG", qtdPapel: 0.9 },
+
+      // —— Página 2 ——
+      { codigo: "1306", nome: "KIWI TREVO FRUTA (I)", medida: "KG", qtdPapel: 0.9 },
+      { codigo: "1309", nome: "UVA TREVO FRUTA (I)", medida: "KG", qtdPapel: 0.966 },
+      { codigo: "1314", nome: "LEITE NINHO PO ZERO LACTOSE", medida: "KG", qtdPapel: 1 },
+      { codigo: "1321", nome: "SACO PARA LIXO 200LTS", medida: "PCT", qtdPapel: 1 },
+      { codigo: "134", nome: "SNOW FLAKES", medida: "KG", qtdPapel: 2 },
+      { codigo: "1398", nome: "ABACAXI TREVO FRUTA (I)", medida: "KG", qtdPapel: 0 },
+      { codigo: "141", nome: "BOBINA PARA CUPOM FISCAL", medida: "UN", qtdPapel: 21 },
+      { codigo: "1463", nome: "AMENDOIM COM COBERTURA DE CHOCOLATE", medida: "KG", qtdPapel: 0 },
+      { codigo: "149", nome: "JUJUBA", medida: "KG", qtdPapel: 0.9 },
+      { codigo: "1616", nome: "CASQUINHA CUMBUCA", medida: "KG", qtdPapel: 1.064 },
+      { codigo: "1645", nome: "SOFT COMPOSTO NINHO TREVO (I)", medida: "UN", qtdPapel: 0 },
+      { codigo: "169", nome: "CRUNCH CEREAL", medida: "KG", qtdPapel: 0 },
+      { codigo: "1694", nome: "CASTANHA CARAMELIZADA", medida: "KG", qtdPapel: 0 },
+      { codigo: "185", nome: "CEREJA FRUTA (I)", medida: "KG", qtdPapel: 3 },
+      { codigo: "194", nome: "POTE 100 ML", medida: "UN", qtdPapel: 0 },
+      { codigo: "197", nome: "DETERGENTE NEUTRO", medida: "LT", qtdPapel: 2 },
+      { codigo: "2051", nome: "TREVO DANINHO SOFT KG (F)", medida: "KG", qtdPapel: 1200 },
+      { codigo: "2053", nome: "SACOLA P/ VIAGEM ACAI PERSONALIZADA", medida: "UN", qtdPapel: 50 },
+      { codigo: "2177", nome: "SOFT COMPOSTO DANINHO TREVO (I)", medida: "UN", qtdPapel: 2 },
+      { codigo: "238", nome: "PAPEL FILME GRANDE", medida: "UN", qtdPapel: 1 },
+      { codigo: "239", nome: "PAPEL FILME PEQUENO", medida: "UN", qtdPapel: 0 },
+      { codigo: "246", nome: "ESPONJA DUPLA FACE", medida: "UN", qtdPapel: 4 },
+      { codigo: "247", nome: "VASSOURA", medida: "UN", qtdPapel: 0 },
+      { codigo: "248", nome: "ALCOOL LIQUIDO 70", medida: "LT", qtdPapel: 1 },
+      { codigo: "251", nome: "SACO PARA LIXO 100LTS", medida: "PCT", qtdPapel: 1 },
+      { codigo: "255", nome: "LUVA VINIL (M)", medida: "CX", qtdPapel: 1 },
+      { codigo: "256", nome: "TOUCA DESCARTAVEL BRANCA", medida: "PCT", qtdPapel: 1 },
+      { codigo: "259", nome: "ALCOOL EM GEL", medida: "LT", qtdPapel: 0 },
+      { codigo: "260", nome: "AGUA SANITARIA", medida: "LT", qtdPapel: 2 },
+      { codigo: "267", nome: "HIPOCLORITO DE SODIO (HIGIENIZACAO DE FRUTAS)", medida: "UN", qtdPapel: 1 },
+      { codigo: "269", nome: "MEL NATURAL", medida: "KG", qtdPapel: 1.4 },
+      { codigo: "2725", nome: "SELO DE ALUMINIO P/ POTE 980ML", medida: "UN", qtdPapel: 200 },
+      { codigo: "2726", nome: "SELO DE ALUMINIO P/ POTE 100ML", medida: "UN", qtdPapel: 2 },
+      { codigo: "283", nome: "PANO MULTIUSO", medida: "UN", qtdPapel: 1 },
+      { codigo: "37", nome: "AGUA MINERAL COM GAS 500ML", medida: "UN", qtdPapel: 5 },
+      { codigo: "381", nome: "MASCARA DESCARTAVEL", medida: "UN", qtdPapel: 1 },
+      { codigo: "390", nome: "CREME TAPIOCA CX 5KG", medida: "KG", qtdPapel: 30 },
+      { codigo: "398", nome: "TESOURA G", medida: "UN", qtdPapel: 1 },
+      { codigo: "40", nome: "PAZINHA PARA DEGUSTACAO", medida: "UN", qtdPapel: 2 },
+      { codigo: "4015", nome: "RESMA DE PAPEL A4 C/ 500 FOLHAS", medida: "UN", qtdPapel: 1 },
+
+      // —— Página 3 ——
+      { codigo: "4034", nome: "ACAI SOFT CALDA CX 20KG", medida: "KG", qtdPapel: 158 },
+      { codigo: "5", nome: "TREVO NINHO SOFT KG (F)", medida: "KG", qtdPapel: 6.51 },
+      { codigo: "56", nome: "CREME DE CHOCOLATE COM AVELA", medida: "KG", qtdPapel: 4 },
+      { codigo: "57", nome: "CREME DE CHOCOTINE", medida: "KG", qtdPapel: 0 },
+      { codigo: "58", nome: "CREME DE CHOCOLATE BRANCO WAFFER", medida: "KG", qtdPapel: 0 },
+      { codigo: "6069", nome: "VARIEGATO MORANGO TREVO", medida: "KG", qtdPapel: 1 },
+      { codigo: "62", nome: "CREME COOKIES BRANCO", medida: "KG", qtdPapel: 0 },
+      { codigo: "636", nome: "SOFT COMPOSTO TREVELLA TREVO (I)", medida: "UN", qtdPapel: 4 },
+      { codigo: "654", nome: "TREVO TREVELLA SOFT KG (P)", medida: "KG", qtdPapel: 8 },
+      { codigo: "7000", nome: "AGUA MINERAL SEM GAS 500ML", medida: "UN", qtdPapel: 1 },
+      { codigo: "80", nome: "BEIJOS DE MORANGO FINI 90G", medida: "UN", qtdPapel: 0 },
+      { codigo: "8058", nome: "PETROGEL TAYLOR LUBRIFICANTE", medida: "UN", qtdPapel: 2 },
+      { codigo: "833", nome: "CHOCOLATE EM GOTAS", medida: "KG", qtdPapel: 2.5 },
+      { codigo: "840", nome: "LIMPA VIDRO", medida: "LT", qtdPapel: 1 },
+      { codigo: "844", nome: "CANECA TREVO", medida: "UN", qtdPapel: 0 },
+      { codigo: "849", nome: "LEITE EM PO INTEGRAL", medida: "KG", qtdPapel: 3 },
+      { codigo: "854", nome: "CLIPER 2/0", medida: "CX", qtdPapel: 0 },
+      { codigo: "884", nome: "CANETA DETECTORA DE DINHEIRO FALSO", medida: "UN", qtdPapel: 0 },
+      { codigo: "956", nome: "LEITE CONDENSADO ZERO LACTOSE", medida: "KG", qtdPapel: 0.79 },
+      { codigo: "964", nome: "REFIL MOP", medida: "UN", qtdPapel: 0 },
+      { codigo: "967", nome: "ETIQUETA ADESIVA EM PAPEL TS 38X40MM", medida: "UN", qtdPapel: 0 },
+      { codigo: "982", nome: "ACAI 0% ACUCAR CX 20KG", medida: "KG", qtdPapel: 20 },
+    ];
+
+    const $ = (s) => document.querySelector(s);
+
+    function inferPesoUn(nome) {
+      const n = String(nome || "").toUpperCase();
+      const m20 = n.match(/CX\s*20\s*KG/);
+      if (m20) return 20;
+      const m5 = n.match(/CX\s*5\s*KG/);
+      if (m5) return 5;
+      return 1;
+    }
+
+    /** Converte anotação da folha → qtd contada + peso/un, mantendo o total do papel. */
+    function seedFromPapel(item) {
+      const fator = inferPesoUn(item.nome);
+      const papel = item.qtdPapel;
+      if (papel == null || Number.isNaN(papel)) {
+        return { qtd: "", pesoUn: fator };
+      }
+      if (fator > 1 && papel >= fator) {
+        const qtd = papel / fator;
+        return { qtd: roundNum(qtd), pesoUn: fator };
+      }
+      return { qtd: papel, pesoUn: fator > 1 && papel < fator ? 1 : fator };
+    }
+
+    function roundNum(n) {
+      const r = Math.round(n * 1000) / 1000;
+      return Object.is(r, -0) ? 0 : r;
+    }
+
+    function uid() {
+      return "p_" + Math.random().toString(36).slice(2, 10);
+    }
+
+    function produtosIniciais() {
+      return FOLHA.map((item, i) => {
+        const seed = seedFromPapel(item);
+        return {
+          id: uid(),
+          codigo: item.codigo,
+          nome: item.nome,
+          medida: item.medida,
+          qtd: seed.qtd === "" ? "" : seed.qtd,
+          pesoUn: seed.pesoUn,
+          ordem: i,
+        };
+      });
+    }
+
+    let state = {
+      mes: "JULHO",
+      nome: "",
+      responsavel: "",
+      contador: "",
+      produtos: produtosIniciais(),
+    };
+
+    /** Vira kg se for medida KG, ou se a pessoa setou kg/un ≠ 1 (ex.: bag 2 kg). */
+    function viraKg(p) {
+      const w = parseNum(p.pesoUn);
+      if (String(p.medida).toUpperCase() === "KG") return true;
+      return w != null && w !== 1;
+    }
+
+    function kgPorUn(p) {
+      const w = parseNum(p.pesoUn);
+      if (w == null) return 1;
+      return w;
+    }
+
+    /** Resultado em kg quando aplica; senão null (é só contagem). */
+    function totalKg(p) {
+      if (!viraKg(p)) return null;
+      const q = parseNum(p.qtd);
+      if (q == null) return null;
+      return roundNum(q * kgPorUn(p));
+    }
+
+    function htmlConta(p) {
+      const q = parseNum(p.qtd);
+      if (q == null) return "—";
+      const w = kgPorUn(p);
+      if (!viraKg(p)) {
+        return `${formatNum(q)} <span class="op">·</span> ${escapeHtml(p.medida)}`;
+      }
+      if (w === 1) {
+        return `${formatNum(q)} <span class="op">×</span> 1`;
+      }
+      return `${formatNum(q)} <span class="op">×</span> ${formatNum(w)}`;
+    }
+
+    function htmlResultado(p) {
+      const q = parseNum(p.qtd);
+      if (q == null) return "—";
+      if (!viraKg(p)) {
+        return `<span class="total-cell contagem">${formatNum(q)}<em>${escapeHtml(p.medida)}</em></span>`;
+      }
+      const tot = totalKg(p);
+      return `<span class="total-cell">${formatNum(tot)}<em>kg</em></span>`;
+    }
+
+    function parseNum(v) {
+      if (v === "" || v == null) return null;
+      const n = typeof v === "number" ? v : parseFloat(String(v).replace(",", "."));
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function formatNum(n) {
+      if (n == null || Number.isNaN(n)) return "—";
+      return n.toLocaleString("pt-BR", {
+        maximumFractionDigits: 3,
+      });
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (!saved || !Array.isArray(saved.produtos) || !saved.produtos.length) return;
+        state = {
+          mes: saved.mes ?? state.mes,
+          nome: saved.nome ?? "",
+          responsavel: saved.responsavel ?? "",
+          contador: saved.contador ?? "",
+          produtos: saved.produtos.map((p, i) => ({
+            id: p.id || uid(),
+            codigo: String(p.codigo ?? ""),
+            nome: String(p.nome ?? ""),
+            medida: String(p.medida || "KG"),
+            qtd: p.qtd === "" || p.qtd == null ? "" : p.qtd,
+            pesoUn: parseNum(p.pesoUn) ?? 1,
+            ordem: p.ordem ?? i,
+          })),
+        };
+      } catch {
+        /* ignore */
+      }
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function syncMetaInputs() {
+      $("#mes").value = state.mes;
+      $("#nome").value = state.nome;
+      $("#responsavel").value = state.responsavel;
+      $("#contador").value = state.contador;
+    }
+
+    function readMeta() {
+      state.mes = $("#mes").value.trim();
+      state.nome = $("#nome").value.trim();
+      state.responsavel = $("#responsavel").value.trim();
+      state.contador = $("#contador").value.trim();
+    }
+
+    function filtrados() {
+      const q = ($("#busca").value || "").trim().toLowerCase();
+      const list = [...state.produtos].sort((a, b) => a.ordem - b.ordem);
+      if (!q) return list;
+      return list.filter(
+        (p) =>
+          String(p.codigo).toLowerCase().includes(q) ||
+          String(p.nome).toLowerCase().includes(q)
+      );
+    }
+
+    function render() {
+      const list = filtrados();
+      const tbody = $("#tbody");
+      tbody.innerHTML = "";
+
+      list.forEach((p, idx) => {
+        const qNum = parseNum(p.qtd);
+        const tr = document.createElement("tr");
+        if (qNum === 0) tr.classList.add("zero");
+        tr.dataset.id = p.id;
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><input class="codigo-input" data-f="codigo" type="text" value="${escapeAttr(p.codigo)}" /></td>
+          <td><input class="nome-input" data-f="nome" type="text" value="${escapeAttr(p.nome)}" /></td>
+          <td><span class="medida">${escapeHtml(p.medida)}</span></td>
+          <td><input data-f="qtd" type="number" inputmode="decimal" step="any" min="0" value="${p.qtd === "" || p.qtd == null ? "" : p.qtd}" placeholder="0" title="Contagem" /></td>
+          <td><input data-f="pesoUn" type="number" inputmode="decimal" step="any" min="0" value="${p.pesoUn}" title="Quantos kg tem cada unidade/caixa" /></td>
+          <td class="conta-cell" data-conta>${htmlConta(p)}</td>
+          <td data-resultado>${htmlResultado(p)}</td>
+          <td><button type="button" class="btn-icon" data-del title="Remover">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      $("#chipCount").textContent = `${list.length} itens`;
+      atualizarResumo();
+    }
+
+    function escapeAttr(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function findById(id) {
+      return state.produtos.find((p) => p.id === id);
+    }
+
+    function atualizarResumo() {
+      const all = state.produtos;
+      let com = 0;
+      let somaKg = 0;
+      let nKg = 0;
+      let nMulti = 0;
+      let somaMulti = 0;
+      let nContagem = 0;
+      const porMedida = {};
+
+      all.forEach((p) => {
+        const q = parseNum(p.qtd);
+        if (q != null && q !== 0) com += 1;
+
+        if (viraKg(p)) {
+          const t = totalKg(p);
+          if (t != null) {
+            somaKg += t;
+            nKg += 1;
+          }
+          if (kgPorUn(p) !== 1 && q != null) {
+            nMulti += 1;
+            somaMulti += t || 0;
+          }
+        } else if (q != null) {
+          nContagem += 1;
+          const m = String(p.medida || "?").toUpperCase();
+          porMedida[m] = (porMedida[m] || 0) + q;
+        }
+      });
+
+      $("#statItens").textContent = String(all.length);
+      $("#statComQtdSub").textContent = `${com} com quantidade`;
+      $("#statTotalKg").textContent = formatNum(roundNum(somaKg));
+      $("#statTotalKgSub").textContent =
+        nKg === 0
+          ? "nenhum item em kg ainda"
+          : `${nKg} produtos somados em kg`;
+      $("#statMulti").textContent = String(nMulti);
+      $("#statMultiSub").textContent =
+        nMulti === 0
+          ? "nenhuma caixa/bag com fator"
+          : `somam ${formatNum(roundNum(somaMulti))} kg`;
+      $("#statContagem").textContent = String(nContagem);
+      const partes = Object.entries(porMedida)
+        .map(([m, v]) => `${formatNum(roundNum(v))} ${m}`)
+        .join(" · ");
+      $("#statContagemSub").textContent =
+        nContagem === 0 ? "UN / CX / PCT / LT (não somam kg)" : partes;
+    }
+
+    function toast(msg, warn) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.toggle("warn", !!warn);
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function adicionarProduto() {
+      const codigo = $("#newCodigo").value.trim();
+      const nome = $("#newNome").value.trim();
+      const medida = $("#newMedida").value;
+      let pesoUn = parseNum($("#newPeso").value);
+      if (!nome) {
+        toast("Digite o nome do produto", true);
+        return;
+      }
+      if (pesoUn == null || pesoUn < 0) pesoUn = inferPesoUn(nome);
+      const maxOrdem = state.produtos.reduce((m, p) => Math.max(m, p.ordem), -1);
+      state.produtos.push({
+        id: uid(),
+        codigo: codigo || String(maxOrdem + 2),
+        nome: nome.toUpperCase(),
+        medida,
+        qtd: "",
+        pesoUn: pesoUn || 1,
+        ordem: maxOrdem + 1,
+      });
+      $("#newCodigo").value = "";
+      $("#newNome").value = "";
+      $("#newPeso").value = String(inferPesoUn(nome) || 1);
+      save();
+      render();
+      toast("Produto adicionado");
+    }
+
+    function textoResumo() {
+      readMeta();
+      const linhas = [
+        `*Balanço Trevo — ${state.mes || "—"}*`,
+      ];
+      if (state.nome) linhas.push(`Nome: ${state.nome}`);
+      if (state.responsavel) linhas.push(`Responsável: ${state.responsavel}`);
+      if (state.contador) linhas.push(`Contador: ${state.contador}`);
+      linhas.push("");
+
+      const list = [...state.produtos].sort((a, b) => a.ordem - b.ordem);
+      let somaKg = 0;
+      list.forEach((p) => {
+        const q = parseNum(p.qtd);
+        if (q == null) {
+          linhas.push(`${p.codigo} ${p.nome} | ${p.medida} | —`);
+          return;
+        }
+        const w = kgPorUn(p);
+        if (viraKg(p)) {
+          const tot = totalKg(p);
+          somaKg += tot || 0;
+          if (w !== 1) {
+            linhas.push(
+              `${p.codigo} ${p.nome} | ${formatNum(q)} × ${formatNum(w)} kg = *${formatNum(tot)} kg*`
+            );
+          } else {
+            linhas.push(`${p.codigo} ${p.nome} | *${formatNum(tot)} kg*`);
+          }
+        } else {
+          linhas.push(`${p.codigo} ${p.nome} | ${formatNum(q)} ${p.medida}`);
+        }
+      });
+
+      linhas.push("");
+      linhas.push(`*Soma dos kilos: ${formatNum(roundNum(somaKg))} kg*`);
+      return linhas.join("\n");
+    }
+
+    async function copiar() {
+      const texto = textoResumo();
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = texto;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast("Resumo copiado!");
+      } catch {
+        toast("Não deu pra copiar", true);
+      }
+    }
+
+    function zerarQtds() {
+      if (!confirm("Zerar todas as quantidades? (pesos/un ficam iguais)")) return;
+      state.produtos.forEach((p) => {
+        p.qtd = "";
+      });
+      save();
+      render();
+      toast("Quantidades zeradas");
+    }
+
+    $("#tbody").addEventListener("input", (e) => {
+      const input = e.target.closest("input[data-f]");
+      if (!input) return;
+      const tr = input.closest("tr");
+      const p = findById(tr.dataset.id);
+      if (!p) return;
+      const f = input.dataset.f;
+      if (f === "codigo" || f === "nome") {
+        p[f] = input.value;
+      } else if (f === "qtd") {
+        p.qtd = input.value === "" ? "" : input.value;
+      } else if (f === "pesoUn") {
+        const n = parseNum(input.value);
+        p.pesoUn = n == null ? 0 : n;
+      }
+      const conta = tr.querySelector("[data-conta]");
+      const resultado = tr.querySelector("[data-resultado]");
+      if (conta) conta.innerHTML = htmlConta(p);
+      if (resultado) resultado.innerHTML = htmlResultado(p);
+      const qNum = parseNum(p.qtd);
+      tr.classList.toggle("zero", qNum === 0);
+      atualizarResumo();
+      save();
+    });
+
+    $("#tbody").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-del]");
+      if (!btn) return;
+      const tr = btn.closest("tr");
+      const p = findById(tr.dataset.id);
+      if (!p) return;
+      if (!confirm(`Remover ${p.codigo} ${p.nome}?`)) return;
+      state.produtos = state.produtos.filter((x) => x.id !== p.id);
+      save();
+      render();
+      toast("Removido");
+    });
+
+    $("#newNome").addEventListener("input", () => {
+      const sugerido = inferPesoUn($("#newNome").value);
+      if (document.activeElement !== $("#newPeso")) {
+        $("#newPeso").value = String(sugerido);
+      }
+    });
+
+    ["mes", "nome", "responsavel", "contador"].forEach((id) => {
+      $("#" + id).addEventListener("input", () => {
+        readMeta();
+        save();
+      });
+    });
+
+    $("#busca").addEventListener("input", render);
+    $("#btnAdd").addEventListener("click", adicionarProduto);
+    $("#newNome").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") adicionarProduto();
+    });
+    $("#btnCopy").addEventListener("click", copiar);
+    $("#btnClear").addEventListener("click", zerarQtds);
+    $("#btnPrint").addEventListener("click", () => window.print());
+
+    load();
+    syncMetaInputs();
+    render();
+  </script>
+</body>
+</html>

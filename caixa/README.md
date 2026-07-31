@@ -1,6 +1,10 @@
-# Caixa PDV
+# Caixa PDV (protótipo antigo)
 
-Sistema de **caixa e estoque** — produto separado do Fiado (caderno de vale).
+O teste novo de PDV está no projeto **CaixaDoBairro** (pasta irmã):
+
+`D:\Jogos\BCKPARENAS\Aqui\NexSales` — marca **CaixaDoBairro**; ver `SETUP-TESTE.md` lá.
+
+Esta pasta `trevoa-ai/caixa` ficou como protótipo; o **Fiado** em `../fiado` não muda.
 
 ## Links
 
