@@ -37,7 +37,7 @@
         radial-gradient(ellipse 120% 80% at 10% -20%, #c5e4d4 0%, transparent 55%),
         radial-gradient(ellipse 90% 60% at 100% 0%, #dceee4 0%, transparent 45%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-      padding: calc(0.9rem + var(--safe-top)) 0.85rem calc(1.25rem + var(--safe-bottom));
+      padding: calc(0.9rem + var(--safe-top)) 0.85rem calc(5.5rem + var(--safe-bottom));
     }
 
     .wrap {
@@ -366,10 +366,70 @@
       color: #f0faf5;
     }
 
+    .btn-deep {
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      box-shadow: 0 4px 16px rgba(11, 61, 46, 0.28);
+      width: 100%;
+    }
+
+    .relatorio {
+      margin-top: 1.25rem;
+      padding: 1rem 1.05rem;
+      background: rgba(11, 61, 46, 0.06);
+      border-radius: 0.9rem;
+      border: 1px dashed var(--line);
+    }
+
+    .relatorio h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--leaf);
+      margin-bottom: 0.65rem;
+    }
+
+    .relatorio pre {
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--ink);
+      max-height: 16rem;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .relatorio .hint-rel {
+      margin-top: 0.65rem;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+    }
+
+    .actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.65rem 0.85rem calc(0.75rem + var(--safe-bottom));
+      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.95) 28%, var(--bg-deep) 100%);
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .actions-inner {
+      width: 100%;
+      max-width: 28rem;
+    }
+
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(1.25rem + var(--safe-bottom));
+      bottom: calc(4.8rem + var(--safe-bottom));
       transform: translateX(-50%) translateY(0.5rem);
       background: var(--leaf-deep);
       color: #f0faf5;
@@ -399,7 +459,7 @@
 
     @media (min-width: 720px) {
       body { padding-left: 1.25rem; padding-right: 1.25rem; }
-      .wrap { max-width: 36rem; }
+      .wrap, .actions-inner { max-width: 36rem; }
       .brand { font-size: 1.85rem; }
     }
   </style>
@@ -444,6 +504,18 @@
     </details>
 
     <div class="lista" id="lista"></div>
+
+    <div class="relatorio">
+      <h2>Relatório pra folha</h2>
+      <pre id="preview"></pre>
+      <p class="hint-rel">Mesmo formato da folha. Copie e cole no WhatsApp pra ir passando os números.</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <button type="button" class="btn btn-deep" id="btnCopy">Copiar pro WhatsApp</button>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -742,6 +814,7 @@
       });
 
       $("#chipCount").textContent = String(list.length);
+      atualizarPreview();
     }
 
     function escapeHtml(s) {
@@ -755,6 +828,40 @@
       return state.produtos.find((p) => p.id === id);
     }
 
+    /** Número final pra anotar na folha (depois da multiplicação). */
+    function valorFolha(p) {
+      const q = parseNum(p.qtd);
+      if (q == null) return null;
+      if (viraKg(p)) return totalKg(p);
+      return q;
+    }
+
+    function textoWhatsApp() {
+      const list = [...state.produtos].sort((a, b) => a.ordem - b.ordem);
+      const linhas = ["*BALANÇO TREVO*", "Produto | Medida | Qtd", ""];
+
+      list.forEach((p) => {
+        const val = valorFolha(p);
+        const med = String(p.medida || "").toUpperCase();
+        if (val == null) {
+          linhas.push(`${p.codigo} ${p.nome} | ${med} |`);
+          return;
+        }
+        const num = formatNum(val);
+        if (med === "KG") {
+          linhas.push(`${p.codigo} ${p.nome} | KG | *${num} KG*`);
+        } else {
+          linhas.push(`${p.codigo} ${p.nome} | ${med} | *${num} ${med}*`);
+        }
+      });
+
+      return linhas.join("\n");
+    }
+
+    function atualizarPreview() {
+      $("#preview").textContent = textoWhatsApp();
+    }
+
     function toast(msg, warn) {
       const el = $("#toast");
       el.textContent = msg;
@@ -762,6 +869,27 @@
       el.classList.add("show");
       clearTimeout(toast._t);
       toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    async function copiar() {
+      const texto = textoWhatsApp();
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(texto);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = texto;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        toast("Copiado! Cole no WhatsApp");
+      } catch {
+        toast("Não deu pra copiar — selecione a prévia", true);
+      }
     }
 
     function adicionarProduto() {
@@ -812,6 +940,7 @@
       const qNum = parseNum(p.qtd);
       card.classList.toggle("zero", qNum === 0);
       save();
+      atualizarPreview();
     });
 
     $("#lista").addEventListener("click", (e) => {
@@ -839,6 +968,7 @@
     $("#newNome").addEventListener("keydown", (e) => {
       if (e.key === "Enter") adicionarProduto();
     });
+    $("#btnCopy").addEventListener("click", copiar);
 
     load();
     render();
