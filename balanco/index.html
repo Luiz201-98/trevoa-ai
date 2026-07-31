@@ -19,7 +19,6 @@
       --leaf-deep: #0b3d2e;
       --cream: #f7fbf8;
       --line: #b8d4c6;
-      --ok: #1a6b4a;
       --warn: #9a5b1a;
       --danger: #9b2e2e;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -27,6 +26,8 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; }
 
     body {
       min-height: 100dvh;
@@ -36,30 +37,19 @@
         radial-gradient(ellipse 120% 80% at 10% -20%, #c5e4d4 0%, transparent 55%),
         radial-gradient(ellipse 90% 60% at 100% 0%, #dceee4 0%, transparent 45%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-      padding: calc(1.1rem + var(--safe-top)) 1rem calc(5.5rem + var(--safe-bottom));
+      padding: calc(0.9rem + var(--safe-top)) 0.85rem calc(7.8rem + var(--safe-bottom));
     }
 
     .wrap {
-      max-width: 72rem;
+      max-width: 28rem;
       margin: 0 auto;
     }
 
-    header {
-      margin-bottom: 1.25rem;
-      animation: rise 0.4s ease-out both;
-    }
-
-    .brand-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.5rem 1rem;
-    }
+    header { margin-bottom: 0.85rem; animation: rise 0.4s ease-out both; }
 
     .brand {
       font-family: "Fraunces", Georgia, serif;
-      font-size: 1.85rem;
+      font-size: 1.65rem;
       font-weight: 700;
       color: var(--leaf-deep);
       letter-spacing: -0.02em;
@@ -69,210 +59,285 @@
     .brand span {
       font-weight: 600;
       color: var(--leaf);
-      font-size: 1.1rem;
-      margin-left: 0.35rem;
+      font-size: 1rem;
+      margin-left: 0.3rem;
     }
 
     .subtitle {
-      margin-top: 0.3rem;
-      font-size: 0.95rem;
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
       color: var(--ink-soft);
+      line-height: 1.35;
+    }
+
+    details.panel {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.85rem;
+      margin-bottom: 0.65rem;
+      overflow: hidden;
+    }
+
+    details.panel summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--leaf-deep);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    details.panel summary::-webkit-details-marker { display: none; }
+
+    details.panel summary::after {
+      content: "+";
+      float: right;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      line-height: 1;
+    }
+
+    details.panel[open] summary::after { content: "−"; }
+
+    details.panel .panel-body {
+      padding: 0 0.85rem 0.85rem;
+      border-top: 1px solid var(--line);
+      padding-top: 0.75rem;
     }
 
     .meta {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-      gap: 0.55rem 0.75rem;
-      margin-top: 1rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
     }
 
-    .meta label {
+    .meta label,
+    .toolbar label,
+    .field-label {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--ink-soft);
     }
 
-    .meta input {
+    .meta input,
+    .toolbar input,
+    .toolbar select,
+    .card input {
       font: inherit;
-      font-size: 0.98rem;
+      font-size: 1rem;
       font-weight: 500;
       text-transform: none;
       letter-spacing: 0;
       color: var(--ink);
-      background: var(--cream);
+      background: #eef7f2;
       border: 1.5px solid var(--line);
       border-radius: 0.65rem;
-      padding: 0.6rem 0.7rem;
+      padding: 0.7rem 0.7rem;
       width: 100%;
+      -webkit-appearance: none;
     }
 
     .meta input:focus,
     .toolbar input:focus,
     .toolbar select:focus,
-    td input:focus {
+    .card input:focus,
+    .filter-row input:focus {
       outline: 2px solid var(--leaf);
       outline-offset: 1px;
       border-color: var(--leaf);
+      background: #fff;
     }
 
     .toolbar {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
-      margin: 1rem 0 0.75rem;
-      align-items: end;
-      animation: rise 0.4s 0.05s ease-out both;
     }
 
-    .toolbar label {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--ink-soft);
-      flex: 1;
-      min-width: 6rem;
-    }
-
-    .toolbar input,
-    .toolbar select {
-      font: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      text-transform: none;
-      letter-spacing: 0;
-      color: var(--ink);
-      background: var(--cream);
-      border: 1.5px solid var(--line);
-      border-radius: 0.6rem;
-      padding: 0.55rem 0.65rem;
-      width: 100%;
-    }
-
-    .toolbar .grow { flex: 2; min-width: 10rem; }
+    .toolbar .grow { grid-column: 1 / -1; }
+    .toolbar .full { grid-column: 1 / -1; }
 
     .hint {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--ink-soft);
       line-height: 1.4;
-      margin-bottom: 0.75rem;
+      margin: 0.5rem 0 0.75rem;
     }
 
     .hint strong { color: var(--leaf-deep); font-weight: 700; }
 
-    .table-wrap {
-      overflow-x: auto;
-      border: 1.5px solid var(--line);
-      border-radius: 0.9rem;
-      background: var(--cream);
-      box-shadow: 0 8px 28px rgba(11, 61, 46, 0.08);
-      animation: rise 0.4s 0.1s ease-out both;
+    .exemplo {
+      display: none;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 58rem;
-    }
-
-    thead th {
+    .filter-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.7rem;
+      align-items: center;
       position: sticky;
-      top: 0;
-      z-index: 2;
-      background: var(--leaf-deep);
-      color: #f0faf5;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      text-align: left;
-      padding: 0.75rem 0.55rem;
-      white-space: nowrap;
+      top: calc(0.35rem + var(--safe-top));
+      z-index: 5;
+      padding: 0.35rem 0;
+      background: linear-gradient(180deg, var(--bg) 60%, transparent);
     }
 
-    thead th:first-child { border-radius: 0.75rem 0 0 0; padding-left: 0.8rem; }
-    thead th:last-child { border-radius: 0 0.75rem 0 0; padding-right: 0.8rem; }
-
-    tbody tr {
-      border-top: 1px solid var(--line);
-      transition: background 0.12s ease;
+    .filter-row input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 1rem;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      color: var(--ink);
+      box-shadow: 0 4px 14px rgba(11, 61, 46, 0.06);
     }
 
-    tbody tr:nth-child(even) { background: rgba(26, 107, 74, 0.04); }
-    tbody tr:hover { background: rgba(26, 107, 74, 0.09); }
-    tbody tr.zero { opacity: 0.55; }
-
-    td {
-      padding: 0.4rem 0.45rem;
-      vertical-align: middle;
-      font-size: 0.9rem;
-    }
-
-    td:first-child { padding-left: 0.75rem; color: var(--ink-soft); font-size: 0.78rem; font-weight: 600; }
-    td:last-child { padding-right: 0.65rem; }
-
-    .codigo {
+    .chip {
+      flex-shrink: 0;
+      font-size: 0.75rem;
       font-weight: 700;
       color: var(--leaf-deep);
-      font-variant-numeric: tabular-nums;
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 0.55rem 0.7rem;
       white-space: nowrap;
     }
 
-    .nome { font-weight: 600; line-height: 1.25; min-width: 12rem; }
+    .lista {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .card {
+      background: var(--cream);
+      border: 1.5px solid var(--line);
+      border-radius: 0.95rem;
+      padding: 0.85rem 0.9rem;
+      animation: rise 0.35s ease-out both;
+    }
+
+    .card.zero { opacity: 0.55; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .card-idx {
+      flex-shrink: 0;
+      width: 1.55rem;
+      height: 1.55rem;
+      display: grid;
+      place-items: center;
+      border-radius: 0.45rem;
+      background: rgba(26, 107, 74, 0.1);
+      color: var(--leaf);
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-top: 0.1rem;
+    }
+
+    .card-title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-code {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--leaf);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.1rem;
+    }
+
+    .card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--ink);
+      word-break: break-word;
+    }
 
     .medida {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 800;
       letter-spacing: 0.04em;
       color: var(--leaf);
       background: rgba(26, 107, 74, 0.12);
-      border-radius: 0.35rem;
-      padding: 0.2rem 0.4rem;
+      border-radius: 0.4rem;
+      padding: 0.3rem 0.45rem;
+      margin-top: 0.1rem;
     }
 
-    td input[type="number"],
-    td input[type="text"] {
-      width: 100%;
-      min-width: 4.2rem;
-      font: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--leaf-deep);
-      background: #eef7f2;
-      border: 1.5px solid var(--line);
+    .btn-icon {
+      flex-shrink: 0;
+      border: none;
+      background: rgba(155, 46, 46, 0.08);
+      color: var(--danger);
+      font-size: 1.15rem;
+      cursor: pointer;
+      width: 2rem;
+      height: 2rem;
       border-radius: 0.5rem;
-      padding: 0.4rem 0.45rem;
-      text-align: right;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+    }
+
+    .card input[type="number"] {
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-align: center;
+      color: var(--leaf-deep);
+      padding: 0.75rem 0.4rem;
+      min-height: 3rem;
       font-variant-numeric: tabular-nums;
       -moz-appearance: textfield;
     }
 
-    td input.nome-input,
-    td input.codigo-input {
-      text-align: left;
-      font-weight: 600;
-      min-width: 5rem;
-    }
-
-    td input[type="number"]::-webkit-outer-spin-button,
-    td input[type="number"]::-webkit-inner-spin-button {
+    .card input[type="number"]::-webkit-outer-spin-button,
+    .card input[type="number"]::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
 
+    .card-result {
+      margin-top: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem 0.7rem;
+      background: rgba(11, 61, 46, 0.06);
+      border-radius: 0.65rem;
+    }
+
     .conta-cell {
       font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-      font-size: 0.84rem;
+      font-size: 0.88rem;
       color: var(--ink-soft);
       font-weight: 600;
     }
@@ -287,14 +352,13 @@
       font-variant-numeric: tabular-nums;
       color: var(--leaf-deep);
       white-space: nowrap;
-      text-align: right;
-      min-width: 6.5rem;
+      font-size: 1.05rem;
     }
 
     .total-cell em {
       font-style: normal;
-      font-weight: 500;
-      font-size: 0.75rem;
+      font-weight: 600;
+      font-size: 0.78rem;
       color: var(--ink-soft);
       margin-left: 0.2rem;
     }
@@ -304,86 +368,29 @@
       font-weight: 700;
     }
 
-    .th-hint {
-      display: block;
-      font-size: 0.62rem;
-      font-weight: 500;
-      letter-spacing: 0;
-      text-transform: none;
-      opacity: 0.8;
-      margin-top: 0.15rem;
-    }
-
-    .stat.destaque {
-      border-color: var(--leaf);
-      background: linear-gradient(160deg, #f7fbf8 0%, #e5f3eb 100%);
-    }
-
-    .stat .sub {
-      margin-top: 0.2rem;
-      font-size: 0.78rem;
-      color: var(--ink-soft);
-      font-weight: 500;
-      line-height: 1.3;
-    }
-
-    .exemplo {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 1rem;
-      align-items: center;
-      background: rgba(11, 61, 46, 0.06);
-      border: 1px dashed var(--line);
-      border-radius: 0.75rem;
-      padding: 0.7rem 0.9rem;
-      margin-bottom: 0.85rem;
-      font-size: 0.86rem;
-      color: var(--ink-soft);
-      line-height: 1.35;
-    }
-
-    .exemplo strong { color: var(--leaf-deep); }
-
-    .exemplo .pill {
-      background: var(--leaf-deep);
-      color: #f0faf5;
-      font-weight: 700;
-      font-size: 0.8rem;
-      padding: 0.35rem 0.65rem;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    .btn-icon {
-      border: none;
-      background: transparent;
-      color: var(--ink-soft);
-      font-size: 1.05rem;
-      cursor: pointer;
-      padding: 0.25rem 0.4rem;
-      border-radius: 0.4rem;
-      line-height: 1;
-    }
-
-    .btn-icon:hover { background: rgba(155, 46, 46, 0.12); color: var(--danger); }
-
     .summary {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-      gap: 0.6rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
       margin-top: 1rem;
-      animation: rise 0.4s 0.15s ease-out both;
+      animation: rise 0.4s 0.1s ease-out both;
     }
 
     .stat {
       background: var(--cream);
       border: 1.5px solid var(--line);
       border-radius: 0.85rem;
-      padding: 0.85rem 1rem;
+      padding: 0.75rem 0.8rem;
+    }
+
+    .stat.destaque {
+      grid-column: 1 / -1;
+      border-color: var(--leaf);
+      background: linear-gradient(160deg, #f7fbf8 0%, #e5f3eb 100%);
     }
 
     .stat .label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -391,12 +398,20 @@
     }
 
     .stat .value {
-      margin-top: 0.25rem;
+      margin-top: 0.2rem;
       font-family: "Fraunces", Georgia, serif;
-      font-size: 1.45rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--leaf-deep);
       font-variant-numeric: tabular-nums;
+    }
+
+    .stat .sub {
+      margin-top: 0.15rem;
+      font-size: 0.74rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      line-height: 1.3;
     }
 
     .actions {
@@ -404,8 +419,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 0.65rem 1rem calc(0.75rem + var(--safe-bottom));
-      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.92) 28%, var(--bg-deep) 100%);
+      padding: 0.5rem 0.85rem calc(0.65rem + var(--safe-bottom));
+      background: linear-gradient(180deg, transparent 0%, rgba(212, 232, 220, 0.95) 22%, var(--bg-deep) 100%);
       display: flex;
       justify-content: center;
       z-index: 10;
@@ -413,22 +428,52 @@
 
     .actions-inner {
       width: 100%;
-      max-width: 72rem;
+      max-width: 28rem;
       display: grid;
-      grid-template-columns: 1fr 1fr 1.3fr;
-      gap: 0.5rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
     }
+
+    .bar-total {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--leaf-deep);
+      color: #f0faf5;
+      border-radius: 0.85rem;
+      padding: 0.65rem 0.9rem;
+      margin-bottom: 0.1rem;
+    }
+
+    .bar-total .lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+
+    .bar-total .val {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .actions-inner .btn-deep { grid-column: 1 / -1; }
 
     button.btn {
       font: inherit;
       font-weight: 700;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       border: none;
       border-radius: 0.85rem;
-      padding: 0.9rem 0.65rem;
+      padding: 0.85rem 0.55rem;
       cursor: pointer;
       transition: transform 0.12s ease;
       -webkit-tap-highlight-color: transparent;
+      min-height: 2.85rem;
     }
 
     button.btn:active { transform: scale(0.97); }
@@ -453,19 +498,20 @@
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(4.8rem + var(--safe-bottom));
+      bottom: calc(7rem + var(--safe-bottom));
       transform: translateX(-50%) translateY(0.5rem);
       background: var(--leaf-deep);
       color: #f0faf5;
       font-weight: 600;
-      font-size: 0.9rem;
-      padding: 0.7rem 1.15rem;
+      font-size: 0.88rem;
+      padding: 0.7rem 1.1rem;
       border-radius: 999px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.2s ease;
       z-index: 20;
-      white-space: nowrap;
+      max-width: calc(100vw - 2rem);
+      text-align: center;
     }
 
     .toast.show {
@@ -475,45 +521,39 @@
 
     .toast.warn { background: var(--warn); }
 
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-      align-items: center;
-    }
-
-    .filter-row input {
-      flex: 1;
-      min-width: 12rem;
-      font: inherit;
-      font-size: 0.95rem;
-      background: var(--cream);
-      border: 1.5px solid var(--line);
-      border-radius: 0.65rem;
-      padding: 0.6rem 0.75rem;
-      color: var(--ink);
-    }
-
-    .chip {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--ink-soft);
-      background: rgba(11, 61, 46, 0.06);
-      border-radius: 999px;
-      padding: 0.4rem 0.7rem;
-      white-space: nowrap;
-    }
-
     @keyframes rise {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 640px) {
-      .actions-inner { grid-template-columns: 1fr 1fr; }
-      .actions-inner .btn-deep { grid-column: 1 / -1; }
-      .brand { font-size: 1.55rem; }
+    @media (min-width: 720px) {
+      body { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .wrap, .actions-inner { max-width: 36rem; }
+      .exemplo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        align-items: center;
+        background: rgba(11, 61, 46, 0.06);
+        border: 1px dashed var(--line);
+        border-radius: 0.75rem;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.86rem;
+        color: var(--ink-soft);
+        line-height: 1.35;
+      }
+      .exemplo strong { color: var(--leaf-deep); }
+      .exemplo .pill {
+        background: var(--leaf-deep);
+        color: #f0faf5;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .brand { font-size: 1.85rem; }
     }
 
     @media print {
@@ -522,10 +562,8 @@
         padding: 0.5rem;
         color: #000;
       }
-      .toolbar, .actions, .toast, .filter-row, .btn-icon { display: none !important; }
-      .table-wrap { box-shadow: none; border-color: #ccc; }
-      thead th { background: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      tbody tr.zero { opacity: 1; }
+      .actions, .toast, .filter-row, .btn-icon, details.panel { display: none !important; }
+      .card { break-inside: avoid; opacity: 1 !important; }
       body { padding-bottom: 0; }
     }
   </style>
@@ -533,104 +571,93 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="brand-row">
-        <p class="brand">Trevo <span>Balanço</span></p>
-      </div>
-      <p class="subtitle">Contagem do mês — a conta de cada produto aparece na linha</p>
-      <div class="meta">
-        <label>Mês / período
-          <input type="text" id="mes" placeholder="Ex: JULHO/2026" autocomplete="off" />
-        </label>
-        <label>Nome
-          <input type="text" id="nome" placeholder="Loja / unidade" autocomplete="organization" />
-        </label>
-        <label>Responsável
-          <input type="text" id="responsavel" placeholder="Quem fechou" autocomplete="name" />
-        </label>
-        <label>Contador 1
-          <input type="text" id="contador" placeholder="Quem contou" autocomplete="name" />
-        </label>
-      </div>
+      <p class="brand">Trevo <span>Balanço</span></p>
+      <p class="subtitle">Contagem × kg/un = total · feito pro celular</p>
     </header>
+
+    <details class="panel">
+      <summary>Dados do balanço</summary>
+      <div class="panel-body">
+        <div class="meta">
+          <label>Mês / período
+            <input type="text" id="mes" placeholder="JULHO/2026" autocomplete="off" />
+          </label>
+          <label>Nome
+            <input type="text" id="nome" placeholder="Loja" autocomplete="organization" />
+          </label>
+          <label>Responsável
+            <input type="text" id="responsavel" placeholder="Quem fechou" autocomplete="name" />
+          </label>
+          <label>Contador 1
+            <input type="text" id="contador" placeholder="Quem contou" autocomplete="name" />
+          </label>
+        </div>
+      </div>
+    </details>
 
     <div class="exemplo">
       <span class="pill">Como funciona</span>
       <span>
         <strong>Contagem</strong> × <strong>kg de cada un</strong> =
         <strong>total em kg</strong>
-        &nbsp;·&nbsp; Ex.: Cupuaçu <strong>4</strong> caixas × <strong>5</strong> kg =
-        <strong>20 kg</strong>
+        · Ex.: Cupuaçu <strong>4</strong> × <strong>5</strong> = <strong>20 kg</strong>
       </span>
     </div>
-    <p class="hint">
-      Em produto por unidade (UN, CX, PCT, LT), deixe <strong>kg de cada un = 1</strong> —
-      aí só conta a quantidade (não entra na soma de kilos).
-      Se a unidade pesa (ex.: bag de 2 kg), mude o <strong>kg de cada un</strong>.
-    </p>
 
     <div class="filter-row">
-      <input type="search" id="busca" placeholder="Buscar código ou produto…" autocomplete="off" />
-      <span class="chip" id="chipCount">0 itens</span>
+      <input type="search" id="busca" placeholder="Buscar código ou produto…" autocomplete="off" enterkeyhint="search" />
+      <span class="chip" id="chipCount">0</span>
     </div>
 
-    <div class="toolbar" id="addForm">
-      <label style="flex:0.7;min-width:5rem">Código
-        <input type="text" id="newCodigo" placeholder="Ex: 999" inputmode="numeric" />
-      </label>
-      <label class="grow">Produto
-        <input type="text" id="newNome" placeholder="Nome do produto" />
-      </label>
-      <label style="flex:0.6;min-width:5rem">Medida
-        <select id="newMedida">
-          <option>KG</option>
-          <option>UN</option>
-          <option>PCT</option>
-          <option>CX</option>
-          <option>LT</option>
-        </select>
-      </label>
-      <label style="flex:0.7;min-width:5.5rem">Kg de cada un
-        <input type="number" id="newPeso" min="0" step="any" value="1" inputmode="decimal" />
-      </label>
-      <button type="button" class="btn btn-leaf" id="btnAdd" style="flex:0 0 auto;padding:0.55rem 1rem;align-self:end">+ Produto</button>
-    </div>
+    <details class="panel">
+      <summary>+ Adicionar produto</summary>
+      <div class="panel-body">
+        <div class="toolbar" id="addForm">
+          <label>Código
+            <input type="text" id="newCodigo" placeholder="Ex: 999" inputmode="numeric" />
+          </label>
+          <label>Medida
+            <select id="newMedida">
+              <option>KG</option>
+              <option>UN</option>
+              <option>PCT</option>
+              <option>CX</option>
+              <option>LT</option>
+            </select>
+          </label>
+          <label class="grow">Produto
+            <input type="text" id="newNome" placeholder="Nome do produto" />
+          </label>
+          <label>Kg de cada un
+            <input type="number" id="newPeso" min="0" step="any" value="1" inputmode="decimal" />
+          </label>
+          <button type="button" class="btn btn-leaf full" id="btnAdd">Adicionar na lista</button>
+        </div>
+        <p class="hint" style="margin-bottom:0">
+          UN/CX/PCT/LT com <strong>kg/un = 1</strong> só contam — não entram na soma de kilos.
+        </p>
+      </div>
+    </details>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Código</th>
-            <th>Produto</th>
-            <th>Medida</th>
-            <th>Contagem<span class="th-hint">quanto tem</span></th>
-            <th>Kg de cada un<span class="th-hint">fator · editável</span></th>
-            <th>Conta<span class="th-hint">contagem × kg/un</span></th>
-            <th>Resultado<span class="th-hint">soma em kg</span></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+    <div class="lista" id="lista"></div>
 
     <div class="summary">
       <div class="stat destaque">
         <div class="label">Soma dos kilos</div>
         <div class="value" id="statTotalKg">0</div>
-        <div class="sub" id="statTotalKgSub">só o que vira kg (qtd × kg/un)</div>
+        <div class="sub" id="statTotalKgSub">só o que vira kg</div>
       </div>
       <div class="stat">
         <div class="label">Com multiplicação</div>
         <div class="value" id="statMulti">0</div>
-        <div class="sub" id="statMultiSub">itens com kg/un diferente de 1</div>
+        <div class="sub" id="statMultiSub">fator ≠ 1</div>
       </div>
       <div class="stat">
         <div class="label">Só contagem</div>
         <div class="value" id="statContagem">0</div>
-        <div class="sub" id="statContagemSub">UN / CX / PCT / LT (não somam kg)</div>
+        <div class="sub" id="statContagemSub">UN / CX / PCT / LT</div>
       </div>
-      <div class="stat">
+      <div class="stat" style="grid-column:1/-1">
         <div class="label">Itens na lista</div>
         <div class="value" id="statItens">0</div>
         <div class="sub" id="statComQtdSub">0 com quantidade</div>
@@ -640,7 +667,11 @@
 
   <div class="actions">
     <div class="actions-inner">
-      <button type="button" class="btn btn-ghost" id="btnClear">Zerar qtds</button>
+      <div class="bar-total">
+        <span class="lbl">Soma kg</span>
+        <span class="val" id="barTotalKg">0</span>
+      </div>
+      <button type="button" class="btn btn-ghost" id="btnClear">Zerar</button>
       <button type="button" class="btn btn-leaf" id="btnPrint">Imprimir</button>
       <button type="button" class="btn btn-deep" id="btnCopy">Copiar resumo</button>
     </div>
@@ -929,29 +960,41 @@
 
     function render() {
       const list = filtrados();
-      const tbody = $("#tbody");
-      tbody.innerHTML = "";
+      const lista = $("#lista");
+      lista.innerHTML = "";
 
       list.forEach((p, idx) => {
         const qNum = parseNum(p.qtd);
-        const tr = document.createElement("tr");
-        if (qNum === 0) tr.classList.add("zero");
-        tr.dataset.id = p.id;
-        tr.innerHTML = `
-          <td>${idx + 1}</td>
-          <td><input class="codigo-input" data-f="codigo" type="text" value="${escapeAttr(p.codigo)}" /></td>
-          <td><input class="nome-input" data-f="nome" type="text" value="${escapeAttr(p.nome)}" /></td>
-          <td><span class="medida">${escapeHtml(p.medida)}</span></td>
-          <td><input data-f="qtd" type="number" inputmode="decimal" step="any" min="0" value="${p.qtd === "" || p.qtd == null ? "" : p.qtd}" placeholder="0" title="Contagem" /></td>
-          <td><input data-f="pesoUn" type="number" inputmode="decimal" step="any" min="0" value="${p.pesoUn}" title="Quantos kg tem cada unidade/caixa" /></td>
-          <td class="conta-cell" data-conta>${htmlConta(p)}</td>
-          <td data-resultado>${htmlResultado(p)}</td>
-          <td><button type="button" class="btn-icon" data-del title="Remover">×</button></td>
+        const card = document.createElement("article");
+        card.className = "card" + (qNum === 0 ? " zero" : "");
+        card.dataset.id = p.id;
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="card-idx">${idx + 1}</span>
+            <div class="card-title">
+              <div class="card-code">${escapeHtml(p.codigo)}</div>
+              <div class="card-name">${escapeHtml(p.nome)}</div>
+            </div>
+            <span class="medida">${escapeHtml(p.medida)}</span>
+            <button type="button" class="btn-icon" data-del title="Remover" aria-label="Remover">×</button>
+          </div>
+          <div class="card-fields">
+            <label class="field-label">Contagem
+              <input data-f="qtd" type="number" inputmode="decimal" step="any" min="0" value="${p.qtd === "" || p.qtd == null ? "" : p.qtd}" placeholder="0" />
+            </label>
+            <label class="field-label">Kg de cada un
+              <input data-f="pesoUn" type="number" inputmode="decimal" step="any" min="0" value="${p.pesoUn}" />
+            </label>
+          </div>
+          <div class="card-result">
+            <span class="conta-cell" data-conta>${htmlConta(p)}</span>
+            <span data-resultado>${htmlResultado(p)}</span>
+          </div>
         `;
-        tbody.appendChild(tr);
+        lista.appendChild(card);
       });
 
-      $("#chipCount").textContent = `${list.length} itens`;
+      $("#chipCount").textContent = String(list.length);
       atualizarResumo();
     }
 
@@ -1004,9 +1047,11 @@
         }
       });
 
+      const somaFmt = formatNum(roundNum(somaKg));
       $("#statItens").textContent = String(all.length);
       $("#statComQtdSub").textContent = `${com} com quantidade`;
-      $("#statTotalKg").textContent = formatNum(roundNum(somaKg));
+      $("#statTotalKg").textContent = somaFmt;
+      $("#barTotalKg").textContent = somaFmt;
       $("#statTotalKgSub").textContent =
         nKg === 0
           ? "nenhum item em kg ainda"
@@ -1021,7 +1066,7 @@
         .map(([m, v]) => `${formatNum(roundNum(v))} ${m}`)
         .join(" · ");
       $("#statContagemSub").textContent =
-        nContagem === 0 ? "UN / CX / PCT / LT (não somam kg)" : partes;
+        nContagem === 0 ? "UN / CX / PCT / LT" : partes;
     }
 
     function toast(msg, warn) {
@@ -1131,36 +1176,34 @@
       toast("Quantidades zeradas");
     }
 
-    $("#tbody").addEventListener("input", (e) => {
+    $("#lista").addEventListener("input", (e) => {
       const input = e.target.closest("input[data-f]");
       if (!input) return;
-      const tr = input.closest("tr");
-      const p = findById(tr.dataset.id);
+      const card = input.closest(".card");
+      const p = findById(card.dataset.id);
       if (!p) return;
       const f = input.dataset.f;
-      if (f === "codigo" || f === "nome") {
-        p[f] = input.value;
-      } else if (f === "qtd") {
+      if (f === "qtd") {
         p.qtd = input.value === "" ? "" : input.value;
       } else if (f === "pesoUn") {
         const n = parseNum(input.value);
         p.pesoUn = n == null ? 0 : n;
       }
-      const conta = tr.querySelector("[data-conta]");
-      const resultado = tr.querySelector("[data-resultado]");
+      const conta = card.querySelector("[data-conta]");
+      const resultado = card.querySelector("[data-resultado]");
       if (conta) conta.innerHTML = htmlConta(p);
       if (resultado) resultado.innerHTML = htmlResultado(p);
       const qNum = parseNum(p.qtd);
-      tr.classList.toggle("zero", qNum === 0);
+      card.classList.toggle("zero", qNum === 0);
       atualizarResumo();
       save();
     });
 
-    $("#tbody").addEventListener("click", (e) => {
+    $("#lista").addEventListener("click", (e) => {
       const btn = e.target.closest("[data-del]");
       if (!btn) return;
-      const tr = btn.closest("tr");
-      const p = findById(tr.dataset.id);
+      const card = btn.closest(".card");
+      const p = findById(card.dataset.id);
       if (!p) return;
       if (!confirm(`Remover ${p.codigo} ${p.nome}?`)) return;
       state.produtos = state.produtos.filter((x) => x.id !== p.id);
